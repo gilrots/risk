@@ -1,0 +1,74 @@
+{
+  "deborah": {
+    "port": 8080
+  },
+  "cols": {
+    "shorts": {
+      "Name": {
+        "key":"name"
+      },
+      "Short Value":  {
+        "key":"value",
+        "format": 2
+      },
+      "% Short": {
+        "key":"valuePer",
+        "format": 0
+      },
+      "Amount": {
+        "key":"amount"
+      },
+      "syn_diff": {
+        "key":"syn_diff",
+        "format": 1
+      }
+    },
+    "longs": {
+      "syn_diff": {
+        "key": "syn_diff",
+        "format": 1
+      },
+      "Amount": {
+        "key": "amount"
+      },
+      "% Longs": {
+        "key": "valuePer",
+        "format": 0
+      },
+      "Long Value": {
+        "key": "value",
+        "format": 2
+      },
+      "Name": {
+        "key": "name"
+      }
+    },
+    "risk": {
+      "Name": {
+        "key":"name"
+      },
+      "Value": {
+        "key":"value"
+      }
+    }
+  },
+  "riskTable": {
+    "total": {
+      "long": "Total Long",
+      "short": "Total Short"
+    },
+    "totalRisk": {
+      "long": "Total Long Risk",
+      "short": "Total Short Risk"
+    },
+    "maham": {
+      "long": "מחמ לונג",
+      "short": "מחמ שורט"
+    },
+    "risk": "RISK"
+  },
+  "ace": {
+    "token": "XXX",
+    "stockData": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=name,last,syn_diff,duration_bruto"
+  }
+}

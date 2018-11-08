@@ -1,0 +1,33 @@
+body {
+    margin: auto;
+}
+.react-grid-Container {
+    font-size: 0.8em;
+}
+
+.longs {
+    color: #3f9a28;
+    /*direction: rtl;*/
+}
+.shorts {
+    color: #9a0f07;
+}
+
+.react-grid-HeaderCell {
+    background: #f9f9f9;
+    padding: 0.2em 0 0 0 !important;
+    font-weight: 700;
+    text-align: center;
+    font-size: 0.8em;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+.react-grid-HeaderRow {
+    overflow-x: inherit !important;
+}
+
+@media (min-width: 1200px) {
+    .container.max {
+        max-width: 95%;
+    }
+}
