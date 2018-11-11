@@ -146,13 +146,18 @@ app.get('/api/getCols', (req, res) => {
   return res.send(config);
 });
 
-app.post('/gili', (req, res) => {
-    const stock = req.body;
+function setStock(stock){
     const id = Number(stock.securityID);
     console.log(id);
     fetch(config.ace.stockData.replace(config.ace.token, id))
         .then(res=> res.json())
-            .then(data => makeStockData(stock, data));
+        .then(data => makeStockData(stock, data))
+        .catch(e => console.log("Ace id offline!"));
+}
+
+app.post('/gili', (req, res) => {
+    const stock = req.body;
+    setStock(stock);
   }
 );
 
@@ -162,8 +167,5 @@ app.listen(port, () => console.log('Listening on port ' + port));
 setInterval(function () {
   const rand = Math.floor(Math.random() * mock.length);
   const stock = mock[rand];
-    const id = Number(stock.securityID);
-    fetch(config.ace.stockData.replace(config.ace.token, id))
-        .then(res=> res.json())
-            .then(data => makeStockData(stock, data));
+  setStock(stock);
 }, 1000);

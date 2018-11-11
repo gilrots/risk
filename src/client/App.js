@@ -8,12 +8,14 @@ import {
     NavbarBrand, NavLink, NavItem, UncontrolledDropdown,
     DropdownToggle, DropdownMenu, DropdownItem
 } from 'reactstrap';
+import TableMaker from "./components/table-maker/table-maker";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { longs: [], shorts: [], risk: [] };
+    this.state = { longs: [], shorts: [], risk: [], isDialogOpen: false, isNewTableOpen: false };
     this.config = {};
+    this.openNewTable = this.openNewTable.bind(this);
   }
 
   componentDidMount() {
@@ -23,7 +25,7 @@ export default class App extends Component {
       fetch('/api/getData')
         .then(res => res.json())
         .then((data) => {
-            console.log("app data", {data: data.riskTable});
+            //console.log("app data", {data: data.riskTable});
             app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData });
         });
     }, 1000);
@@ -39,24 +41,31 @@ export default class App extends Component {
       });
   }
 
+  openNewTable(){
+    this.setState({isDialogOpen: true, isNewTableOpen: true});
+  }
+
   render() {
-    const { longs, shorts, risk } = this.state;
+    const { longs, shorts, risk, isDialogOpen, isNewTableOpen } = this.state;
     const cols = this.config.cols || { longs:{}, shorts:{} };
 
     return (
         <Fragment>
-            <AppHeader />
+            {isDialogOpen && <div className="modalScreen" id="modalScreen">
+                {isNewTableOpen && <TableMaker/>}
+            </div>}
+            <AppHeader onNewTableClicked={this.openNewTable} />
             <main className="my-5 py-5">
                 <Container className="max">
                     <Row>
                         <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {risk && <StockViewer  className={'risk'} data={risk} cols={cols.risk}  id="risk"/>}
+                            {risk && <StockViewer  className="risk" data={risk} cols={cols.risk}  id="risk"/>}
                         </Col>
                         <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {longs && <StockViewer  className={'longs'} data={longs} cols={cols.longs} reverse={true}  id="longs"/>}
+                            {longs && <StockViewer  className="longs" data={longs} cols={cols.longs} reverse={true}  id="longs"/>}
                         </Col>
                         <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                            {shorts && <StockViewer className={'shorts'} data={shorts} cols={cols.shorts} id="shorts"/>}
+                            {shorts && <StockViewer className="shorts" data={shorts} cols={cols.shorts} id="shorts"/>}
                         </Col>
                     </Row>
                 </Container>

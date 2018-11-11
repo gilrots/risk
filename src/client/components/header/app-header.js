@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 const logo = require('../../assests/logo.jpg');
 
 import {
@@ -10,6 +11,22 @@ import {
 const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
 
 class AppHeader extends React.Component {
+    static propTypes = {
+        onNewTableClicked: PropTypes.func.isRequired
+    };
+
+    constructor(props, context) {
+        super(props, context)
+    }
+
+    newTable = (evt) => {
+        evt.preventDefault();
+        const delegate = this.props.onNewTableClicked;
+        if(delegate) {
+            delegate();
+        }
+    }
+
     render() {
         return (
             <header>
@@ -42,7 +59,7 @@ class AppHeader extends React.Component {
                                             <DropdownItem divider/>
                                             <DropdownItem>Table 1</DropdownItem>
                                             <DropdownItem>Table 2</DropdownItem>
-                                            <DropdownItem>Table 3</DropdownItem>
+                                            <DropdownItem onClick={e => this.newTable(e)}>Add Table</DropdownItem>
                                         </DropdownMenu>
                                     </UncontrolledDropdown>
 
