@@ -32,6 +32,12 @@ body {
     }
 }
 
+@media (min-width: 576px){
+      .modal-dialog.max {
+          max-width: 95%;
+      }
+}
+
 .modalScreen {
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */

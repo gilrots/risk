@@ -4,18 +4,23 @@ import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
 import {
-    Container, Row, Col, Form, Input, Button, Navbar, Nav,
-    NavbarBrand, NavLink, NavItem, UncontrolledDropdown,
-    DropdownToggle, DropdownMenu, DropdownItem
-} from 'reactstrap';
+    Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { longs: [], shorts: [], risk: [], isDialogOpen: false, isNewTableOpen: false, errors:{} };
-    this.config = {};
-    this.openNewTable = this.openNewTable.bind(this);
+    this.state = {
+        config: {},
+        longs: [],
+        shorts: [],
+        risk: [],
+        errors:{ace:false},
+        modal: {
+            isOpen: false,
+            newTable: false}
+    };
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
   componentDidMount() {
@@ -25,8 +30,6 @@ export default class App extends Component {
             fetch('/api/getData')
                 .then(res => res.json())
                 .then((data) => {
-                    //console.log("app data", {data: data.riskTable});
-                    app.config = config
                     app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData, errors: data.errors });
                 });
         }, config.deborah.updateInterval);
@@ -39,7 +42,7 @@ export default class App extends Component {
               .then(res => res.json())
               .then(config => {
                   //console.log(config);
-                  resolve(config);
+                  this.setState({config},()=>resolve(config));
               })
               .catch(error => {
                   console.log(error)
@@ -48,31 +51,45 @@ export default class App extends Component {
       });
   }
 
-  openNewTable(){
-    this.setState({isDialogOpen: true, isNewTableOpen: true});
+  toggleModal(title,component){
+    this.setState(state =>{
+        return state.modal.isOpen ? {modal: {isOpen: false, title: '', component: undefined}} : {
+            modal: {
+                isOpen: true,
+                title: title,
+                component: component
+            }
+        };
+    });
   }
 
   render() {
-    const { longs, shorts, risk, isDialogOpen, isNewTableOpen, errors } = this.state;
-    const cols = this.config.cols || { longs:{}, shorts:{} };
-
-    return (
+    const { config, longs, shorts, risk, modal, errors } = this.state;
+    const initialized = !_.isEmpty(config);
+    return ( initialized &&
         <Fragment>
-            {isDialogOpen && <div className="modalScreen" id="modalScreen">
-                {isNewTableOpen && <TableMaker/>}
-            </div>}
-            <AppHeader onNewTableClicked={this.openNewTable} ace={errors.ace} />
+            <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
+                <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
+                <ModalBody>
+                    {modal.component}
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.toggleModal}>Do Something</Button>{' '}
+                    <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
+                </ModalFooter>
+            </Modal>
+            <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)} config={config} ace={errors.ace} />
             <main className="my-5 py-5">
                 <Container className="max">
                     <Row>
                         <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {risk && <StockViewer  className="risk" data={risk} cols={cols.risk}  id="risk"/>}
+                            {risk && <StockViewer  className="risk" data={risk} cols={config.cols.risk} id="risk"/>}
                         </Col>
                         <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {longs && <StockViewer  className="longs" data={longs} cols={cols.longs} reverse={true}  id="longs"/>}
+                            {longs && <StockViewer  className="longs" data={longs} cols={config.cols.longs} id="longs"/>}
                         </Col>
                         <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                            {shorts && <StockViewer className="shorts" data={shorts} cols={cols.shorts} id="shorts"/>}
+                            {shorts && <StockViewer className="shorts" data={shorts} cols={config.cols.shorts} id="shorts"/>}
                         </Col>
                     </Row>
                 </Container>

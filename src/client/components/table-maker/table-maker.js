@@ -20,9 +20,7 @@ class TableMaker extends React.Component {
         this.state = {name:'New table', predicates:[]};
     }
     componentDidMount() {
-        fetch(config.api.getTableFilterData).then(res=> res.json()).then(json =>{
-
-        });
+        //fetch(config.api.getTableFilterData).then(res=> res.json()).then(json =>{});
         this.addPredicate(this.operators[1]);
     }
 
@@ -115,7 +113,7 @@ class TableMaker extends React.Component {
                             <div>Operator</div>
                             <ButtonGroup>
                                 { operators.map(operator => (
-                                    <Button color="primary" onClick={() => {this.setPredicateData(index,'operator',operator); this.addPredicate(operator)}} active={predicate.operator === operator}>{operator}</Button>
+                                    <Button color="primary" key={operator} onClick={() => {this.setPredicateData(index,'operator',operator); this.addPredicate(operator)}} active={predicate.operator === operator}>{operator}</Button>
                                 ))}
                             </ButtonGroup>
                         </Col>
