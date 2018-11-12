@@ -1,8 +1,13 @@
 import React, {Fragment} from 'react';
 import _ from 'lodash';
 import {Container, Row, Col, Input, DropdownMenu, DropdownItem, DropdownToggle,UncontrolledDropdown, ButtonGroup,Button} from "reactstrap";
+import PropTypes from "prop-types";
 
 class TableMaker extends React.Component {
+    static propTypes = {
+        config: PropTypes.object.isRequired,
+    };
+
     constructor(props, context) {
         super(props, context)
         this.setName = this.setName.bind(this);
@@ -15,6 +20,9 @@ class TableMaker extends React.Component {
         this.state = {name:'New table', predicates:[]};
     }
     componentDidMount() {
+        fetch(config.api.getTableFilterData).then(res=> res.json()).then(json =>{
+
+        });
         this.addPredicate(this.operators[1]);
     }
 

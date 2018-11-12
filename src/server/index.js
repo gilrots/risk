@@ -7,6 +7,9 @@ const config = require('../mocks/consts.json');
 const mock = _.values(data);
 const bodyParser = require('body-parser');
 const StocksDB = {
+    errors: {
+        ace: false
+    },
     riskTable: {
         // durationPerTotal: {
         //     long: 0,
@@ -39,6 +42,30 @@ const StocksDB = {
     shorts: {
         name:'short',
         data: {}
+    }
+};
+const TablesDB = {
+    tables: [{
+      name: "Position Report",
+      cols:  [{
+          name: '',
+          key: '',
+          arguments: {
+              bank: [],
+              ace: []
+          },
+          aggregations: [],
+          expression:'',
+          format: null,
+      }]
+    }],
+    generator:{
+        fields: {
+            risk:config.tableGenerator.fields,
+            ace: []
+        },
+        actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
+        operators: ['None', 'And', 'Or']
     }
 };
 
@@ -91,7 +118,7 @@ function updateStock(stock, fromStocks, toStocks = undefined) {
 }
 
 function updateStocksData(stockData) {
-    if(stockData.amount == 0) {
+    if(stockData.amount === 0) {
         updateStock(stockData,StocksDB.shorts);
         updateStock(stockData, StocksDB.longs);
     }
@@ -104,6 +131,7 @@ function updateStocksData(stockData) {
 }
 
 function makeStockData(stock, data) {
+    StocksDB.errors.ace = false;
     //console.log("stock data", {stock:stock,data:data});
     const amount = stock.StartDayQty + stock.FillQty;
     const value = amount * data.GetManyFieldsResult.Values[1];
@@ -137,12 +165,17 @@ function setRiskData() {
 app.use(express.static('dist'));
 app.use(bodyParser.json())
 
+app.get('/api/getTableFields', (req, res) => {
+    // console.log(StocksDB);
+    return res.send(StocksDB);
+});
+
 app.get('/api/getData', (req, res) => {
    // console.log(StocksDB);
     return res.send(StocksDB);
 });
 
-app.get('/api/getCols', (req, res) => {
+app.get('/api/getConfig', (req, res) => {
   return res.send(config);
 });
 
@@ -152,7 +185,7 @@ function setStock(stock){
     fetch(config.ace.stockData.replace(config.ace.token, id))
         .then(res=> res.json())
         .then(data => makeStockData(stock, data))
-        .catch(e => console.log("Ace id offline!"));
+        .catch(e => StocksDB.errors.ace = true);
 }
 
 app.post('/gili', (req, res) => {

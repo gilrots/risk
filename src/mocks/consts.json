@@ -1,6 +1,7 @@
 {
   "deborah": {
-    "port": 8080
+    "port": 8080,
+    "updateInterval": 1000
   },
   "cols": {
     "shorts": {
@@ -70,5 +71,8 @@
   "ace": {
     "token": "XXX",
     "stockData": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=name,last,syn_diff,duration_bruto"
+  },
+  "tableGenerator": {
+    "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"]
   }
 }

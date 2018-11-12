@@ -13,31 +13,38 @@ import TableMaker from "./components/table-maker/table-maker";
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { longs: [], shorts: [], risk: [], isDialogOpen: false, isNewTableOpen: false };
+    this.state = { longs: [], shorts: [], risk: [], isDialogOpen: false, isNewTableOpen: false, errors:{} };
     this.config = {};
     this.openNewTable = this.openNewTable.bind(this);
   }
 
   componentDidMount() {
     const app = this;
-    this.getConfig();
-    setInterval(function () {
-      fetch('/api/getData')
-        .then(res => res.json())
-        .then((data) => {
-            //console.log("app data", {data: data.riskTable});
-            app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData });
-        });
-    }, 1000);
+    this.getConfig().then(config => {
+        setInterval(() => {
+            fetch('/api/getData')
+                .then(res => res.json())
+                .then((data) => {
+                    //console.log("app data", {data: data.riskTable});
+                    app.config = config
+                    app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData, errors: data.errors });
+                });
+        }, config.deborah.updateInterval);
+    });
   }
 
   getConfig(){
-  const app = this;
-  fetch('/api/getCols')
-      .then(res => res.json())
-      .then((data) => {
-          //console.log(data);
-          this.config = data;
+      return new Promise((resolve, reject) => {
+          fetch('/api/getConfig')
+              .then(res => res.json())
+              .then(config => {
+                  //console.log(config);
+                  resolve(config);
+              })
+              .catch(error => {
+                  console.log(error)
+                  reject();
+              });
       });
   }
 
@@ -46,7 +53,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { longs, shorts, risk, isDialogOpen, isNewTableOpen } = this.state;
+    const { longs, shorts, risk, isDialogOpen, isNewTableOpen, errors } = this.state;
     const cols = this.config.cols || { longs:{}, shorts:{} };
 
     return (
@@ -54,7 +61,7 @@ export default class App extends Component {
             {isDialogOpen && <div className="modalScreen" id="modalScreen">
                 {isNewTableOpen && <TableMaker/>}
             </div>}
-            <AppHeader onNewTableClicked={this.openNewTable} />
+            <AppHeader onNewTableClicked={this.openNewTable} ace={errors.ace} />
             <main className="my-5 py-5">
                 <Container className="max">
                     <Row>

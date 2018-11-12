@@ -12,11 +12,20 @@ const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c
 
 class AppHeader extends React.Component {
     static propTypes = {
+        config: PropTypes.object.isRequired,
+        ace: PropTypes.bool.isRequired,
         onNewTableClicked: PropTypes.func.isRequired
     };
 
     constructor(props, context) {
         super(props, context)
+        this.state = {ace:false};
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.ace !== this.props.ace){
+            this.setState({ace:nextProps.ace});
+        }
     }
 
     newTable = (evt) => {
@@ -28,6 +37,8 @@ class AppHeader extends React.Component {
     }
 
     render() {
+        const {ace} = this.state;
+
         return (
             <header>
                 <Navbar fixed="top" color="light" light expand="xs" className="border-bottom border-gray bg-white"
@@ -50,6 +61,8 @@ class AppHeader extends React.Component {
                                     <NavItem className="d-flex align-items-center">
                                         <NavLink className="font-weight-bold" href="/">Intra</NavLink>
                                     </NavItem>
+
+                                    <Button color={ace ? 'danger' : 'success'}>Ace</Button>
 
                                     <UncontrolledDropdown className="d-flex align-items-center" nav inNavbar>
                                         <DropdownToggle className="font-weight-bold" nav caret>Tables</DropdownToggle>
