@@ -54,17 +54,15 @@ class StockViewer extends React.Component {
 
         const rows = sortDirection === 'NONE' ? this.state.originalRows.slice(0) : this.state.originalRows.sort(comparer);
         console.log('im sorting!',{sortColumn, sortDirection});
-
-        this.setState({rows });
+        //TODO: SORT this out - hihi
+        this.setState({rows },()=>{window.dispatchEvent(new Event('resize'))});
     };
 
     rowGetter = rowIdx => this.state.rows[rowIdx];
 
     render() {
-        window.dispatchEvent(new Event('resize'));
-
         const columns = this.createColumns();
-    const can = !_.isEmpty(columns);
+        const can = !_.isEmpty(columns);
         return (
             can && <ReactDataGrid
                 ref={this.sortRef}

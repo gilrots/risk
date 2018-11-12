@@ -62,8 +62,6 @@ class AppHeader extends React.Component {
                                         <NavLink className="font-weight-bold" href="/">Intra</NavLink>
                                     </NavItem>
 
-                                    <Button color={ace ? 'danger' : 'success'}>Ace</Button>
-
                                     <UncontrolledDropdown className="d-flex align-items-center" nav inNavbar>
                                         <DropdownToggle className="font-weight-bold" nav caret>Tables</DropdownToggle>
                                         <DropdownMenu right>
@@ -76,6 +74,7 @@ class AppHeader extends React.Component {
                                         </DropdownMenu>
                                     </UncontrolledDropdown>
 
+                                    <Button color={ace ? 'danger' : 'success'}>Ace</Button>
                                 </Nav>
                             </Col>
 

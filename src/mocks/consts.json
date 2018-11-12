@@ -1,5 +1,5 @@
 {
-  "deborah": {
+  "app": {
     "port": 8080,
     "updateInterval": 1000
   },

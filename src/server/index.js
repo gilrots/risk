@@ -194,7 +194,7 @@ app.post('/gili', (req, res) => {
   }
 );
 
-const port = config.deborah.port;
+const port = config.app.port;
 app.listen(port, () => console.log('Listening on port ' + port));
 
 setInterval(function () {

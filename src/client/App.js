@@ -32,7 +32,7 @@ export default class App extends Component {
                 .then((data) => {
                     app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData, errors: data.errors });
                 });
-        }, config.deborah.updateInterval);
+        }, config.app.updateInterval);
     });
   }
 
