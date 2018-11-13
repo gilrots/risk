@@ -69,8 +69,10 @@
     "risk": "RISK"
   },
   "ace": {
-    "token": "XXX",
-    "stockData": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=name,last,syn_diff,duration_bruto"
+    "idToken": "XXX",
+    "queries" :{
+      "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f="
+    }
   },
   "tableGenerator": {
     "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"]
