@@ -156,7 +156,7 @@ setInterval(function () {
   const rand = Math.floor(Math.random() * mock.length);
   const stock = mock[rand];
   Bank.updateStocksData(stock);
-}, 1000);
+}, 200);
 
 const app = express();
 app.use(express.static('dist'));

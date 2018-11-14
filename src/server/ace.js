@@ -25,11 +25,12 @@ function getFieldsQuery(fields) {
 }
 
 function getFieldValue(stockId, aceDB, queryResult, index) {
-    const val = queryResult.GetManyFieldsResult.Values[index];
+    let val = queryResult.GetManyFieldsResult.Values[index];
     if(val === errorField) {
         aceDB.errors.fieldsMissing[stockId] = true;
     }
-    return val;
+    const num = Number(val);
+    return Number.isNaN(num) ? val : num;
 }
 
 function setQueryId(id,query) {

@@ -8,35 +8,42 @@ class StockViewer extends React.Component {
     constructor(props, context) {
         super(props, context)
         this.sortRef = React.createRef();
-        let originalRows = this.props.data;
-        let rows = this.props.data.slice(0);
-        this.state = { originalRows, rows };
+        this.state = this.mapResult();
+        this.data = this.props.data.data;
         this.lastSort = {};
+    }
+
+    mapResult(){
+        let originalRows = this.props.data.dataKey ?
+            _.map(this.props.data.data, this.props.data.dataKey) :
+            this.props.data.data;
+        let rows = originalRows.slice(0);
+        return { originalRows, rows };
     }
 
     componentWillReceiveProps(nextProps) {
         // You don't have to do this check first, but it can help prevent an unneeded render
-        //if (nextProps.data !== this.state.originalRows) {
-            this.setState({ originalRows: nextProps.data, rows: nextProps.data.slice(0)});
+        if (nextProps.data !== this.data) {
+            this.data = nextProps.data;
+            this.setState(this.mapResult());
             if(this.sortRef.current && !_.isEmpty(this.lastSort))
             {
                 //this.sortRef.current;
                 this.sortRef.current.setState({sortColumn:this.lastSort.sortColumn, sortDirection:this.lastSort.sortDirection})
                 this.sortRef.current.handleSort(this.lastSort.sortColumn, this.lastSort.sortDirection);
             }
-        //}
+        }
     }
 
     createColumns() {
-        const cols = _.get(this,'props.cols',{});
-        const res =  _.keys(cols).map(header => ({
-            key: cols[header].key,
-            name: header.toUpperCase(),
-            sortable: cols[header].sortable || true,
+        let res =  this.props.data.cols.map(col => ({
+            key: col.key,
+            name: col.name,
+            sortable: true,
             resizable: true,
-            formatter: cols[header].format != undefined ? Formatters[cols[header].format] : undefined
+            formatter: col.format != undefined ? Formatters[col.format] : undefined
         }));
-        return res;
+        return this.props.reverse ? res.reverse() : res;
     }
 
     handleGridSort = (sortColumn, sortDirection) => {
@@ -52,6 +59,7 @@ class StockViewer extends React.Component {
             }
         };
 
+        //TODO: function clled when sort = none
         const rows = sortDirection === 'NONE' ? this.state.originalRows.slice(0) : this.state.originalRows.sort(comparer);
         console.log('im sorting!',{sortColumn, sortDirection});
         //TODO: SORT this out - hihi

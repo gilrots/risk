@@ -34,7 +34,7 @@ function getTable(tableId) {
 }
 
 function getAllAceData(resolve, reject, data) {
-
+    const t0 = new Date().getTime();
     const {table, bankDB,aceDB,aceQuery,ids} = data;
 
     const promises = _.map(ids, stockId =>
@@ -48,10 +48,12 @@ function getAllAceData(resolve, reject, data) {
         if(missingIds.length === 0 || data.tries > config.ace.tries) {
             try {
                 const result = Tables.calculateTable(table,bankDB,aceDB);
+                const t1 = new Date().getTime();
+                console.log(`Call to table took ${t1 - t0} milliseconds`);
                 resolve(result);
             }
             catch (e) {
-                resolve('err')
+                resolve(Tables.getResultFormat());
             }
         }
         else {

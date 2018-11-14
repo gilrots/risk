@@ -12,9 +12,7 @@ export default class App extends Component {
     super(props);
     this.state = {
         config: {},
-        longs: [],
-        shorts: [],
-        risk: [],
+        data:{},
         errors:{ace:false},
         modal: {
             isOpen: false,
@@ -28,10 +26,11 @@ export default class App extends Component {
     const app = this;
     this.getConfig().then(config => {
         setInterval(() => {
-            fetch('/api/getData')
+            fetch('/api/g')
                 .then(res => res.json())
                 .then((data) => {
-                    app.setState({ longs: _.values(data.longs.data), shorts: _.values(data.shorts.data), risk: data.riskData, errors: data.errors });
+                    console.log(data);
+                    app.setState({ data });
                 });
         }, config.app.updateInterval);
     });
@@ -68,8 +67,11 @@ export default class App extends Component {
   checkTable(){
       fetch('/api/g')
           .then(res => res.json())
-          .then(config => {
-              console.log(config);
+          .then(data => {
+              if(typeof data !== 'string') {
+                  this.setState({data});
+
+              }
           })
           .catch(error => {
               console.log(error)
@@ -77,9 +79,10 @@ export default class App extends Component {
   }
 
   render() {
-    const { config, longs, shorts, risk, modal, errors } = this.state;
-    const initialized = !_.isEmpty(config);
-    return ( initialized &&
+    const { config, data, modal, errors } = this.state;
+    const configInit = !_.isEmpty(config);
+    const dataInit = !_.isEmpty(data);
+    return (
         <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
@@ -91,23 +94,27 @@ export default class App extends Component {
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>
-            <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)} config={config} ace={errors.ace} />
-            <main className="my-5 py-5">
+            {configInit && <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)}>
                 <Button color="primary" onClick={this.checkTable}>Check Code</Button>{' '}
-                <Container className="max">
-                    <Row>
-                        <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {risk && <StockViewer  className="risk" data={risk} cols={config.cols.risk} id="risk"/>}
-                        </Col>
-                        <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                            {longs && <StockViewer  className="longs" data={longs} cols={config.cols.longs} id="longs"/>}
-                        </Col>
-                        <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                            {shorts && <StockViewer className="shorts" data={shorts} cols={config.cols.shorts} id="shorts"/>}
-                        </Col>
-                    </Row>
-                </Container>
-            </main>
+                <Button color={errors.ace ? 'danger' : 'success'}>Ace</Button>
+            </AppHeader>}
+            {dataInit && <Fragment>
+                <main className="my-5 py-5">
+                    <Container className="max">
+                        <Row>
+                            <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                                {<StockViewer  className="risk" data={data.risk} id="risk"/>}
+                            </Col>
+                            <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                                {<StockViewer  className="longs" data={data.long} id="longs" reverse/>}
+                            </Col>
+                            <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
+                                {<StockViewer className="shorts" data={data.short} id="shorts"/>}
+                            </Col>
+                        </Row>
+                    </Container>
+                </main>
+            </Fragment>}
         </Fragment>
     );
   }
