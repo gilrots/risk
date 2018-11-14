@@ -70,6 +70,8 @@
   },
   "ace": {
     "idToken": "XXX",
+    "error": "!error!",
+    "tries": 3,
     "queries" :{
       "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f="
     }

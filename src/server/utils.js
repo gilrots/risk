@@ -20,10 +20,30 @@ function treeForEach(obj, key, func, args) {
     else {
         func(obj, key, args);
     }
-
-
 }
 
-module.exports = {copy, treeForEach};
+
+function performance(func, name) {
+    const t0 = new Date().getTime();
+    func();
+    const t1 =  new Date().getTime();
+    console.log(`Call to ${name} took ${t1 - t0} milliseconds`);
+}
+
+async function doUntilSuccess(promise) {
+    let response;
+    do {
+        try {
+            response = await promise;
+        }
+        catch (e){
+            console.log(e);
+        }
+    } while (!response);
+
+    return response;
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess};
 
 

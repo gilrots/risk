@@ -5,7 +5,10 @@ const data = require('../mocks/mock-table.json');
 const config = require('../mocks/consts.json');
 const mock = _.values(data);
 const bodyParser = require('body-parser');
-const utils = require('./utils.js');
+const Bank = require('./bank-logic');
+const Tables = require('./tables-logic');
+const Logic = require('./data-logic');
+Tables.init();
 const StocksDB = {
     errors: {
         ace: false
@@ -44,176 +47,6 @@ const StocksDB = {
         data: {}
     }
 };
-
-const TablesDB = {
-    partition: ['long','short'],
-    replaceToken: '$$$',
-    tables: [{
-      name: "Position Report",
-      cols:  [
-      {
-          name: 'Name',
-          key: 'name',
-          arguments: {
-              bank: [],
-              ace: ['name']
-          },
-          aggregations: [],
-          expression:'{a:0}',
-      },
-      {
-          name: '$$$ Value',
-          key: 'value',
-          arguments: {
-              stock:[],
-              bank: [config.tableGenerator.fields[3],config.tableGenerator.fields[6]],
-              ace: ['last']
-          },
-          aggregations: [],
-          expression:'{a:0}*{b:0}*{b:1}',
-          format: 2,
-      },
-      {
-          name: '$$$ Value %',
-          key: 'valuePer',
-          arguments: {
-              stock:['value'],
-              bank: [],
-              ace: []
-          },
-          aggregations: [{key:'$$$_total_value', exp:'acc + {s:0}'}],
-          expression:'{s:0}/{ag:0}',
-          format: 0,
-      },
-      {
-          name: 'Amount',
-          key: 'amount',
-          arguments: {
-              stock: [],
-              bank: [config.tableGenerator.fields[3], config.tableGenerator.fields[6]],
-              ace: []
-          },
-          aggregations: [],
-          expression:'{b:0}*{b:1}'
-      },
-      {
-          name: 'Syn Diff',
-          key: 'syn_diff',
-          arguments: {
-              stock: [],
-              bank: [],
-              ace: ['syn_diff']
-          },
-          aggregations: [],
-          expression:'{b:0}*{b:1}',
-          format: 1
-      }],
-      risk:[
-          {
-              name: 'Total $$$',
-              key: 'total_$$$',
-              arguments: {
-                  stock:['value'],
-                  bank: [],
-                  ace: []
-              },
-              aggregations: [{key:'$$$_total_value', exp:'acc + {s:0}'}],
-              expression:'{ag:0}',
-          },
-          {
-              name: 'Total $$$ Risk',
-              key: 'total_$$$_risk',
-              arguments: {
-                  stock:['valuePer', 'value'],
-                  bank: [],
-                  ace: ['duration_bruto']
-              },
-              aggregations: [
-                  {key:'$$$_total_duration', exp:'acc + {a:0}'},
-                  {key:'$$$_total_duration_per', exp:'acc + ({s:0} * {a:0})'},
-                  {key:'$$$_total_value', exp:'acc + {s:1}'}],
-              expression:'({ag:0} * {ag:1}) / {ag:2}',
-          },
-          {
-              name: '$$$ Duration',
-              key: '$$$_duration',
-              arguments: {
-                  stock:['valuePer'],
-                  bank: [],
-                  ace: ['duration_bruto']
-              },
-              aggregations: [
-                  {key:'$$$_total_duration', exp:'acc + {a:0}'},
-                  {key:'$$$_total_duration_per', exp:'acc + ({s:0} * {a:0})'}],
-              expression:'{ag:0} * {ag:1}',
-          },
-          {
-              name: 'Risk',
-              key: 'risk',
-              arguments: {
-                  stock: [],
-                  bank: [],
-                  ace: []
-              },
-              aggregations: [
-                  {key:'long_total_value', exp:''},
-                  {key:'short_total_value', exp:''}],
-              expression:'{ag:0} / {ag:1}'
-          }
-      ],
-      calculated:{
-          cols:{
-              long:[],
-              short:[],
-              risk:[]
-          },
-          aceFields: [],
-          aggregations: {
-          }
-      }
-    }],
-    generator:{
-        fields: {
-            risk:config.tableGenerator.fields,
-            ace: []
-        },
-        actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
-        operators: ['None', 'And', 'Or']
-    }
-};
-
-
-function replaceToken(obj, key, args) {
-    const val = obj[key];
-    if (typeof val === 'string' && val.includes(args.token)) {
-        const replace = key === 'name' ? args.name : args.part;
-        obj[key] = val.replace(args.token, replace);
-    }
-}
-
-function parseTableColumns(table) {
-    const token = TablesDB.replaceToken;
-    const parts = TablesDB.partition;
-
-    //Sums (optimize) all ace fields required for the table
-    table.calculated.aceFields = _.uniq(_.reduce([...table.cols,...table.risk],(sum,col) => sum.concat(...col.arguments.ace),[]));
-
-    _.forEach(parts, part => {
-        const name = part.charAt(0).toUpperCase() + part.slice(1);
-        const data = {name, part, token};
-        table.calculated.cols[part] = utils.copy(table.cols);
-        table.calculated.cols.risk = table.calculated.cols.risk.concat(utils.copy(table.risk));
-
-        utils.treeForEach(table.calculated.cols, part, replaceToken, data);
-        utils.treeForEach(table.calculated.cols, 'risk', replaceToken, data);
-
-        //Sums (optimize) all aggregations value from al cols
-        _.forEach(_.uniq(_.reduce(table.calculated.cols[part],(sum,col) => sum.concat(_.map(col.aggregations,'key')),[])), key => table.calculated.aggregations[key] = undefined);
-        _.forEach(_.uniq(_.reduce(table.calculated.cols.risk,(sum,col) => sum.concat(_.map(col.aggregations,'key')),[])), key => table.calculated.aggregations[key] = undefined);
-    });
-}
-parseTableColumns(TablesDB.tables[0]);
-console.log(TablesDB.tables[0].calculated);
 
 function getSums(stocks,fields) {
     const res = {};
@@ -322,7 +155,7 @@ function setStock(bankData){
 setInterval(function () {
   const rand = Math.floor(Math.random() * mock.length);
   const stock = mock[rand];
-  setStock(stock);
+  Bank.updateStocksData(stock);
 }, 1000);
 
 const app = express();
@@ -330,7 +163,7 @@ app.use(express.static('dist'));
 app.use(bodyParser.json())
 
 const port = config.app.port;
-//app.listen(port, () => console.log('Listening on port ' + port));
+app.listen(port, () => console.log('Listening on port ' + port));
 
 app.post('/gili', (req, res) => {
         const stock = req.body;
@@ -338,9 +171,8 @@ app.post('/gili', (req, res) => {
     }
 );
 
-app.get('/api/getTableFields', (req, res) => {
-    // console.log(StocksDB);
-    return res.send(StocksDB);
+app.get('/api/g', (req, res) => {
+    Logic.getTable(0).then(result => res.send(result));
 });
 
 app.get('/api/getData', (req, res) => {

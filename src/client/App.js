@@ -21,6 +21,7 @@ export default class App extends Component {
             newTable: false}
     };
     this.toggleModal = this.toggleModal.bind(this);
+    this.checkTable = this.checkTable.bind(this);
   }
 
   componentDidMount() {
@@ -63,6 +64,18 @@ export default class App extends Component {
     });
   }
 
+
+  checkTable(){
+      fetch('/api/g')
+          .then(res => res.json())
+          .then(config => {
+              console.log(config);
+          })
+          .catch(error => {
+              console.log(error)
+          });
+  }
+
   render() {
     const { config, longs, shorts, risk, modal, errors } = this.state;
     const initialized = !_.isEmpty(config);
@@ -80,6 +93,7 @@ export default class App extends Component {
             </Modal>
             <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)} config={config} ace={errors.ace} />
             <main className="my-5 py-5">
+                <Button color="primary" onClick={this.checkTable}>Check Code</Button>{' '}
                 <Container className="max">
                     <Row>
                         <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
