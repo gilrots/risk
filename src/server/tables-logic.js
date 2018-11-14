@@ -1,4 +1,4 @@
-const config = require('../mocks/consts.json');
+const config = require('../mocks/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
 const Utils = require('./utils.js');
@@ -30,7 +30,7 @@ const DB = {
                     exp:'{a:0}*({b:0}+{b:1})',
                     arguments: {
                         stock:[],
-                        bank: [config.tableGenerator.fields[3],config.tableGenerator.fields[6]],
+                        bank: [config.bank.fields[3],config.bank.fields[6]],
                         ace: ['last']
                     },
                     aggregations: [],
@@ -58,7 +58,7 @@ const DB = {
                     exp:'{b:0}+{b:1}',
                     arguments: {
                         stock: [],
-                        bank: [config.tableGenerator.fields[3], config.tableGenerator.fields[6]],
+                        bank: [config.bank.fields[3], config.bank.fields[6]],
                         ace: []
                     },
                     aggregations: []
@@ -170,7 +170,7 @@ const DB = {
     }],
     generator:{
         fields: {
-            risk:config.tableGenerator.fields,
+            risk:config.bank.fields,
             ace: []
         },
         actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
@@ -302,14 +302,14 @@ function calculateTable(table, bankDB, aceDB) {
                     // these values may seem redundant but the eval func needs them
                     const {stock, ace, bank} = dat;
                     const val = eval(agg.exp);
-                    return Number.isNaN(val) ? acc : val;
+                    return Utils.getNumber(val,acc);
                 }, 0);
             });
             // now that aggregations values are computed, recalculate stock values that needed them
             _.forEach(result[type].data, dat => {
                     const {stock, ace, bank} = dat;
                     const val = eval(col.func.exp);
-                    dat.stock[col.key] = Number.isNaN(val) ? undefined : val;
+                    dat.stock[col.key] = Utils.getNumber(val,Number.NaN);
             });
         });
         //console.log(result[type].data);
@@ -326,7 +326,7 @@ function calculateTable(table, bankDB, aceDB) {
                     // these values may seem redundant but the eval func needs them
                     const {stock, ace, bank} = dat;
                     const val = eval(agg.exp);
-                    return Number.isNaN(val) ? acc : val;
+                    return Utils.getNumber(val,acc);
                 }, 0);
                 result.aggs[col.key] = aggResult;
                 result.aggs[agg.key] = aggResult;

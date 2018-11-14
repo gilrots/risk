@@ -1,0 +1,24 @@
+{
+  "server": {
+    "port": 8080,
+    "api": {
+      "bankPost":"/gili",
+      "getConfig":"/api/getConfig",
+      "getData":"/api/getData"
+    }
+  },
+  "app": {
+    "updateInterval": 5000
+  },
+  "bank": {
+    "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"]
+  },
+  "ace": {
+    "idToken": "XXX",
+    "error": "!error!",
+    "tries": 3,
+    "queries" :{
+      "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f="
+    }
+  }
+}

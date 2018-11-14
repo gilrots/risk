@@ -1,4 +1,4 @@
-const config = require('../mocks/consts.json');
+const config = require('../mocks/config.json');
 const Utils = require('./utils.js');
 const Ace = require('./ace');
 const _ = require('lodash');

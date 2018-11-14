@@ -3,8 +3,7 @@ import _ from 'lodash';
 import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
-import {
-    Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
+import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 
 export default class App extends Component {
@@ -19,14 +18,13 @@ export default class App extends Component {
             newTable: false}
     };
     this.toggleModal = this.toggleModal.bind(this);
-    this.checkTable = this.checkTable.bind(this);
   }
 
   componentDidMount() {
     const app = this;
     this.getConfig().then(config => {
         setInterval(() => {
-            fetch('/api/g')
+            fetch(config.server.api.getData)
                 .then(res => res.json())
                 .then((data) => {
                     console.log(data);
@@ -63,21 +61,6 @@ export default class App extends Component {
     });
   }
 
-
-  checkTable(){
-      fetch('/api/g')
-          .then(res => res.json())
-          .then(data => {
-              if(typeof data !== 'string') {
-                  this.setState({data});
-
-              }
-          })
-          .catch(error => {
-              console.log(error)
-          });
-  }
-
   render() {
     const { config, data, modal, errors } = this.state;
     const configInit = !_.isEmpty(config);
@@ -95,7 +78,6 @@ export default class App extends Component {
                 </ModalFooter>
             </Modal>
             {configInit && <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)}>
-                <Button color="primary" onClick={this.checkTable}>Check Code</Button>{' '}
                 <Button color={errors.ace ? 'danger' : 'success'}>Ace</Button>
             </AppHeader>}
             {dataInit && <Fragment>

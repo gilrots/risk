@@ -30,6 +30,11 @@ function performance(func, name) {
     console.log(`Call to ${name} took ${t1 - t0} milliseconds`);
 }
 
+function getNumber(val, fallback) {
+    const num = Number(val);
+    return Number.isNaN(num) ? fallback : num;
+}
+
 async function doUntilSuccess(promise) {
     let response;
     do {
@@ -44,6 +49,6 @@ async function doUntilSuccess(promise) {
     return response;
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess};
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber};
 
 

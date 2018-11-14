@@ -1,5 +1,5 @@
 const fetch = require("node-fetch");
-const config = require('../mocks/consts.json');
+const config = require('../mocks/config.json');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Ace = require('./ace');
@@ -28,7 +28,6 @@ function getTable(tableId) {
             console.log("No ace fields", {name:table.name})
             return;
         }
-
         getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids, tries:0});
     });
 }
@@ -36,7 +35,6 @@ function getTable(tableId) {
 function getAllAceData(resolve, reject, data) {
     const t0 = new Date().getTime();
     const {table, bankDB,aceDB,aceQuery,ids} = data;
-
     const promises = _.map(ids, stockId =>
         fetch(Ace.setQueryId(stockId, aceQuery))
             .then(res => res.json())
@@ -45,6 +43,7 @@ function getAllAceData(resolve, reject, data) {
 
     Promise.all(promises).then(() => {
         const missingIds = _.keys(aceDB.errors.fieldsMissing);
+        aceDB.errors.fieldsMissing = {};
         if(missingIds.length === 0 || data.tries > config.ace.tries) {
             try {
                 const result = Tables.calculateTable(table,bankDB,aceDB);
