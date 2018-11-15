@@ -70,6 +70,19 @@ function getAllAceData(resolve, reject, data) {
     });
 }
 
+function getTableMakerData() {
+    return new Promise(resolve => {
+        Ace.getAllSystemFields().then(result => {
+            if(result.length > 0){
+                resolve({ace:result, bank: Bank.getFields()});
+            }
+            else {
+                resolve([]);
+            }
+        })
+    });
+}
 
 
-module.exports = {getTable};
+
+module.exports = {getTable, getTableMakerData};

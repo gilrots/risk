@@ -4,7 +4,8 @@
     "api": {
       "bankPost":"/gili",
       "getConfig":"/api/getConfig",
-      "getData":"/api/getData"
+      "getData":"/api/getData",
+      "getTableMakerData":"/api/getTBMD"
     }
   },
   "app": {
@@ -22,7 +23,9 @@
     "error": "!error!",
     "tries": 3,
     "queries" :{
-      "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f="
+      "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=",
+      "aceFields": "http://localhost:4071/Aoc/Core/AocRT/getallfields?",
+      "aceFieldsData": "http://localhost:4071/Aoc/Core/AocRT/getmultifieldinfo?s="
     }
   }
 }

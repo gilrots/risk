@@ -32,6 +32,10 @@ app.get(config.server.api.getData, (req, res) => {
     Logic.getTable(tableId).then(result => res.send(result));
 });
 
+app.get(config.server.api.getTableMakerData, (req, res) => {
+    Logic.getTableMakerData().then(result => res.send(result));
+});
+
 app.get(config.server.api.getConfig, (req, res) => {
     return res.send(config);
 });

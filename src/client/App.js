@@ -17,7 +17,8 @@ export default class App extends Component {
         modal: {
             isOpen: false,
             newTable: false
-        }
+        },
+        tableMakerData: {}
     };
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
@@ -27,6 +28,10 @@ export default class App extends Component {
     const app = this;
     this.getConfig().then( () => {
         const {config, activeTable} = app.state;
+        fetch(config.server.api.getTableMakerData).then(res => res.json()).then(tableMakerData => {
+            app.setState({tableMakerData});
+            console.log(tableMakerData);
+        });
         app.getData(activeTable,() => {
             setInterval(() => {
                 const table = app.state.activeTable;
@@ -86,13 +91,21 @@ export default class App extends Component {
     });
   }
 
-    toggleTab(tab) {
-        if (this.state.activeTable !== tab) {
-            this.setState({
-                activeTable: tab
-            }, this.getData(tab));
-        }
+  toggleTab(tab) {
+    if (this.state.activeTable !== tab) {
+        this.setState({
+            activeTable: tab
+        }, this.getData(tab));
     }
+  }
+
+  newTable(tab) {
+    if (this.state.activeTable !== tab) {
+        this.setState({
+            activeTable: tab
+        }, this.getData(tab));
+    }
+  }
 
   render() {
     const { config, data, modal, activeTab } = this.state;
@@ -118,12 +131,17 @@ export default class App extends Component {
                     <Nav tabs>
                         { data.tables.map((table)=>{
                             return (<NavItem key={table.id}>
-                                <NavLink className={classnames({ active: activeTab === table.id })}
-                                         onClick={() => { this.toggleTab(table.id); }}>
-                                    {table.name}
-                                </NavLink>
-                            </NavItem>)
+                                        <NavLink className={classnames({ active: activeTab === table.id })}
+                                                 onClick={() => { this.toggleTab(table.id); }}>
+                                            {table.name}
+                                        </NavLink>
+                                    </NavItem>)
                         })}
+                        <NavItem>
+                            <NavLink>
+                                <Button color="primary" onClick={() => this.newTable()}>New tab</Button>
+                            </NavLink>
+                        </NavItem>
                     </Nav>
                     <TabContent activeTab={'0'}>
                         <TabPane tabId={'0'}>

@@ -1,5 +1,6 @@
 const config = require('../mocks/config.json');
 const Utils = require('./utils.js');
+const _ = require('lodash');
 
 const DB = {
     long: {},
@@ -20,24 +21,12 @@ function getId(stock) {
     return stock.securityID;
 }
 
-function getShorts() {
-    return DB.short;
-}
-
-function getLongs() {
-    return DB.long;
-}
-
-function getAllStocks() {
-    return DB.all;
-}
-
-function getAllStockIds() {
-    return DB.ids;
-}
-
 function getStock(stockId) {
     return DB.all[stockId];
+}
+
+function getFields() {
+    return _.map(config.bank.fields, field => ({id: field, name: field}));
 }
 
 function updateDB(stock, fromStocks, toStocks = undefined) {
@@ -72,4 +61,4 @@ function updateStocksData(bankData) {
     }
 }
 
-module.exports = {updateStocksData,getDBSnap,getShorts,getLongs,getAllStocks,getStock,getAllStockIds};
+module.exports = {updateStocksData,getDBSnap, getFields};

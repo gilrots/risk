@@ -49,6 +49,44 @@ async function doUntilSuccess(promise) {
     return response;
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber};
+function tryAtleast(resolve, reject, tries, maxTries, fallback, promiseFunc) {
+    new Promise(promiseFunc).then(result => {
+        if(result !== undefined) {
+            resolve(result);
+        }
+        else if(tries > maxTries) {
+            resolve(fallback);
+        }
+        else {
+            tryAtleast(resolve, reject, ++tries, maxTries, fallback, promiseFunc);
+        }
+    }).catch(e => {
+        //reject(e);
+        console.log(e);
+    });
+}
+
+function divideUrl(urlParams, maxCharsPerSegment, separator) {
+    const res = [];
+    res.push([]);
+    let index = 0;
+    let currLength = 0;
+    const sepLeng = separator.length;
+    _.forEach(urlParams, param => {
+        if((currLength + param.length) <= maxCharsPerSegment) {
+            currLength += (param.length + sepLeng);
+            res[index].push(param);
+        }
+        else {
+            index++;
+            res.push([]);
+            res[index].push(param);
+            currLength = param.length + sepLeng;
+        }
+    });
+    return res;
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl};
 
 
