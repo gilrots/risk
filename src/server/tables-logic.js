@@ -8,7 +8,8 @@ const DB = {
     subTypes: ['risk'],
     replaceToken: '$$$',
     tables: [{
-        name: "Position Report",
+        id: config.app.defaultTable.id,
+        name: config.app.defaultTable.name,
         cols:  [
             {
                 name: 'Name',
@@ -100,7 +101,7 @@ const DB = {
                 type: '$$$',
                 order: 1,
                 func:{
-                    exp:'({t:0} * {t:1}) / {t:2}',
+                    exp:'({t:1} / {t:0}) * {t:2}',
                     arguments: {
                         stock:['valuePer', 'value'],
                         bank: [],
@@ -118,7 +119,7 @@ const DB = {
                 type: '$$$',
                 order: 2,
                 func:{
-                    exp:'{t:0} * {t:1}',
+                    exp:'{t:1} / {t:0}',
                     arguments: {
                         stock:['valuePer'],
                         bank: [],
@@ -258,6 +259,8 @@ function getResultFormat() {
         long:{cols:[], data:[], dataKey:'stock'},
         risk:{cols:[], data:[]},
         aggs:[],
+        tables: _.map(DB.tables, table => ({id: table.id, name:table.name})),
+        errors: {}
     };
 }
 
@@ -265,6 +268,7 @@ function calculateTable(table, bankDB, aceDB) {
     const result = getResultFormat();
     //console.log(table.calculated.aggregations)
     result.aggs = Utils.copy(table.calculated.aggregations);
+    result.errors = aceDB.errors;
     _.forEach(DB.types, type => {
         const aggs = [];
         // set presentation columns
@@ -345,8 +349,8 @@ function init() {
     _.forEach(DB.tables, parseTable);
 }
 
-function GetTable(tableIndex){
-    return DB.tables[tableIndex];
+function GetTable(tableId){
+    return _.find(DB.tables, table => tableId === table.id);
 }
 
 module.exports = {init, GetTable, calculateTable, formatAceData, getResultFormat};

@@ -3,35 +3,58 @@ import _ from 'lodash';
 import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
-import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader} from 'reactstrap';
+import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader, NavItem, Nav, TabContent, TabPane, NavLink } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
+import classnames from 'classnames';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
         config: {},
-        data:{},
-        errors:{ace:false},
+        data: {},
+        activeTable: '0',
         modal: {
             isOpen: false,
-            newTable: false}
+            newTable: false
+        }
     };
     this.toggleModal = this.toggleModal.bind(this);
+    this.toggleTab = this.toggleTab.bind(this);
   }
 
   componentDidMount() {
     const app = this;
-    this.getConfig().then(config => {
-        setInterval(() => {
-            fetch(config.server.api.getData)
-                .then(res => res.json())
-                .then((data) => {
-                    console.log(data);
-                    app.setState({ data });
-                });
-        }, config.app.updateInterval);
+    this.getConfig().then( () => {
+        const {config, activeTable} = app.state;
+        app.getData(activeTable,() => {
+            setInterval(() => {
+                const table = app.state.activeTable;
+                app.getData(table);
+            }, config.app.updateInterval);
+        });
     });
+  }
+
+  setUrl(link,params){
+      const url = link + "?";///new URL(link);
+      const keys = Object.keys(params);
+      return _.reduce(keys,(acc,key,index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1)? '' : '&'}`), url);
+  }
+
+  getData(tableId, callback) {
+      const app = this;
+      const {config} = this.state;
+      const  url = this.setUrl(config.server.api.getData, {tableId});
+      fetch(url)
+          .then(res => res.json())
+          .then((data) => {
+              console.log(data);
+              app.setState({ data });
+              if(callback) {
+                  callback();
+              }
+          });
   }
 
   getConfig(){
@@ -39,11 +62,13 @@ export default class App extends Component {
           fetch('/api/getConfig')
               .then(res => res.json())
               .then(config => {
-                  //console.log(config);
-                  this.setState({config},()=>resolve(config));
+
+                  console.log(config);
+                  const activeTable = config.app.defaultTable.id;
+                  this.setState({config,activeTable},() => resolve());
               })
               .catch(error => {
-                  console.log(error)
+                  console.log(error);
                   reject();
               });
       });
@@ -61,8 +86,16 @@ export default class App extends Component {
     });
   }
 
+    toggleTab(tab) {
+        if (this.state.activeTable !== tab) {
+            this.setState({
+                activeTable: tab
+            }, this.getData(tab));
+        }
+    }
+
   render() {
-    const { config, data, modal, errors } = this.state;
+    const { config, data, modal, activeTab } = this.state;
     const configInit = !_.isEmpty(config);
     const dataInit = !_.isEmpty(data);
     return (
@@ -78,23 +111,37 @@ export default class App extends Component {
                 </ModalFooter>
             </Modal>
             {configInit && <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)}>
-                <Button color={errors.ace ? 'danger' : 'success'}>Ace</Button>
+                {dataInit && <Button color={data.errors.ace ? 'danger' : 'success'}>Ace</Button>}
             </AppHeader>}
             {dataInit && <Fragment>
                 <main className="my-5 py-5">
-                    <Container className="max">
-                        <Row>
-                            <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                {<StockViewer  className="risk" data={data.risk} id="risk"/>}
-                            </Col>
-                            <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                {<StockViewer  className="longs" data={data.long} id="longs" reverse/>}
-                            </Col>
-                            <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                                {<StockViewer className="shorts" data={data.short} id="shorts"/>}
-                            </Col>
-                        </Row>
-                    </Container>
+                    <Nav tabs>
+                        { data.tables.map((table)=>{
+                            return (<NavItem key={table.id}>
+                                <NavLink className={classnames({ active: activeTab === table.id })}
+                                         onClick={() => { this.toggleTab(table.id); }}>
+                                    {table.name}
+                                </NavLink>
+                            </NavItem>)
+                        })}
+                    </Nav>
+                    <TabContent activeTab={'0'}>
+                        <TabPane tabId={'0'}>
+                            <Container className="max">
+                                <Row>
+                                    <Col xs={{ order: 1 }} md={{ size: 2 }} className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                                        {<StockViewer  className="risk" data={data.risk} id="risk"/>}
+                                    </Col>
+                                    <Col xs={{ order: 2 }} md={{ size: 5 }} className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                                        {<StockViewer  className="longs" data={data.long} id="longs" reverse/>}
+                                    </Col>
+                                    <Col xs={{ order: 3 }} md={{ size: 5 }} className="shorts py-5 mb-5 py-md-0 mb-md-0">
+                                        {<StockViewer className="shorts" data={data.short} id="shorts"/>}
+                                    </Col>
+                                </Row>
+                            </Container>
+                        </TabPane>
+                    </TabContent>
                 </main>
             </Fragment>}
         </Fragment>

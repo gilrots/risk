@@ -8,7 +8,11 @@
     }
   },
   "app": {
-    "updateInterval": 5000
+    "updateInterval": 5000,
+    "defaultTable": {
+      "name": "Position Report",
+      "id": "-999"
+    }
   },
   "bank": {
     "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"]

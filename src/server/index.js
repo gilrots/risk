@@ -28,7 +28,8 @@ app.listen(port, () => console.log(`Server is up on port: ${port}`));
 app.post(config.server.api.bankPost, (req, res) => Bank.updateStocksData(req.body));
 
 app.get(config.server.api.getData, (req, res) => {
-    Logic.getTable(0).then(result => res.send(result));
+    const tableId = req.query.tableId;
+    Logic.getTable(tableId).then(result => res.send(result));
 });
 
 app.get(config.server.api.getConfig, (req, res) => {

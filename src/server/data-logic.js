@@ -22,13 +22,17 @@ function getTable(tableId) {
         const table =  Tables.GetTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
-        const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
         let ids = bankDB.ids;
-        if(table.calculated.aceFields.length === 0){
-            console.log("No ace fields", {name:table.name})
-            return;
+        if(table === undefined) {
+            console.log("No such table id:", {tableId});
         }
-        getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids, tries:0});
+        else if(table.calculated.aceFields.length === 0){
+            console.log("No ace fields", {name:table.name})
+        }
+        else {
+            const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
+            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids, tries:0});
+        }
     });
 }
 
@@ -52,7 +56,10 @@ function getAllAceData(resolve, reject, data) {
                 resolve(result);
             }
             catch (e) {
-                resolve(Tables.getResultFormat());
+                const error = Tables.getResultFormat();
+                error.errors.ace = true;
+                error.errors.errors = [e];
+                resolve(error);
             }
         }
         else {
