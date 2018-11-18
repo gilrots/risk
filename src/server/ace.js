@@ -89,7 +89,7 @@ function getAllSystemFields() {
                             const promises = _.map(urls, urlParams => fetch(getFieldsDataQuery(urlParams)).then(res => res.json()));
                             Promise.all(promises).then(res => {
                                 const allFieldsData = _.reduce(res, (acc,curr) => acc.concat(curr.GetMultiFieldInfoResult),[]);
-                                DB.allFields = _.map(allFieldsData, fd => ({id: fd['Symbol'], name: fd['Name']}));
+                                DB.allFields = _.uniqBy(_.map(allFieldsData, fd => ({id: fd['Symbol'], name: fd['Name']})), 'id');
                                 innerResolve(DB.allFields);
                             })
                         }

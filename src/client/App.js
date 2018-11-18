@@ -20,6 +20,7 @@ export default class App extends Component {
         },
         tableMakerData: {}
     };
+    this.polling = true;
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
   }
@@ -34,8 +35,10 @@ export default class App extends Component {
         });
         app.getData(activeTable,() => {
             setInterval(() => {
-                const table = app.state.activeTable;
-                app.getData(table);
+                if(app.polling) {
+                    const table = app.state.activeTable;
+                    app.getData(table);
+                }
             }, config.app.updateInterval);
         });
     });
@@ -80,7 +83,7 @@ export default class App extends Component {
   }
 
   toggleModal(title,component){
-    this.setState(state =>{
+    this.setState(state => {
         return state.modal.isOpen ? {modal: {isOpen: false, title: '', component: undefined}} : {
             modal: {
                 isOpen: true,
@@ -88,7 +91,7 @@ export default class App extends Component {
                 component: component
             }
         };
-    });
+    }, () => {this.polling = !this.state.modal.isOpen});
   }
 
   toggleTab(tab) {
@@ -108,8 +111,9 @@ export default class App extends Component {
   }
 
   render() {
-    const { config, data, modal, activeTab } = this.state;
+    const { config, data, modal, tableMakerData, activeTable } = this.state;
     const configInit = !_.isEmpty(config);
+    const tableInit = !_.isEmpty(tableMakerData);
     const dataInit = !_.isEmpty(data);
     return (
         <Fragment>
@@ -123,7 +127,7 @@ export default class App extends Component {
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>
-            {configInit && <AppHeader onNewTableClicked={() => this.toggleModal('Create new table', <TableMaker config={config}/>)}>
+            {configInit && <AppHeader>
                 {dataInit && <Button color={data.errors.ace ? 'danger' : 'success'}>Ace</Button>}
             </AppHeader>}
             {dataInit && <Fragment>
@@ -131,17 +135,19 @@ export default class App extends Component {
                     <Nav tabs>
                         { data.tables.map((table)=>{
                             return (<NavItem key={table.id}>
-                                        <NavLink className={classnames({ active: activeTab === table.id })}
+                                        <NavLink className={classnames({ active: activeTable === table.id })}
                                                  onClick={() => { this.toggleTab(table.id); }}>
                                             {table.name}
                                         </NavLink>
                                     </NavItem>)
                         })}
-                        <NavItem>
+                        {tableInit &&  <NavItem>
                             <NavLink>
-                                <Button color="primary" onClick={() => this.newTable()}>New tab</Button>
+                                <Button color="primary" onClick={() => this.toggleModal('Create new table', <TableMaker id="table-maker" config={config} fields={tableMakerData}/>)}>
+                                    <i className="fa fa-plus"></i>
+                                </Button>
                             </NavLink>
-                        </NavItem>
+                        </NavItem>}
                     </Nav>
                     <TabContent activeTab={'0'}>
                         <TabPane tabId={'0'}>

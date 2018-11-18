@@ -5,7 +5,8 @@
       "bankPost":"/gili",
       "getConfig":"/api/getConfig",
       "getData":"/api/getData",
-      "getTableMakerData":"/api/getTBMD"
+      "getTableMakerData":"/api/getTBMD",
+      "createTable":"/api/createTable"
     }
   },
   "app": {

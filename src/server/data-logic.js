@@ -83,6 +83,10 @@ function getTableMakerData() {
     });
 }
 
+function createTable(cols) {
+
+}
+
 
 
 module.exports = {getTable, getTableMakerData};
