@@ -58,7 +58,12 @@ function getAllAceData(resolve, reject, data) {
             catch (e) {
                 const error = Tables.getResultFormat();
                 error.errors.ace = true;
-                error.errors.errors = [e];
+                if( error.errors.errors) {
+                    error.errors.errors.push(e.message);
+                }
+                else {
+                    error.errors.errors = [e.message];
+                }
                 resolve(error);
             }
         }
@@ -82,11 +87,5 @@ function getTableMakerData() {
         })
     });
 }
-
-function createTable(cols) {
-
-}
-
-
 
 module.exports = {getTable, getTableMakerData};

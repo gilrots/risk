@@ -27,6 +27,8 @@ app.listen(port, () => console.log(`Server is up on port: ${port}`));
 
 app.post(config.server.api.bankPost, (req, res) => Bank.updateStocksData(req.body));
 
+app.post(config.server.api.createTable, (req, res) => Tables.createTable(req.body));
+
 app.get(config.server.api.getData, (req, res) => {
     const tableId = req.query.tableId;
     Logic.getTable(tableId).then(result => res.send(result));

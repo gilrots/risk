@@ -15,6 +15,7 @@ class TableMaker extends React.Component {
         this.addCol = this.addCol.bind(this);
         this.deleteCol = this.deleteCol.bind(this);
         this.setColData = this.setColData.bind(this);
+        this.createTable = this.createTable.bind(this);
         this.state = {name:'', cols:[], risk:[] , selectedColIndex:0 };
         this.defaultParam = {source: "ace", item: this.props.fields.ace.find(x=>x.id = "Symbol")};
         this.defaultAgg = {key: '', exp: ''};
@@ -39,11 +40,8 @@ class TableMaker extends React.Component {
         let assignVal = value;
         if(secIndex !== undefined) {
             const arr = this.state.cols[colIndex][colField];
-            console.log("dd",arr);
             assignVal = arr.map((val, index) => (index === secIndex ? (secField !== undefined ? Object.assign({}, val, {[secField]:value}): value) : val));
         }
-
-        //console.log("pred change:",{"pred:":this.state.predicates[0],"index:":predicateIndex,"field:":predicateField,"value:":value});
 
         this.setState(pervState => ({
             cols: pervState.cols.map((col, index) => (index === colIndex ? Object.assign({}, col, {[colField]:assignVal}) : col))
@@ -77,13 +75,20 @@ class TableMaker extends React.Component {
     }
 
     createTable(){
-        //fetch(config.server.api.createTable)
+        fetch(this.props.config.server.api.createTable, {
+            method: 'POST', // or 'PUT'
+            body: JSON.stringify(this.state), // data can be `string` or {object}!
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        }).then(res => res.json())
+            .then(response => console.log('Success:', JSON.stringify(response)))
+            .catch(error => console.error('Error:', error));
     }
 
     render() {
         const {name, cols, selectedColIndex} = this.state;
         const col = cols[selectedColIndex];
-        console.log('ddd');
         if(col === undefined)
             return ('');
 
@@ -102,8 +107,12 @@ class TableMaker extends React.Component {
             <Container>
                 <Row className="my-2">
                     <Col>
-                        Name
-                        <Input value={name} placeholder="New Table..." onChange={e => this.setName(e.target.value)}/>
+                        <InputGroup>
+                            <InputGroupAddon addonType="prepend">
+                                <InputGroupText>Table's name</InputGroupText>
+                            </InputGroupAddon>
+                            <Input value={name} placeholder="New Table..." onChange={e => this.setName(e.target.value)}/>
+                        </InputGroup>
                     </Col>
                 </Row>
                 <Row className="my-2">
@@ -124,7 +133,12 @@ class TableMaker extends React.Component {
                         <Container>
                             <Row className="my-3">
                                 <Col>
-                                    <Input value={col.name} placeholder="Column Name" onChange={e => this.setColData(index,'name',e.target.value)}/>
+                                    <InputGroup>
+                                        <InputGroupAddon addonType="prepend">
+                                            <InputGroupText>Column's name</InputGroupText>
+                                        </InputGroupAddon>
+                                        <Input value={col.name} placeholder="New Column..." onChange={e => this.setColData(index,'name',e.target.value)}/>
+                                    </InputGroup>
                                 </Col>
                             </Row>
                             <Row className="my-1">
@@ -153,7 +167,8 @@ class TableMaker extends React.Component {
                                         </ButtonGroup>
                                     </Col>
                                     <Col>
-                                        <SearchDropdown items={getItems(param.source, col.name)} selected={param.item} onSelected={item => this.setColData(index, 'params', item, parIndex,'item')}/>
+                                        <SearchDropdown id="items-dropdown" items={getItems(param.source, col.name)} selected={param.item}
+                                                        onSelected={item => this.setColData(index, 'params', item, parIndex,'item')}/>
                                     </Col>
                                     <Col xs="auto" className="align-self-center">
                                         <Button color="danger" className="hover-item" disabled={col.params.length < 2}
@@ -209,6 +224,11 @@ class TableMaker extends React.Component {
                                 </Col>
                             </Row>
                         </Container>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Button color="primary" onClick={this.createTable}>Create</Button>{' '}
                     </Col>
                 </Row>
             </Container>

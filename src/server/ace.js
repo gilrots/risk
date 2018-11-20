@@ -85,7 +85,6 @@ function getAllSystemFields() {
                         }
                         else {
                             const urls = Utils.divideUrl(fieldsResult.GetAllFieldsResult, 1000, ',');
-                            console.log("urls", {t:urls.length, 0:urls[0].toString().length,1:urls[1].toString().length,2:urls[2].toString().length});
                             const promises = _.map(urls, urlParams => fetch(getFieldsDataQuery(urlParams)).then(res => res.json()));
                             Promise.all(promises).then(res => {
                                 const allFieldsData = _.reduce(res, (acc,curr) => acc.concat(curr.GetMultiFieldInfoResult),[]);

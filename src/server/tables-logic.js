@@ -147,28 +147,28 @@ const DB = {
                         {key:'short_total_risk', exp:''}],
                 }
             }
-        ],
-        riskCols:[
-            {
-                name: 'Name',
-                key: 'name',
-            },
-            {
-                name: 'Value',
-                key: 'value',
-            },
-        ],
-        calculated:{
-            cols:{
-                long:[],
-                short:[],
-                risk:[]
-            },
-            aceFields: [],
-            aggregations: {
-            }
-        }
+        ]
     }],
+    riskCols:[
+        {
+            name: 'Name',
+            key: 'name',
+        },
+        {
+            name: 'Value',
+            key: 'value',
+        },
+    ],
+    calculated:{
+        cols:{
+            long:[],
+            short:[],
+            risk:[]
+        },
+        aceFields: [],
+        aggregations: {
+        }
+    },
     generator:{
         fields: {
             risk:config.bank.fields,
@@ -191,7 +191,7 @@ function replaceToken(obj, key, args) {
     const val = obj[key];
     if (typeof val === 'string' && val.includes(args.token)) {
         const replace = key === 'name' ? args.name : args.part;
-        obj[key] = val.replace(args.token, replace);
+        obj[key] = Utils.replaceAll(val, args.token, replace);
     }
 }
 
@@ -211,7 +211,7 @@ function setExpressions(obj, key, argsMap) {
                 const source = argsMap[groups[1]];
                 const property = argsMap.args[source] ? argsMap.args[source][groups[2]] : argsMap.aggs[groups[2]].key;
                 const parsedExp = `${source}.${property}`;
-                return res.replace(match, parsedExp);
+                return Utils.replaceAll(res, match, parsedExp);
             }, val);
         }
     }
@@ -228,7 +228,8 @@ function formatAceData(stockId, aceDB, aceData, aceFields) {
 
 function parseTable(table) {
     const token = DB.replaceToken;
-
+    table.riskCols = Utils.copy(DB.riskCols);
+    table.calculated = Utils.copy(DB.calculated);
     //Sums (optimize) all ace fields required for the table
     table.calculated.aceFields = _.uniq(_.reduce([...table.cols,...table.risk],(sum,col) => sum.concat(...col.func.arguments.ace),[]));
 
@@ -345,6 +346,51 @@ function calculateTable(table, bankDB, aceDB) {
     return result;
 }
 
+
+function createTable(data) {
+  const formatKey = name => Utils.replaceAll(name.toLowerCase(),' ', '_');
+  const parseExpression = (exp,argsMap) => _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
+  const generatetId = (ids) => {
+      let id = Math.floor(Math.random() * 100000).toString();
+      while (ids[id]){
+          id = Math.floor(Math.random() * 100000).toString();
+      }
+      return id;
+  };
+  const newTable = {
+      name: data.name,
+      id: generatetId(_.map(DB.tables,tab => ({[tab.id]:true,}))),
+      cols: _.map(data.cols, col => {
+          const calc = _.reduce(col.params,(acc, param, index) => {
+              if(param.source === 'stock') {
+                  param.item.id = Utils.replaceAll(formatKey(param.item.id),DB.replaceToken,'')
+              }
+              acc.arguments[param.source].push(param.item.id)
+              acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
+              return acc;
+          },{arguments:{stock: [], bank: [], ace: []},argsMap:{}, aggregations:[]});
+
+          _.forEach(col.aggregations, (agg, index) => {
+              calc.argsMap[`Y${index}`] = `{t:${index}}`;
+              calc.aggregations.push({ key:formatKey(agg.key), exp: `acc ${parseExpression(agg.exp,calc.argsMap)}`})
+          });
+          return {
+              name: col.name,
+              key: Utils.replaceAll(formatKey(col.name),DB.replaceToken,''),
+              func:{
+                  exp: parseExpression(col.exp,calc.argsMap),
+                  arguments: calc.arguments,
+                  aggregations: calc.aggregations
+              },
+              format: col.format
+          };}),
+      risk: []
+  };
+  parseTable(newTable);
+  console.log();
+  DB.tables.push(newTable);
+}
+
 function init() {
     _.forEach(DB.tables, parseTable);
 }
@@ -353,4 +399,4 @@ function GetTable(tableId){
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-module.exports = {init, GetTable, calculateTable, formatAceData, getResultFormat};
+module.exports = {init, GetTable, calculateTable, formatAceData, getResultFormat, createTable};

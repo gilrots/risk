@@ -53,8 +53,9 @@ class SearchDropdown extends React.Component {
     selectionChanged(item) {
         if(!this.state.selected || item.id !== this.state.selected.id) {
             this.setState({selected:item},()=>{
-                if(this.onSelected) {
-                    this.onSelected(item);
+                const delegate = this.props.onSelected;
+                if(delegate) {
+                    delegate(item);
                 }
             })
         }

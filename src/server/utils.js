@@ -87,6 +87,16 @@ function divideUrl(urlParams, maxCharsPerSegment, separator) {
     return res;
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl};
+function escapeRegExp(str) {
+    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(str,search,replace) {
+    const res= str.replace(new RegExp(escapeRegExp(search), 'gi'), replace);
+    console.log('replace', {str,search,replace, res});
+    return res;
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl,replaceAll};
 
 

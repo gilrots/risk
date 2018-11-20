@@ -91,7 +91,10 @@ export default class App extends Component {
                 component: component
             }
         };
-    }, () => {this.polling = !this.state.modal.isOpen});
+    }, () => {
+        this.polling = !this.state.modal.isOpen
+
+    });
   }
 
   toggleTab(tab) {
@@ -115,12 +118,21 @@ export default class App extends Component {
     const configInit = !_.isEmpty(config);
     const tableInit = !_.isEmpty(tableMakerData);
     const dataInit = !_.isEmpty(data);
+    const modalComponent = (component) => {
+        switch(component) {
+            case 'TableMaker':
+                return (<TableMaker id="table-maker"  config={config} fields={tableMakerData}/>);
+            default:
+                return (<div>---</div>);
+        }
+    }
+
     return (
         <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
                 <ModalBody>
-                    {modal.component}
+                    {modalComponent(modal.component)}
                 </ModalBody>
                 <ModalFooter>
                     <Button color="primary" onClick={this.toggleModal}>Do Something</Button>{' '}
@@ -130,7 +142,8 @@ export default class App extends Component {
             {configInit && <AppHeader>
                 {dataInit && <Button color={data.errors.ace ? 'danger' : 'success'}>Ace</Button>}
             </AppHeader>}
-            {dataInit && <Fragment>
+            {dataInit &&
+            <Fragment>
                 <main className="my-5 py-5">
                     <Nav tabs>
                         { data.tables.map((table)=>{
@@ -141,9 +154,10 @@ export default class App extends Component {
                                         </NavLink>
                                     </NavItem>)
                         })}
-                        {tableInit &&  <NavItem>
+                        {configInit && tableInit &&
+                        <NavItem>
                             <NavLink>
-                                <Button color="primary" onClick={() => this.toggleModal('Create new table', <TableMaker id="table-maker" config={config} fields={tableMakerData}/>)}>
+                                <Button color="primary" onClick={() => this.toggleModal('Create new table', 'TableMaker')}>
                                     <i className="fa fa-plus"></i>
                                 </Button>
                             </NavLink>
