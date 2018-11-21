@@ -1,5 +1,5 @@
 const config = require('../mocks/config.json');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 const _ = require('lodash');
 
 const DB = {

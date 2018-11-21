@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const fetch =  require("node-fetch");
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -92,11 +93,29 @@ function escapeRegExp(str) {
 }
 
 function replaceAll(str,search,replace) {
-    const res= str.replace(new RegExp(escapeRegExp(search), 'gi'), replace);
-    console.log('replace', {str,search,replace, res});
-    return res;
+    return str.replace(new RegExp(escapeRegExp(search), 'gi'), replace);
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl,replaceAll};
+function setUrl(link,params){
+    const url = link + "?";///new URL(link);
+    const keys = Object.keys(params);
+    return _.reduce(keys,(acc,key,index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1)? '' : '&'}`), url);
+}
+
+function fetchJson(url, params){
+    let link = params ? setUrl(url,params) : url;
+    return fetch(link).then(res => res.json())
+}
+
+function postJson(url, object){
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(object),
+        headers:{
+            'Content-Type': 'application/json'
+        }}).then(res => res.json());
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson};
 
 

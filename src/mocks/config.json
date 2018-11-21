@@ -6,7 +6,15 @@
       "getConfig":"/api/getConfig",
       "getData":"/api/getData",
       "getTableMakerData":"/api/getTBMD",
-      "createTable":"/api/createTable"
+      "createTable":"/api/createTable",
+      "tableAction":{
+        "url": "/api/tableAction",
+        "actions":{
+          "copy":"copy",
+          "get":"get",
+          "remove":"remove"
+        }
+      }
     }
   },
   "app": {

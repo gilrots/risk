@@ -30,26 +30,6 @@ class AppHeader extends React.Component {
                                                  style={{width: 36}}/>
                                         </NavLink>
                                     </NavItem>
-
-                                    <NavItem className="d-flex align-items-center">
-                                        <NavLink className="font-weight-bold" href="/">Position Report</NavLink>
-                                    </NavItem>
-
-                                    <NavItem className="d-flex align-items-center">
-                                        <NavLink className="font-weight-bold" href="/">Intra</NavLink>
-                                    </NavItem>
-
-                                    <UncontrolledDropdown className="d-flex align-items-center" nav inNavbar>
-                                        <DropdownToggle className="font-weight-bold" nav caret>Tables</DropdownToggle>
-                                        <DropdownMenu right>
-                                            <DropdownItem className="font-weight-bold text-secondary text-uppercase"
-                                                          header disabled>Search tables</DropdownItem>
-                                            <DropdownItem divider/>
-                                            <DropdownItem>Table 1</DropdownItem>
-                                            <DropdownItem>Table 2</DropdownItem>
-                                        </DropdownMenu>
-                                    </UncontrolledDropdown>
-
                                     {this.props.children}
                                 </Nav>
                             </Col>
@@ -63,7 +43,6 @@ class AppHeader extends React.Component {
                             <Col className="d-none d-lg-flex justify-content-end">
                                 <Form inline>
                                     <Input type="search" className="mr-3" placeholder="Search bonds"/>
-                                    <Button type="submit" color="info" outline>Search</Button>
                                 </Form>
                             </Col>
 

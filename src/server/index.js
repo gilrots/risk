@@ -38,6 +38,10 @@ app.get(config.server.api.getTableMakerData, (req, res) => {
     Logic.getTableMakerData().then(result => res.send(result));
 });
 
+app.get(config.server.api.tableAction.url, (req, res) => {
+    Logic.tableAction(req.query).then(result => res.send(result));
+});
+
 app.get(config.server.api.getConfig, (req, res) => {
     return res.send(config);
 });

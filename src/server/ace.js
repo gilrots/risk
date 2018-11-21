@@ -1,6 +1,6 @@
 const config = require('../mocks/config.json');
 const fetch = require("node-fetch");
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 const _ = require('lodash');
 
 const idToken = config.ace.idToken;
@@ -49,31 +49,6 @@ function setQueryId(id,query) {
     return query.replace(idToken, Number(id))
 }
 
-function getAllSystemFields2() {
-    return new Promise((resolve, reject) => {
-        if (DB.allFields.length === 0) {
-            fetch(config.ace.queries.aceFields)
-                .then(fieldsResult => {
-                    console.log("fff", {query: config.ace.queries.aceFields, fieldsResult});
-                    if (fieldsResult === undefined || fieldsResult.GetAllFieldsResult === errorField){
-                        reject([]);//throw 'ace returned no fields!'
-                    }
-                    else {
-                        fetch(getFieldsDataQuery(fieldsResult))
-                            .then(fieldsData => {
-                                DB.allFields = _.map(fieldsData, fd => ({id:fd['Symbol'], name:fd['Name']}));
-                                resolve( DB.allFields);
-                        })
-                    }
-                })
-        }
-        else {
-            resolve(DB.allFields);
-        }
-    });
-}
-
-
 function getAllSystemFields() {
     return new Promise((resolve, reject) => {
         if (DB.allFields.length === 0) {
@@ -101,4 +76,12 @@ function getAllSystemFields() {
     });
 }
 
-module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields };
+function getFieldName(fieldId) {
+    if(DB.allFields.length === 0) {
+        return fieldId;
+    }
+    const aceField = _.find(DB.allFields, field => field.id === fieldId);
+    return aceField ? aceField.name : fieldId;
+}
+
+module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName };

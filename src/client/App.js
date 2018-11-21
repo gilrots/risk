@@ -6,6 +6,7 @@ import AppHeader from "./components/header/app-header";
 import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader, NavItem, Nav, TabContent, TabPane, NavLink } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 import classnames from 'classnames';
+import * as Utils from '../common/utils';
 
 export default class App extends Component {
   constructor(props) {
@@ -18,20 +19,23 @@ export default class App extends Component {
             isOpen: false,
             newTable: false
         },
-        tableMakerData: {}
+        tableMakerData: {},
+        editedTable: {}
     };
     this.polling = true;
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleTab = this.toggleTab.bind(this);
+    this.tableAction = this.tableAction.bind(this);
   }
 
   componentDidMount() {
     const app = this;
     this.getConfig().then( () => {
         const {config, activeTable} = app.state;
-        fetch(config.server.api.getTableMakerData).then(res => res.json()).then(tableMakerData => {
-            app.setState({tableMakerData});
-            console.log(tableMakerData);
+        Utils.fetchJson(config.server.api.getTableMakerData)
+            .then(tableMakerData => {
+                app.setState({tableMakerData});
+                console.log(tableMakerData);
         });
         app.getData(activeTable,() => {
             setInterval(() => {
@@ -44,18 +48,9 @@ export default class App extends Component {
     });
   }
 
-  setUrl(link,params){
-      const url = link + "?";///new URL(link);
-      const keys = Object.keys(params);
-      return _.reduce(keys,(acc,key,index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1)? '' : '&'}`), url);
-  }
-
   getData(tableId, callback) {
       const app = this;
-      const {config} = this.state;
-      const  url = this.setUrl(config.server.api.getData, {tableId});
-      fetch(url)
-          .then(res => res.json())
+      Utils.fetchJson(this.state.config.server.api.getData,{tableId})
           .then((data) => {
               console.log(data);
               app.setState({ data });
@@ -67,10 +62,8 @@ export default class App extends Component {
 
   getConfig(){
       return new Promise((resolve, reject) => {
-          fetch('/api/getConfig')
-              .then(res => res.json())
+          Utils.fetchJson('/api/getConfig')
               .then(config => {
-
                   console.log(config);
                   const activeTable = config.app.defaultTable.id;
                   this.setState({config,activeTable},() => resolve());
@@ -105,23 +98,25 @@ export default class App extends Component {
     }
   }
 
-  newTable(tab) {
-    if (this.state.activeTable !== tab) {
-        this.setState({
-            activeTable: tab
-        }, this.getData(tab));
-    }
+  tableAction(url,tableId, action){
+        Utils.fetchJson(url,{tableId, action})
+            .then(response => {
+                if(typeof response !== 'string' && response.id !== ''){
+                    this.setState({editedTable:response, activeTable: response.id});
+                    this.toggleModal(action,'TableMaker');
+                }
+            });
   }
 
   render() {
-    const { config, data, modal, tableMakerData, activeTable } = this.state;
+    const { config, data, modal, tableMakerData, activeTable, editedTable } = this.state;
     const configInit = !_.isEmpty(config);
     const tableInit = !_.isEmpty(tableMakerData);
     const dataInit = !_.isEmpty(data);
     const modalComponent = (component) => {
         switch(component) {
             case 'TableMaker':
-                return (<TableMaker id="table-maker"  config={config} fields={tableMakerData}/>);
+                return (<TableMaker id="table-maker" edited={editedTable} config={config} fields={tableMakerData}/>);
             default:
                 return (<div>---</div>);
         }
@@ -147,18 +142,31 @@ export default class App extends Component {
                 <main className="my-5 py-5">
                     <Nav tabs>
                         { data.tables.map((table)=>{
+                            const ta = config.server.api.tableAction;
                             return (<NavItem key={table.id}>
-                                        <NavLink className={classnames({ active: activeTable === table.id })}
-                                                 onClick={() => { this.toggleTab(table.id); }}>
+                                        <NavLink className={classnames({ active: activeTable === table.id, 'pop-box': true})}
+                                                 onClick={() => this.toggleTab(table.id)}>
                                             {table.name}
+                                            <Button className="ml-2 pop-item rounded-circle" outline
+                                                    onClick={() => this.tableAction(ta.url, table.id, ta.actions.copy)}>
+                                                <i className="fa fa-copy"/>
+                                            </Button>
+                                            <Button className="ml-2 pop-item rounded-circle" outline
+                                                    onClick={() => this.tableAction(ta.url, table.id, ta.actions.get)}>
+                                                <i className="fa fa-cog"/>
+                                            </Button>
+                                            <Button className="ml-2 pop-item rounded-circle" color="danger" outline
+                                                    onClick={() => this.tableAction(ta.url, table.id, ta.actions.remove)}>
+                                                <i className="fa fa-times"/>
+                                            </Button>
                                         </NavLink>
                                     </NavItem>)
                         })}
                         {configInit && tableInit &&
                         <NavItem>
                             <NavLink>
-                                <Button color="primary" onClick={() => this.toggleModal('Create new table', 'TableMaker')}>
-                                    <i className="fa fa-plus"></i>
+                                <Button className="rounded-circle" outline color="primary" onClick={() => this.toggleModal('Create new table', 'TableMaker')}>
+                                    <i className="fa fa-plus"/>
                                 </Button>
                             </NavLink>
                         </NavItem>}
@@ -186,5 +194,3 @@ export default class App extends Component {
     );
   }
 }
-//noGutters className="pt-2 w-100 px-4 px-xl-0 position-relative"
-// className="px-0"

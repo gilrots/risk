@@ -1,7 +1,7 @@
 const config = require('../mocks/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 
 const DB = {
     types: ['long','short'],
@@ -187,6 +187,13 @@ const argsMap = {
     regEx: /{(.):(\d)}/g
 };
 
+const clientTableFormat = {
+    name:'',
+    id: '',
+    cols: [],
+    risk:[]
+};
+
 function replaceToken(obj, key, args) {
     const val = obj[key];
     if (typeof val === 'string' && val.includes(args.token)) {
@@ -346,20 +353,25 @@ function calculateTable(table, bankDB, aceDB) {
     return result;
 }
 
+function generateId(){
+    const ids = _.map(DB.tables,tab => ({[tab.id]:true}));
+    let id = Math.floor(Math.random() * 100000).toString();
+    while (ids[id]){
+        id = Math.floor(Math.random() * 100000).toString();
+    }
+    return id;
+}
+
+function parseExpression(exp,argsMap) {
+    return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp)
+}
 
 function createTable(data) {
   const formatKey = name => Utils.replaceAll(name.toLowerCase(),' ', '_');
-  const parseExpression = (exp,argsMap) => _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
-  const generatetId = (ids) => {
-      let id = Math.floor(Math.random() * 100000).toString();
-      while (ids[id]){
-          id = Math.floor(Math.random() * 100000).toString();
-      }
-      return id;
-  };
+  const update = !_.isEmpty(data.id);
   const newTable = {
       name: data.name,
-      id: generatetId(_.map(DB.tables,tab => ({[tab.id]:true,}))),
+      id: update ? data.id : generateId(),
       cols: _.map(data.cols, col => {
           const calc = _.reduce(col.params,(acc, param, index) => {
               if(param.source === 'stock') {
@@ -387,16 +399,76 @@ function createTable(data) {
       risk: []
   };
   parseTable(newTable);
-  console.log();
-  DB.tables.push(newTable);
+  if(update){
+      const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
+      if(updateIndex > -1) {
+          DB.tables[updateIndex] = newTable;
+      }
+  }
+  else {
+      DB.tables.push(newTable);
+  }
 }
 
 function init() {
     _.forEach(DB.tables, parseTable);
 }
 
-function GetTable(tableId){
+function getTable(tableId){
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-module.exports = {init, GetTable, calculateTable, formatAceData, getResultFormat, createTable};
+function copyTable(tableId){
+    const table = getTable(tableId);
+    if(table) {
+        const copy = Utils.copy(table);
+        copy.id = generateId();
+
+        copy.name += ' Copy';
+        DB.tables.push(copy);
+        return tableToClient(copy);
+    }
+
+    return `No such table with id ${tableId}`;
+}
+
+function removeTable(tableId){
+    const index = _.findIndex(DB.tables, table => tableId === table.id);
+    if(index > -1){
+        DB.tables.splice(index);
+        return `Removed table with id: ${tableId}`;
+    }
+    return `No such table with id ${tableId}`;
+}
+
+function tableToClient(table) {
+    const result = Utils.copy(clientTableFormat);
+    if(table){
+        result.name = table.name;
+        result.id = table.id;
+        result. cols =_.map(table.cols, col => {
+            const calc = _.reduce(_.keys(col.func.arguments),(acc, source) => {
+                _.forEach(col.func.arguments[source], (id,index) => {
+                    acc.params.push({source, item:{id}});
+                    acc.argsMap[`{${source[0]}:${index}}`] = `X${acc.index++}`;
+                });
+                return acc;
+            },{params:[],argsMap:{},index: 0, aggregations:[]});
+            calc.agglen = col.func.aggregations.length;
+            _.forEach(col.func.aggregations.reverse(), (agg,index) => {
+                const revInd = calc.agglen - 1 - index;
+                calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
+                calc.aggregations.push({key:Utils.replaceAll(agg.key,'_',' '), exp: parseExpression(agg.exp,calc.argsMap).slice(3)});
+            });
+            return {
+                name: col.name,
+                exp: parseExpression(col.func.exp,calc.argsMap),
+                params: calc.params,
+                aggregations: calc.aggregations.reverse(),
+                format: col.format
+            };});
+    }
+    return result;
+}
+
+module.exports = {init, getTable, calculateTable, formatAceData, getResultFormat, createTable, copyTable, removeTable, tableToClient};

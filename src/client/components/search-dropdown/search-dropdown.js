@@ -10,6 +10,7 @@ class SearchDropdown extends React.Component {
 
     static propTypes = {
         onSelected: PropTypes.func,
+        selectedId: PropTypes.string,
         items: PropTypes.arrayOf(PropTypes.shape({
             name: PropTypes.string,
             id: PropTypes.string
@@ -27,18 +28,22 @@ class SearchDropdown extends React.Component {
         return {
             search: '',
             filtered: props.items.slice(0),
-            //selected:  _.get(props,'selected', _.get(props.items,'[0]', undefined))
             selected:  _.get(props.items,'[0]', undefined)
         };
     }
 
-    componentDidMount() {
-        //this.selectionChanged(_.get(this.props.items,'[0]', undefined));
-    }
-
     componentWillReceiveProps(nextProps) {
-        if (nextProps.items !== this.props.items) {
+        if (nextProps.items && nextProps.items !== this.props.items) {
             this.setState(this.initState(nextProps));
+        }
+        if (nextProps.selectedId && nextProps.selectedId !== this.props.selectedId) {
+            const item = nextProps.items.find(item => item.id === nextProps.selectedId);
+            if(item){
+                this.selectionChanged(item);
+            }
+            else {
+                console.log(`No such item id:${nextProps.selectedId}`);
+            }
         }
     }
 

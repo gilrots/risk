@@ -3,7 +3,7 @@ const config = require('../mocks/config.json');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Ace = require('./ace');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 
 const _ = require('lodash');
 
@@ -19,7 +19,7 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
 
 function getTable(tableId) {
     return new Promise((resolve, reject) => {
-        const table =  Tables.GetTable(tableId);
+        const table =  Tables.getTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
         let ids = bankDB.ids;
@@ -88,4 +88,22 @@ function getTableMakerData() {
     });
 }
 
-module.exports = {getTable, getTableMakerData};
+function tableAction(params) {
+    return new Promise(resolve => {
+        let result = 'No such action';
+        switch (params.action) {
+            case config.server.api.tableAction.actions.copy:
+                result = Tables.copyTable(params.tableId);
+                break;
+            case config.server.api.tableAction.actions.get:
+                result = Tables.tableToClient(Tables.getTable(params.tableId));
+                break
+            case config.server.api.tableAction.actions.remove:
+                result = Tables.removeTable(params.tableId);
+                break;
+        }
+        resolve(result);
+    });
+}
+
+module.exports = {getTable, getTableMakerData, tableAction};
