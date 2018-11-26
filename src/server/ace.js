@@ -28,6 +28,10 @@ function appendParams(query , params) {
     return query + params.toString();
 }
 
+function getFieldQuery(field) {
+    return appendParams(config.ace.queries.stockField, field);
+}
+
 function getFieldsQuery(fieldsArr) {
     return appendParams(config.ace.queries.stockFields, fieldsArr);
 }
@@ -76,6 +80,10 @@ function getAllSystemFields() {
     });
 }
 
+function aceResponseValid(response, field) {
+    return (response === undefined || response[field] === undefined || response[field] === errorField) ? errorField : response[field];
+}
+
 function getFieldName(fieldId) {
     if(DB.allFields.length === 0) {
         return fieldId;
@@ -84,4 +92,21 @@ function getFieldName(fieldId) {
     return aceField ? aceField.name : fieldId;
 }
 
-module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName };
+function getStocksNames(stockIds) {
+    const aceQuery = getFieldQuery(config.ace.nameField);
+    const queryResult = 'GetDataResult';
+    const promises = stockIds.map(stockId =>
+        new Promise((resolve, reject) => {
+            Utils.tryAtleast(resolve, reject, 0, config.ace.tries, undefined,
+                innerResolve =>
+                    Utils.fetchJson(setQueryId(stockId, aceQuery)).then(response => {
+                        const result = aceResponseValid(response, queryResult);
+                        innerResolve(result !== errorField ? {id:stockId, name: result} : undefined);
+                    }));
+        })
+    );
+
+    return Promise.all(promises);
+}
+
+module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames };

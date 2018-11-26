@@ -104,7 +104,7 @@ function setUrl(link,params){
 
 function fetchJson(url, params){
     let link = params ? setUrl(url,params) : url;
-    return fetch(link).then(res => res.json())
+    return fetch(link).then(res => res.json());
 }
 
 function postJson(url, object){
@@ -116,6 +116,22 @@ function postJson(url, object){
         }}).then(res => res.json());
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson};
+function jsonError(message){
+    return {error:message};
+}
+
+function jsonResult(boolean){
+    return {operation:boolean};
+}
+
+function moveTo(parent, fromArr, toArr, item, deletedIndex) {
+    const to = [...parent[toArr], item];
+    const from = [...parent[fromArr]];
+    from.splice(deletedIndex, 1);
+    return {[toArr]: to, [fromArr]: from};
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber,
+    tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson ,jsonError ,moveTo, jsonResult};
 
 

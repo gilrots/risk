@@ -22,7 +22,6 @@ function getTable(tableId) {
         const table =  Tables.getTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
-        let ids = bankDB.ids;
         if(table === undefined) {
             console.log("No such table id:", {tableId});
         }
@@ -30,8 +29,9 @@ function getTable(tableId) {
             console.log("No ace fields", {name:table.name})
         }
         else {
+            Bank.filter(bankDB, table.filter.excluded);
             const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
-            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids, tries:0});
+            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids:bankDB.ids, tries:0});
         }
     });
 }
@@ -106,4 +106,22 @@ function tableAction(params) {
     });
 }
 
-module.exports = {getTable, getTableMakerData, tableAction};
+function getTableExcludeList(tableId) {
+    return new Promise(resolve => {
+        const table = Tables.getTable(tableId);
+        if(table) {
+            const ids = Bank.getDBSnap().ids;
+            const excludes = table.filter.excluded;
+            Ace.getStocksNames(ids).then(stocks => {
+                const filtered = _.filter(stocks, stock => stock && stock.name);
+                const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
+                resolve({included:parts[0], excluded:parts[1]});
+            });
+        }
+        else {
+            resolve(Utils.jsonError(`No such table id ${tableId}`));
+        }
+    });
+}
+
+module.exports = {getTable, getTableMakerData, tableAction, getTableExcludeList};

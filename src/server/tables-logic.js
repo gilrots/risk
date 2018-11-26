@@ -147,7 +147,11 @@ const DB = {
                         {key:'short_total_risk', exp:''}],
                 }
             }
-        ]
+        ],
+        filter:{
+            excluded: [],
+            predicate: []
+        }
     }],
     riskCols:[
         {
@@ -170,10 +174,6 @@ const DB = {
         }
     },
     generator:{
-        fields: {
-            risk:config.bank.fields,
-            ace: []
-        },
         actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
         operators: ['None', 'And', 'Or']
     }
@@ -418,6 +418,19 @@ function getTable(tableId){
     return _.find(DB.tables, table => tableId === table.id);
 }
 
+function updateTableExcludes(tableId, excluded){
+    const table = getTable(tableId);
+    if(table) {
+        if(Array.isArray(excluded)){
+            table.filter.excluded = excluded;
+        }
+        else {
+            table.filter.excluded.push(excluded);
+        }
+    }
+    return table !== undefined;
+}
+
 function copyTable(tableId){
     const table = getTable(tableId);
     if(table) {
@@ -471,4 +484,6 @@ function tableToClient(table) {
     return result;
 }
 
-module.exports = {init, getTable, calculateTable, formatAceData, getResultFormat, createTable, copyTable, removeTable, tableToClient};
+module.exports = {init, getTable, calculateTable, formatAceData,
+                  getResultFormat, createTable, copyTable, removeTable,
+                  tableToClient, updateTableExcludes};
