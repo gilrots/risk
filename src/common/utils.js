@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const fetch =  require("node-fetch");
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -87,6 +88,50 @@ function divideUrl(urlParams, maxCharsPerSegment, separator) {
     return res;
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber, tryAtleast, divideUrl};
+function escapeRegExp(str) {
+    return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+
+function replaceAll(str,search,replace) {
+    return str.replace(new RegExp(escapeRegExp(search), 'gi'), replace);
+}
+
+function setUrl(link,params){
+    const url = link + "?";///new URL(link);
+    const keys = Object.keys(params);
+    return _.reduce(keys,(acc,key,index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1)? '' : '&'}`), url);
+}
+
+function fetchJson(url, params){
+    let link = params ? setUrl(url,params) : url;
+    return fetch(link).then(res => res.json());
+}
+
+function postJson(url, object){
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(object),
+        headers:{
+            'Content-Type': 'application/json'
+        }}).then(res => res.json());
+}
+
+function jsonError(message){
+    return {error:message};
+}
+
+function jsonResult(boolean){
+    return {operation:boolean};
+}
+
+function moveTo(parent, fromArr, toArr, item, deletedIndex) {
+    const to = [...parent[toArr], item];
+    const from = [...parent[fromArr]];
+    from.splice(deletedIndex, 1);
+    return {[toArr]: to, [fromArr]: from};
+}
+
+module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber,
+    tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson ,jsonError ,moveTo, jsonResult};
 
 

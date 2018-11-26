@@ -1,49 +1,83 @@
 import {Formatters} from "./formatters";
-
 const ReactDataGrid = require('react-data-grid');
 const React = require('react');
 import _ from 'lodash';
+import PropTypes from "prop-types";
+import RiskLoader from "../loader/loader";
+import * as Utils from '../../../common/utils';
+
 
 class StockViewer extends React.Component {
+    static propTypes = {
+        stocks: PropTypes.object.isRequired,
+        reverse: PropTypes.bool,
+        onRowActionClicked: PropTypes.func
+    };
+
     constructor(props, context) {
         super(props, context)
         this.sortRef = React.createRef();
-        this.state = this.mapResult();
-        this.data = this.props.data.data;
+        this.getCellActions = props.onRowActionClicked ? this.getCellActions : undefined;
+        console.log("dfdf",props.onRowActionClicked);
+        this.state = this.changeState(props);
+        this.state.cols = this.createColumns(props);
+        this.state.selectedIndexes = [];
         this.lastSort = {};
+        this.rowActions = [
+            {
+                icon: <span className="fa fa-times" />,
+                callback: args => {
+                    const delegate = this.props.onRowActionClicked;
+                    if(delegate){
+                        delegate(args.row.id,"remove");
+                    }
+                }
+            }
+        ];
     }
 
-    mapResult(){
-        let originalRows = this.props.data.dataKey ?
-            _.map(this.props.data.data, this.props.data.dataKey) :
-            this.props.data.data;
-        let rows = originalRows.slice(0);
-        return { originalRows, rows };
+    changeCallback(rowActions,args) {
+        return rowActions ? rowActions.map(rowAction =>
+            ({icon: rowAction.icon, callback: () => rowAction.callback(args)})) :
+            rowActions;
     }
 
     componentWillReceiveProps(nextProps) {
         // You don't have to do this check first, but it can help prevent an unneeded render
-        if (nextProps.data !== this.data) {
-            this.data = nextProps.data;
-            this.setState(this.mapResult());
+        if (nextProps.stocks.data !== this.props.stocks.data) {
+            this.setState(this.changeState(nextProps));
             if(this.sortRef.current && !_.isEmpty(this.lastSort))
             {
-                //this.sortRef.current;
                 this.sortRef.current.setState({sortColumn:this.lastSort.sortColumn, sortDirection:this.lastSort.sortDirection})
+                //TODO: check if even needs sorting
                 this.sortRef.current.handleSort(this.lastSort.sortColumn, this.lastSort.sortDirection);
             }
         }
+        if(nextProps.stocks.cols !== this.props.stocks.cols) {
+            this.setState({cols: this.createColumns(nextProps)});
+        }
     }
 
-    createColumns() {
-        let res =  this.props.data.cols.map(col => ({
+    changeState(props){
+        let originalRows = props.stocks.dataKey ?
+            _.map(props.stocks.data, props.stocks.dataKey) :
+            props.stocks.data;
+        let rows = originalRows.slice(0);
+        return { originalRows, rows };
+    }
+
+    createColumns(props) {
+        let res =  props.stocks.cols.map(col => ({
             key: col.key,
             name: col.name,
             sortable: true,
             resizable: true,
             formatter: col.format != undefined ? Formatters[col.format] : undefined
         }));
-        return this.props.reverse ? res.reverse() : res;
+        this.cellActions = {
+            [res[0].key]: this.rowActions
+        };
+        return props.reverse ? res.reverse() : res;
     }
 
     handleGridSort = (sortColumn, sortDirection) => {
@@ -68,20 +102,48 @@ class StockViewer extends React.Component {
 
     rowGetter = rowIdx => this.state.rows[rowIdx];
 
+    getCellActions = (col,row) => this.changeCallback(this.cellActions[col.key],{col,row});
+
+    onRowsSelected = rows => {
+        this.setState({
+            selectedIndexes: this.state.selectedIndexes.concat(
+                rows.map(r => r.rowIdx)
+            )
+        });
+    };
+
+    onRowsDeselected = rows => {
+        let rowIndexes = rows.map(r => r.rowIdx);
+        this.setState({
+            selectedIndexes: this.state.selectedIndexes.filter(
+                i => rowIndexes.indexOf(i) === -1
+            )
+        });
+    };
+
     render() {
-        const columns = this.createColumns();
-        const can = !_.isEmpty(columns);
-        return (
-            can && <ReactDataGrid
-                ref={this.sortRef}
-                enableCellSelect
-                columns={columns}
-                onGridSort={this.handleGridSort}
-                rowGetter={this.rowGetter}
-                rowsCount={this.state.rows.length}
-                minHeight={800}
-                rowHeight={20}
-            /> || null);
+        const {cols,rows} = this.state;
+        const can = _.isEmpty(cols);
+        return <RiskLoader loading={can}>
+                    <ReactDataGrid
+                    ref={this.sortRef}
+                    columns={cols}
+                    onGridSort={this.handleGridSort}
+                    rowGetter={this.rowGetter}
+                    rowsCount={rows.length}
+                    getCellActions={this.getCellActions}
+                    minHeight={800}
+                    rowHeight={20}
+                    rowSelection={{
+                        showCheckbox: false,
+                        enableShiftSelect: true,
+                        onRowsSelected: this.onRowsSelected,
+                        onRowsDeselected: this.onRowsDeselected,
+                        selectBy: {
+                            indexes: this.state.selectedIndexes
+                        }
+                    }}/>
+              </RiskLoader>;
     }
 }
 

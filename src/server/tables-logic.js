@@ -1,7 +1,7 @@
 const config = require('../mocks/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 
 const DB = {
     types: ['long','short'],
@@ -148,32 +148,32 @@ const DB = {
                 }
             }
         ],
-        riskCols:[
-            {
-                name: 'Name',
-                key: 'name',
-            },
-            {
-                name: 'Value',
-                key: 'value',
-            },
-        ],
-        calculated:{
-            cols:{
-                long:[],
-                short:[],
-                risk:[]
-            },
-            aceFields: [],
-            aggregations: {
-            }
+        filter:{
+            excluded: [],
+            predicate: []
         }
     }],
-    generator:{
-        fields: {
-            risk:config.bank.fields,
-            ace: []
+    riskCols:[
+        {
+            name: 'Name',
+            key: 'name',
         },
+        {
+            name: 'Value',
+            key: 'value',
+        },
+    ],
+    calculated:{
+        cols:{
+            long:[],
+            short:[],
+            risk:[]
+        },
+        aceFields: [],
+        aggregations: {
+        }
+    },
+    generator:{
         actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
         operators: ['None', 'And', 'Or']
     }
@@ -187,11 +187,18 @@ const argsMap = {
     regEx: /{(.):(\d)}/g
 };
 
+const clientTableFormat = {
+    name:'',
+    id: '',
+    cols: [],
+    risk:[]
+};
+
 function replaceToken(obj, key, args) {
     const val = obj[key];
     if (typeof val === 'string' && val.includes(args.token)) {
         const replace = key === 'name' ? args.name : args.part;
-        obj[key] = val.replace(args.token, replace);
+        obj[key] = Utils.replaceAll(val, args.token, replace);
     }
 }
 
@@ -211,7 +218,7 @@ function setExpressions(obj, key, argsMap) {
                 const source = argsMap[groups[1]];
                 const property = argsMap.args[source] ? argsMap.args[source][groups[2]] : argsMap.aggs[groups[2]].key;
                 const parsedExp = `${source}.${property}`;
-                return res.replace(match, parsedExp);
+                return Utils.replaceAll(res, match, parsedExp);
             }, val);
         }
     }
@@ -228,7 +235,8 @@ function formatAceData(stockId, aceDB, aceData, aceFields) {
 
 function parseTable(table) {
     const token = DB.replaceToken;
-
+    table.riskCols = Utils.copy(DB.riskCols);
+    table.calculated = Utils.copy(DB.calculated);
     //Sums (optimize) all ace fields required for the table
     table.calculated.aceFields = _.uniq(_.reduce([...table.cols,...table.risk],(sum,col) => sum.concat(...col.func.arguments.ace),[]));
 
@@ -345,12 +353,137 @@ function calculateTable(table, bankDB, aceDB) {
     return result;
 }
 
+function generateId(){
+    const ids = _.map(DB.tables,tab => ({[tab.id]:true}));
+    let id = Math.floor(Math.random() * 100000).toString();
+    while (ids[id]){
+        id = Math.floor(Math.random() * 100000).toString();
+    }
+    return id;
+}
+
+function parseExpression(exp,argsMap) {
+    return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp)
+}
+
+function createTable(data) {
+  const formatKey = name => Utils.replaceAll(name.toLowerCase(),' ', '_');
+  const update = !_.isEmpty(data.id);
+  const newTable = {
+      name: data.name,
+      id: update ? data.id : generateId(),
+      cols: _.map(data.cols, col => {
+          const calc = _.reduce(col.params,(acc, param, index) => {
+              if(param.source === 'stock') {
+                  param.item.id = Utils.replaceAll(formatKey(param.item.id),DB.replaceToken,'')
+              }
+              acc.arguments[param.source].push(param.item.id)
+              acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
+              return acc;
+          },{arguments:{stock: [], bank: [], ace: []},argsMap:{}, aggregations:[]});
+
+          _.forEach(col.aggregations, (agg, index) => {
+              calc.argsMap[`Y${index}`] = `{t:${index}}`;
+              calc.aggregations.push({ key:formatKey(agg.key), exp: `acc ${parseExpression(agg.exp,calc.argsMap)}`})
+          });
+          return {
+              name: col.name,
+              key: Utils.replaceAll(formatKey(col.name),DB.replaceToken,''),
+              func:{
+                  exp: parseExpression(col.exp,calc.argsMap),
+                  arguments: calc.arguments,
+                  aggregations: calc.aggregations
+              },
+              format: col.format
+          };}),
+      risk: []
+  };
+  parseTable(newTable);
+  if(update){
+      const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
+      if(updateIndex > -1) {
+          DB.tables[updateIndex] = newTable;
+      }
+  }
+  else {
+      DB.tables.push(newTable);
+  }
+}
+
 function init() {
     _.forEach(DB.tables, parseTable);
 }
 
-function GetTable(tableId){
+function getTable(tableId){
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-module.exports = {init, GetTable, calculateTable, formatAceData, getResultFormat};
+function updateTableExcludes(tableId, excluded){
+    const table = getTable(tableId);
+    if(table) {
+        if(Array.isArray(excluded)){
+            table.filter.excluded = excluded;
+        }
+        else {
+            table.filter.excluded.push(excluded);
+        }
+    }
+    return table !== undefined;
+}
+
+function copyTable(tableId){
+    const table = getTable(tableId);
+    if(table) {
+        const copy = Utils.copy(table);
+        copy.id = generateId();
+
+        copy.name += ' Copy';
+        DB.tables.push(copy);
+        return tableToClient(copy);
+    }
+
+    return `No such table with id ${tableId}`;
+}
+
+function removeTable(tableId){
+    const index = _.findIndex(DB.tables, table => tableId === table.id);
+    if(index > -1){
+        DB.tables.splice(index);
+        return `Removed table with id: ${tableId}`;
+    }
+    return `No such table with id ${tableId}`;
+}
+
+function tableToClient(table) {
+    const result = Utils.copy(clientTableFormat);
+    if(table){
+        result.name = table.name;
+        result.id = table.id;
+        result. cols =_.map(table.cols, col => {
+            const calc = _.reduce(_.keys(col.func.arguments),(acc, source) => {
+                _.forEach(col.func.arguments[source], (id,index) => {
+                    acc.params.push({source, item:{id}});
+                    acc.argsMap[`{${source[0]}:${index}}`] = `X${acc.index++}`;
+                });
+                return acc;
+            },{params:[],argsMap:{},index: 0, aggregations:[]});
+            calc.agglen = col.func.aggregations.length;
+            _.forEach(col.func.aggregations.reverse(), (agg,index) => {
+                const revInd = calc.agglen - 1 - index;
+                calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
+                calc.aggregations.push({key:Utils.replaceAll(agg.key,'_',' '), exp: parseExpression(agg.exp,calc.argsMap).slice(3)});
+            });
+            return {
+                name: col.name,
+                exp: parseExpression(col.func.exp,calc.argsMap),
+                params: calc.params,
+                aggregations: calc.aggregations.reverse(),
+                format: col.format
+            };});
+    }
+    return result;
+}
+
+module.exports = {init, getTable, calculateTable, formatAceData,
+                  getResultFormat, createTable, copyTable, removeTable,
+                  tableToClient, updateTableExcludes};

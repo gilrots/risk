@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 const logo = require('../../assests/logo.jpg');
 
 import {
@@ -11,20 +10,9 @@ import {
 const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
 
 class AppHeader extends React.Component {
-    static propTypes = {
-        onNewTableClicked: PropTypes.func.isRequired
-    };
 
     constructor(props, context) {
         super(props, context)
-    }
-
-    newTable = (evt) => {
-        evt.preventDefault();
-        const delegate = this.props.onNewTableClicked;
-        if(delegate) {
-            delegate();
-        }
     }
 
     render() {
@@ -42,27 +30,6 @@ class AppHeader extends React.Component {
                                                  style={{width: 36}}/>
                                         </NavLink>
                                     </NavItem>
-
-                                    <NavItem className="d-flex align-items-center">
-                                        <NavLink className="font-weight-bold" href="/">Position Report</NavLink>
-                                    </NavItem>
-
-                                    <NavItem className="d-flex align-items-center">
-                                        <NavLink className="font-weight-bold" href="/">Intra</NavLink>
-                                    </NavItem>
-
-                                    <UncontrolledDropdown className="d-flex align-items-center" nav inNavbar>
-                                        <DropdownToggle className="font-weight-bold" nav caret>Tables</DropdownToggle>
-                                        <DropdownMenu right>
-                                            <DropdownItem className="font-weight-bold text-secondary text-uppercase"
-                                                          header disabled>Search tables</DropdownItem>
-                                            <DropdownItem divider/>
-                                            <DropdownItem>Table 1</DropdownItem>
-                                            <DropdownItem>Table 2</DropdownItem>
-                                            <DropdownItem onClick={e => this.newTable(e)}>Add Table</DropdownItem>
-                                        </DropdownMenu>
-                                    </UncontrolledDropdown>
-
                                     {this.props.children}
                                 </Nav>
                             </Col>
@@ -76,7 +43,6 @@ class AppHeader extends React.Component {
                             <Col className="d-none d-lg-flex justify-content-end">
                                 <Form inline>
                                     <Input type="search" className="mr-3" placeholder="Search bonds"/>
-                                    <Button type="submit" color="info" outline>Search</Button>
                                 </Form>
                             </Col>
 

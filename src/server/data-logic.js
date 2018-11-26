@@ -3,7 +3,7 @@ const config = require('../mocks/config.json');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Ace = require('./ace');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 
 const _ = require('lodash');
 
@@ -19,10 +19,9 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
 
 function getTable(tableId) {
     return new Promise((resolve, reject) => {
-        const table =  Tables.GetTable(tableId);
+        const table =  Tables.getTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
-        let ids = bankDB.ids;
         if(table === undefined) {
             console.log("No such table id:", {tableId});
         }
@@ -30,8 +29,9 @@ function getTable(tableId) {
             console.log("No ace fields", {name:table.name})
         }
         else {
+            Bank.filter(bankDB, table.filter.excluded);
             const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
-            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids, tries:0});
+            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids:bankDB.ids, tries:0});
         }
     });
 }
@@ -58,7 +58,12 @@ function getAllAceData(resolve, reject, data) {
             catch (e) {
                 const error = Tables.getResultFormat();
                 error.errors.ace = true;
-                error.errors.errors = [e];
+                if( error.errors.errors) {
+                    error.errors.errors.push(e.message);
+                }
+                else {
+                    error.errors.errors = [e.message];
+                }
                 resolve(error);
             }
         }
@@ -83,6 +88,40 @@ function getTableMakerData() {
     });
 }
 
+function tableAction(params) {
+    return new Promise(resolve => {
+        let result = 'No such action';
+        switch (params.action) {
+            case config.server.api.tableAction.actions.copy:
+                result = Tables.copyTable(params.tableId);
+                break;
+            case config.server.api.tableAction.actions.get:
+                result = Tables.tableToClient(Tables.getTable(params.tableId));
+                break
+            case config.server.api.tableAction.actions.remove:
+                result = Tables.removeTable(params.tableId);
+                break;
+        }
+        resolve(result);
+    });
+}
 
+function getTableExcludeList(tableId) {
+    return new Promise(resolve => {
+        const table = Tables.getTable(tableId);
+        if(table) {
+            const ids = Bank.getDBSnap().ids;
+            const excludes = table.filter.excluded;
+            Ace.getStocksNames(ids).then(stocks => {
+                const filtered = _.filter(stocks, stock => stock && stock.name);
+                const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
+                resolve({included:parts[0], excluded:parts[1]});
+            });
+        }
+        else {
+            resolve(Utils.jsonError(`No such table id ${tableId}`));
+        }
+    });
+}
 
-module.exports = {getTable, getTableMakerData};
+module.exports = {getTable, getTableMakerData, tableAction, getTableExcludeList};

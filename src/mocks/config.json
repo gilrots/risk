@@ -1,11 +1,26 @@
 {
   "server": {
     "port": 8080,
+    "mock": {
+      "allow": true,
+      "interval": 200
+    },
     "api": {
       "bankPost":"/gili",
       "getConfig":"/api/getConfig",
       "getData":"/api/getData",
-      "getTableMakerData":"/api/getTBMD"
+      "getTableMakerData":"/api/getTBMD",
+      "getExcludeList":"/api/getExclude",
+      "setExcludeList":"/api/setExclude",
+      "createTable":"/api/createTable",
+      "tableAction":{
+        "url": "/api/tableAction",
+        "actions":{
+          "copy":"copy",
+          "get":"get",
+          "remove":"remove"
+        }
+      }
     }
   },
   "app": {
@@ -22,7 +37,9 @@
     "idToken": "XXX",
     "error": "!error!",
     "tries": 3,
+    "nameField": "name",
     "queries" :{
+      "stockField": "http://localhost:4071/aoc/core/AocRT/getdata?s=XXX&f=",
       "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=",
       "aceFields": "http://localhost:4071/Aoc/Core/AocRT/getallfields?",
       "aceFieldsData": "http://localhost:4071/Aoc/Core/AocRT/getmultifieldinfo?s="

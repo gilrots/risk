@@ -70,12 +70,6 @@ class FilterMaker extends React.Component {
         const operators = this.operators;
         return (
             <Container>
-                <Row>
-                    <Col>
-                        Name
-                        <Input value={name} onChange={e => this.setName(e.target.value)}/>
-                    </Col>
-                </Row>
                 {predicates.map((predicate, index) => (
                     <Fragment key={index}>
                         <Row>

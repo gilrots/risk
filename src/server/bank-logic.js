@@ -1,16 +1,18 @@
 const config = require('../mocks/config.json');
-const Utils = require('./utils.js');
+const Utils = require('../common/utils.js');
 const _ = require('lodash');
 
 const DB = {
     long: {},
     short: {},
     all:{},
-    ids:[]
+    ids: undefined
 };
 
 function getDBSnap(){
-    return Utils.copy(DB);
+    const snap = Utils.copy(DB);
+    snap.ids = _.keys(snap.all);
+    return snap;
 }
 
 function getAmount(stock) {
@@ -34,15 +36,10 @@ function updateDB(stock, fromStocks, toStocks = undefined) {
     if(fromStocks[id]) {
         delete fromStocks[id];
         delete DB.all[id];
-        const index = DB.ids.indexOf(id);
-        if(index > -1) {
-            DB.ids.splice(index, 1);
-        }
     }
     if(toStocks){
         toStocks[id] = stock;
         DB.all[id] = stock;
-        DB.ids.push(id);
     }
 }
 
@@ -61,4 +58,13 @@ function updateStocksData(bankData) {
     }
 }
 
-module.exports = {updateStocksData,getDBSnap, getFields};
+function filter(bankSnap, ids){
+    _.forEach(ids, id => {
+        delete bankSnap.long[id];
+        delete bankSnap.short[id];
+        delete bankSnap.all[id];
+    });
+    bankSnap.ids = _.difference(bankSnap.ids, ids);
+}
+
+module.exports = {updateStocksData, getDBSnap, getFields, filter};
