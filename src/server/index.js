@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Logic = require('./data-logic');
+const lala = require('../DB/Login');
 
 Tables.init();
 const port = config.server.port;
@@ -38,5 +39,14 @@ app.get(config.server.api.getTableMakerData, (req, res) => {
 
 app.get(config.server.api.getConfig, (req, res) => {
     return res.send(config);
+});
+
+app.post(config.server.api.getApp, (req,res) => {
+    console.log("Im here");
+    const user = req.body.UserName;
+    const password = req.body.password;
+    console
+        .log(lala.Connectdb(user,password));
+    return res.send();
 });
 
