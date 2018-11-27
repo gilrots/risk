@@ -8,8 +8,11 @@ class RiskLoader extends React.Component {
     };
 
     render() {
-        const {loading, children} = this.props;
-        return loading ? <Loader type="Puff" color="#00BFFF" height="100" width="100"/> : children;
+        return this.props.loading ?
+            <div className="h-100 d-flex align-items-center justify-content-center">
+                <Loader  type="Triangle" color="#00BFFF" height="100" width="100"/>
+            </div> :
+            this.props.children;
     }
 }
 

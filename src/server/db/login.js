@@ -1,4 +1,4 @@
-const PG = require('../../mocks/config').DB.PG;
+const PG = require('../../common/config').DB.PG;
 const Sequelize = require('Sequelize');
 const sequelize = new Sequelize(PG.database, PG.username, PG.password, PG.settings);
 function Connectdb(username,password) {

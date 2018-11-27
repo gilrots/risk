@@ -14,11 +14,10 @@ class StockViewer extends React.Component {
         onRowActionClicked: PropTypes.func
     };
 
-    constructor(props, context) {
-        super(props, context);
+    constructor(props) {
+        super(props);
         this.sortRef = React.createRef();
         this.getCellActions = props.onRowActionClicked ? this.getCellActions : undefined;
-        console.log("dfdf",props.onRowActionClicked);
         this.state = this.changeState(props);
         this.state.cols = this.createColumns(props);
         this.state.selectedIndexes = [];
@@ -102,6 +101,7 @@ class StockViewer extends React.Component {
 
     rowGetter = rowIdx => this.state.rows[rowIdx];
 
+    //TODO: make this efficient
     getCellActions = (col,row) => this.changeCallback(this.cellActions[col.key],{col,row});
 
     onRowsSelected = rows => {

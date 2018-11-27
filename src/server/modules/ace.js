@@ -1,6 +1,6 @@
-const config = require('../mocks/config.json');
+const config = require('../../common/config.json');
 const fetch = require("node-fetch");
-const Utils = require('../common/utils.js');
+const Utils = require('../../common/utils.js');
 const _ = require('lodash');
 
 const idToken = config.ace.idToken;

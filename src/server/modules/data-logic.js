@@ -1,9 +1,9 @@
 const fetch = require("node-fetch");
-const config = require('../mocks/config.json');
+const config = require('../../common/config.json');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Ace = require('./ace');
-const Utils = require('../common/utils.js');
+const Utils = require('../../common/utils.js');
 
 const _ = require('lodash');
 

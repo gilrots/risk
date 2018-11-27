@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import {Container, Row, Col, Button, Form, Label, Input, FormGroup, FormFeedback } from 'reactstrap';
 import RiskLoader from "../loader/loader";
 import * as Utils from "../../../common/utils";
+import * as config from "../../../common/config";
 import * as User from "../../helpers/user";
 import PropTypes from "prop-types";
 import history from "../../helpers/history";
@@ -24,7 +25,6 @@ class Login extends React.Component {
             loggingIn: false,
             user: undefined
         };
-
     }
 
     handleChange = (e) => {
@@ -57,7 +57,7 @@ class Login extends React.Component {
     }
 
     authenticate(username, password) {
-        return Utils.postJson2(`api/login`, { username, password })
+        return Utils.postJson2(config.server.api.login, { username, password })
             .then(response => Utils.handleResponse(response, User.remove()))
             .then(user => {
                 // login successful if there's a jwt token in the response

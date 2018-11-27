@@ -2,13 +2,13 @@ const fetch = require("node-fetch");
 const express = require('express');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
-const Bank = require('./bank-logic');
-const Tables = require('./tables-logic');
-const Logic = require('./data-logic');
+const Bank = require('./modules/bank-logic');
+const Tables = require('./modules/tables-logic');
+const Logic = require('./modules/data-logic');
 const Utils = require('../common/utils');
 const Login = require('./db/login');
 
-const config = require('../mocks/config.json');
+const config = require('../common/config.json');
 const mockData = _.values(require('../mocks/mock-table.json'));
 
 const api = config.server.api;

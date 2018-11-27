@@ -4,6 +4,7 @@ import * as Utils from '../../../common/utils';
 import {Container, Row, Col, ListGroup, ListGroupItem, Button} from "reactstrap";
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
+const api = require('../../../common/config').server.api;
 
 function StockList(props) {
     const {title, items: stocks, icon, color, func} = props;
@@ -25,11 +26,10 @@ function StockList(props) {
 class ExcludeList extends React.Component {
     static propTypes = {
         tableId: PropTypes.string.isRequired,
-        api: PropTypes.object.isRequired,
     };
 
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.state = {excluded:[], included:[], error: undefined};
         this.exclude = this.exclude.bind(this);
         this.include = this.include.bind(this);
@@ -37,7 +37,7 @@ class ExcludeList extends React.Component {
     }
 
     componentDidMount() {
-        const {api, tableId} = this.props;
+        const {tableId} = this.props;
         Utils.fetchJson(api.getExcludeList, {tableId}).then(response => {
             console.log(response);
             this.setState(response)
@@ -53,7 +53,7 @@ class ExcludeList extends React.Component {
     }
 
     updateExcludeTable() {
-        const {api, tableId} = this.props;
+        const {tableId} = this.props;
         const exclude = _.map(this.state.excluded,'id');
         Utils.postJson(api.setExcludeList, {tableId, exclude}).then(response => {
             console.log(response);

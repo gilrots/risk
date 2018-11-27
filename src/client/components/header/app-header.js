@@ -10,11 +10,6 @@ import {
 const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
 
 class AppHeader extends React.Component {
-
-    constructor(props, context) {
-        super(props, context)
-    }
-
     render() {
         return (
             <header>

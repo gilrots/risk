@@ -4,15 +4,15 @@ import {Container, Row, Col, Input,InputGroup,InputGroupAddon,InputGroupText, Bu
 import PropTypes from "prop-types";
 import SearchDropdown from "../search-dropdown/search-dropdown";
 import * as Utils from "../../../common/utils";
+const api = require('../../../common/config').server.api;
 
 class TableMaker extends React.Component {
     static propTypes = {
-        config: PropTypes.object.isRequired,
         edited: PropTypes.object.isRequired
     };
 
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.addCol = this.addCol.bind(this);
         this.deleteCol = this.deleteCol.bind(this);
         this.setColData = this.setColData.bind(this);
@@ -81,7 +81,7 @@ class TableMaker extends React.Component {
     }
 
     createTable(){
-        Utils.postJson(this.props.config.server.api.createTable, this.state)
+        Utils.postJson(api.createTable, this.state)
         .then(response => console.log('Success:', JSON.stringify(response)))
         .catch(error => console.error('Error:', error));
     }

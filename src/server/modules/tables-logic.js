@@ -1,7 +1,7 @@
-const config = require('../mocks/config.json');
+const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const Utils = require('../common/utils.js');
+const Utils = require('../../common/utils.js');
 
 const DB = {
     types: ['long','short'],

@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Users = require('./models').Users;
-const config = require('../../mocks/config').DB.JWT;
+const config = require('../../common/config').DB.JWT;
 
 function authenticate(params) {
     return Users.findOne({

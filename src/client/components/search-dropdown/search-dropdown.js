@@ -17,8 +17,8 @@ class SearchDropdown extends React.Component {
         }))
     };
 
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.selectionChanged =  this.selectionChanged.bind(this);
         this.searchChanged =  this.searchChanged.bind(this);//_.debounce(this.searchChanged())
         this.state = this.initState(this.props);

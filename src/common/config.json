@@ -6,13 +6,6 @@
       "interval": 200
     },
     "api": {
-      "app": {
-        "updateInterval": 5000,
-        "defaultTable": {
-          "name": "Position Report",
-          "id": "-999"
-        }
-      },
       "bankPost":"/gili",
       "login":"/api/login",
       "getConfig":"/api/getConfig",

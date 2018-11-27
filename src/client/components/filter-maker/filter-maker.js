@@ -1,15 +1,10 @@
 import React, {Fragment} from 'react';
 import _ from 'lodash';
 import {Container, Row, Col, Input, DropdownMenu, DropdownItem, DropdownToggle,UncontrolledDropdown, ButtonGroup,Button} from "reactstrap";
-import PropTypes from "prop-types";
 
 class FilterMaker extends React.Component {
-    static propTypes = {
-        config: PropTypes.object.isRequired,
-    };
-
-    constructor(props, context) {
-        super(props, context)
+    constructor(props) {
+        super(props);
         this.setName = this.setName.bind(this);
         this.addPredicate = this.addPredicate.bind(this);
         this.deletePredicate = this.deletePredicate.bind(this);

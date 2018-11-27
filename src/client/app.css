@@ -1,5 +1,5 @@
-body {
-    margin: auto;
+html, body, #root {
+    height: 100%;
 }
 .react-grid-Container {
     font-size: 0.8em;
