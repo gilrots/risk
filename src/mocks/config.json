@@ -6,7 +6,15 @@
       "interval": 200
     },
     "api": {
+      "app": {
+        "updateInterval": 5000,
+        "defaultTable": {
+          "name": "Position Report",
+          "id": "-999"
+        }
+      },
       "bankPost":"/gili",
+      "login":"/api/login",
       "getConfig":"/api/getConfig",
       "getData":"/api/getData",
       "getTableMakerData":"/api/getTBMD",
@@ -19,6 +27,31 @@
           "copy":"copy",
           "get":"get",
           "remove":"remove"
+        }
+      }
+    }
+  },
+  "DB":{
+    "JWT":{
+      "port": 3000,
+      "dbConnectionString": "your postgresql connection",
+      "saltRounds": 2,
+      "jwtSecret": "yo-its-a-secret",
+      "tokenExpireTime": "6h"
+    },
+    "PG": {
+      "database":"Risk",
+      "username":"postgres",
+      "password":"carbit1",
+      "settings":{
+        "host": "localhost",
+        "dialect": "postgres",
+        "operatorsAliases": false,
+        "pool": {
+          "max": 5,
+          "min": 0,
+          "acquire": 30000,
+          "idle": 10000
         }
       }
     }

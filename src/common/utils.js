@@ -116,6 +116,15 @@ function postJson(url, object){
         }}).then(res => res.json());
 }
 
+function postJson2(url, object){
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(object),
+        headers:{
+            'Content-Type': 'application/json'
+        }});
+}
+
 function jsonError(message){
     return {error:message};
 }
@@ -131,7 +140,26 @@ function moveTo(parent, fromArr, toArr, item, deletedIndex) {
     return {[toArr]: to, [fromArr]: from};
 }
 
+function handleResponse(response, notFoundCallback) {
+    return response.text().then(text => {
+        const data = text && JSON.parse(text);
+        if (!response.ok) {
+            if (response.status === 401) {
+                // auto logout if 401 response returned from api
+                notFoundCallback();
+                location.reload(true);
+            }
+
+            const error = (data && data.message) || response.statusText;
+            return Promise.reject(error);
+        }
+
+        return data;
+    });
+}
+
 module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber,
-    tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson ,jsonError ,moveTo, jsonResult};
+    tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson ,jsonError ,moveTo, jsonResult
+    ,handleResponse, postJson2};
 
 

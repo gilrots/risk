@@ -6,6 +6,7 @@ const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Logic = require('./data-logic');
 const Utils = require('../common/utils');
+const Login = require('./db/login');
 
 const config = require('../mocks/config.json');
 const mockData = _.values(require('../mocks/mock-table.json'));
@@ -33,6 +34,13 @@ app.post(api.createTable, (req, res) => Tables.createTable(req.body));
 app.post(api.setExcludeList, (req, res) => {
     const {tableId,exclude} = req.body;
     res.send(JSON.stringify(Tables.updateTableExcludes(tableId, exclude)));
+});
+
+app.post(config.server.api.login, (req,res) => {
+    console.log("Im here");
+    const {user, password} = req.body;
+    console.log(Login.Connectdb(user,password));
+    return res.send();
 });
 
 //Gets
