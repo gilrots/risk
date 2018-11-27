@@ -15,7 +15,7 @@ class StockViewer extends React.Component {
     };
 
     constructor(props, context) {
-        super(props, context)
+        super(props, context);
         this.sortRef = React.createRef();
         this.getCellActions = props.onRowActionClicked ? this.getCellActions : undefined;
         console.log("dfdf",props.onRowActionClicked);

@@ -4,6 +4,6 @@ import Popper from 'popper.js';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Risk from "./Risk";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<Risk />, document.getElementById('root'));
