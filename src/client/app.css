@@ -1,6 +1,10 @@
 html, body, #root {
     height: 100%;
 }
+
+.jumbo {
+    background-color: #e9ecef;
+}
 .react-grid-Container {
     font-size: 0.8em;
 }

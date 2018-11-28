@@ -99,7 +99,7 @@ function getStocksNames(stockIds) {
         new Promise((resolve, reject) => {
             Utils.tryAtleast(resolve, reject, 0, config.ace.tries, undefined,
                 innerResolve =>
-                    Utils.fetchJson(setQueryId(stockId, aceQuery)).then(response => {
+                    Utils.fetchJsonBackend(setQueryId(stockId, aceQuery)).then(response => {
                         const result = aceResponseValid(response, queryResult);
                         innerResolve(result !== errorField ? {id:stockId, name: result} : undefined);
                     }));

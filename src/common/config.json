@@ -8,14 +8,14 @@
     "api": {
       "bankPost":"/gili",
       "login":"/api/login",
-      "getConfig":"/api/getConfig",
-      "getData":"/api/getData",
-      "getTableMakerData":"/api/getTBMD",
-      "getExcludeList":"/api/getExclude",
-      "setExcludeList":"/api/setExclude",
-      "createTable":"/api/createTable",
+      "register":"/api/register",
+      "getData":"/api/secured/getData",
+      "getTableMakerData":"/api/secured/getTBMD",
+      "getExcludeList":"/api/secured/getExclude",
+      "setExcludeList":"/api/secured/setExclude",
+      "createTable":"/api/secured/createTable",
       "tableAction":{
-        "url": "/api/tableAction",
+        "url": "/api/secured/tableAction",
         "actions":{
           "copy":"copy",
           "get":"get",
@@ -25,12 +25,13 @@
     }
   },
   "DB":{
+    "admin": "123",
     "JWT":{
-      "port": 3000,
+      "port": 9123,
       "dbConnectionString": "your postgresql connection",
       "saltRounds": 2,
       "jwtSecret": "yo-its-a-secret",
-      "tokenExpireTime": "6h"
+      "tokenExpireTime": "10h"
     },
     "PG": {
       "database":"Risk",

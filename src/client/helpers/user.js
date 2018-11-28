@@ -1,11 +1,16 @@
 const USER = '123RISK_USER321';
 
 function exist() {
-    return localStorage.getItem(USER) !== null;
+    return !_.isEmpty(localStorage.getItem(USER));
 }
 
 function get() {
-    return JSON.parse(localStorage.getItem(USER));
+    const token = localStorage.getItem(USER);
+    if (_.isEmpty(token)) {
+        return token;
+    } else {
+        return JSON.parse(token);
+    }
 }
 
 function set(user) {

@@ -1,5 +1,6 @@
 const _ = require('lodash');
-const fetch =  require("node-fetch");
+const fetch = require("node-fetch");
+const User = require('../client/helpers/user');
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -7,13 +8,13 @@ function copy(obj) {
 
 function treeForEach(obj, key, func, args) {
     const val = obj[key];
-    if(val === null || val === undefined) {
+    if (val === null || val === undefined) {
         return;
     }
-    else if(Array.isArray(val)){
-        _.forEach(val, (element, index) => treeForEach(val,index,func, args));
+    else if (Array.isArray(val)) {
+        _.forEach(val, (element, index) => treeForEach(val, index, func, args));
     }
-    else if(typeof val === 'object'){
+    else if (typeof val === 'object') {
         _.forEach(_.keys(val), entry => {
             treeForEach(val, entry, func, args);
         });
@@ -27,7 +28,7 @@ function treeForEach(obj, key, func, args) {
 function performance(func, name) {
     const t0 = new Date().getTime();
     func();
-    const t1 =  new Date().getTime();
+    const t1 = new Date().getTime();
     console.log(`Call to ${name} took ${t1 - t0} milliseconds`);
 }
 
@@ -42,7 +43,7 @@ async function doUntilSuccess(promise) {
         try {
             response = await promise;
         }
-        catch (e){
+        catch (e) {
             console.log(e);
         }
     } while (!response);
@@ -52,10 +53,10 @@ async function doUntilSuccess(promise) {
 
 function tryAtleast(resolve, reject, tries, maxTries, fallback, promiseFunc) {
     new Promise(promiseFunc).then(result => {
-        if(result !== undefined) {
+        if (result !== undefined) {
             resolve(result);
         }
-        else if(tries > maxTries) {
+        else if (tries > maxTries) {
             resolve(fallback);
         }
         else {
@@ -74,7 +75,7 @@ function divideUrl(urlParams, maxCharsPerSegment, separator) {
     let currLength = 0;
     const sepLeng = separator.length;
     _.forEach(urlParams, param => {
-        if((currLength + param.length) <= maxCharsPerSegment) {
+        if ((currLength + param.length) <= maxCharsPerSegment) {
             currLength += (param.length + sepLeng);
             res[index].push(param);
         }
@@ -92,45 +93,57 @@ function escapeRegExp(str) {
     return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
 
-function replaceAll(str,search,replace) {
+function replaceAll(str, search, replace) {
     return str.replace(new RegExp(escapeRegExp(search), 'gi'), replace);
 }
 
-function setUrl(link,params){
+function setUrl(link, params) {
     const url = link + "?";///new URL(link);
     const keys = Object.keys(params);
-    return _.reduce(keys,(acc,key,index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1)? '' : '&'}`), url);
+    return _.reduce(keys, (acc, key, index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1) ? '' : '&'}`), url);
 }
 
-function fetchJson(url, params){
-    let link = params ? setUrl(url,params) : url;
+function fetchJson(url, params) {
+    const headers = {...buildAuthHeader()};
+    let link = params ? setUrl(url, params) : url;
+    return fetch(link, {headers}).then(res => res.json());
+}
+
+function fetchJsonBackend(url, params) {
+    let link = params ? setUrl(url, params) : url;
     return fetch(link).then(res => res.json());
 }
 
-function postJson(url, object){
+function buildAuthHeader() {
+    // return authorization header with jwt token
+    let token = User.get();
+
+    return token ? {'Authorization': 'Bearer ' + token} : {};
+}
+
+function getPath(fullPath) {
+    return `/${_.last(fullPath.split('/'))}`;
+}
+
+function postJson(url, object, asJson = true) {
+    const authHeader = buildAuthHeader();
+
     return fetch(url, {
         method: 'POST',
         body: JSON.stringify(object),
-        headers:{
-            'Content-Type': 'application/json'
-        }}).then(res => res.json());
+        headers: {
+            'Content-Type': 'application/json',
+            ...authHeader,
+        }
+    }).then(res => asJson ? res.json() : res);
 }
 
-function postJson2(url, object){
-    return fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(object),
-        headers:{
-            'Content-Type': 'application/json'
-        }});
+function jsonError(message) {
+    return {error: message};
 }
 
-function jsonError(message){
-    return {error:message};
-}
-
-function jsonResult(boolean){
-    return {operation:boolean};
+function jsonResult(boolean) {
+    return {operation: boolean};
 }
 
 function moveTo(parent, fromArr, toArr, item, deletedIndex) {
@@ -154,12 +167,14 @@ function handleResponse(response, notFoundCallback) {
             return Promise.reject(error);
         }
 
-        return data;
+        return;
     });
 }
 
-module.exports = {copy, treeForEach, performance, doUntilSuccess, getNumber,
-    tryAtleast, divideUrl,replaceAll, setUrl, fetchJson, postJson ,jsonError ,moveTo, jsonResult
-    ,handleResponse, postJson2};
+module.exports = {
+    copy, treeForEach, performance, doUntilSuccess, getNumber,
+    tryAtleast, divideUrl, replaceAll, setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult
+    , handleResponse, fetchJsonBackend, getPath
+};
 
 

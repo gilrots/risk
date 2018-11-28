@@ -2,33 +2,40 @@ const sequelize = require("./db")
 const Sequelize = require('Sequelize')
 
 const Users = sequelize.define('Users', {
-    id:{type:Sequelize.INTEGER,
-        primaryKey:true},
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     username:Sequelize.STRING,
     password:Sequelize.STRING,
     accounts:Sequelize.ARRAY(Sequelize.STRING)
-})
+});
 
 const Tables = sequelize.define('Tables', {
-    id:{type:Sequelize.INTEGER,
-        primaryKey:true},
-    UserOwner:Sequelize.INTEGER,
-    Query:Sequelize.STRING,
-    Include:Sequelize.INTEGER
-})
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
+    user:Sequelize.STRING,
+    scheme:Sequelize.JSON,
+    filter:Sequelize.JSON,
+    excludes:Sequelize.ARRAY(Sequelize.STRING),
+});
 
-const Includes = sequelize.define('Includes', {
-    UserOwner: Sequelize.INTEGER,
-    TableOwner: Sequelize.INTEGER,
-    RowData: Sequelize.JSON
-})
+const Intras = sequelize.define('Intras', {
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
+    stockId: Sequelize.STRING,
+    user: Sequelize.INTEGER,
+    amount: Sequelize.INTEGER,
+});
 
-Tables.hasMany(Includes,{foreginKey:'TableOwner',sourceKey:'id'})
-Includes.belongsTo(Tables,{foreginKey:'TableOwner',targetKey:'id'})
-Users.hasMany(Tables,{foreginKey:'UserOwner', sourceKey:'id'})
-Tables.belongsTo(Users,{foreginKey:'UserOwner', targetKey:'id'})
+const IPO = sequelize.define('IPO', {
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
+    data: Sequelize.JSON,
+    date: Sequelize.DATE,
+    time: Sequelize.INTEGER,
+});
+
+//Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'})
+//Tables.belongsTo(Users,{foreignKey:'user', targetKey:'id'})
+
 module.exports = {
     Users,
     Tables,
-    Includes
+    Intras,
+    IPO
 }

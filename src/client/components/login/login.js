@@ -1,12 +1,14 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import {Container, Row, Col, Button, Form, Label, Input, FormGroup, FormFeedback } from 'reactstrap';
+import {Link} from 'react-router-dom';
+import {Button, Form, Label, Input, FormGroup, FormFeedback} from 'reactstrap';
 import RiskLoader from "../loader/loader";
 import * as Utils from "../../../common/utils";
-import * as config from "../../../common/config";
 import * as User from "../../helpers/user";
 import PropTypes from "prop-types";
 import history from "../../helpers/history";
+
+const config = require('../../../common/config');
+const api = config.server.api;
 
 class Login extends React.Component {
     static propTypes = {
@@ -28,28 +30,28 @@ class Login extends React.Component {
     }
 
     handleChange = (e) => {
-        const { name, value } = e.target;
-        this.setState({ [name]: value });
+        const {name, value} = e.target;
+        this.setState({[name]: value});
     };
 
     handleSubmit = (e) => {
         e.preventDefault();
 
-        this.setState({ submitted: true });
-        const { username, password } = this.state;
+        this.setState({submitted: true});
+        const {username, password} = this.state;
         if (username && password) {
             this.login(username, password);
         }
     };
 
     login(username, password) {
-        this.setState({loggingIn:true}, () => {
+        this.setState({loggingIn: true}, () => {
             this.authenticate(username, password).then(
-                user => {
-                    //this.setState({user,loggedIn:true});
+                () => {
                     history.push('/');
                 },
                 error => {
+                    this.setState({loggingIn:false});
                     this.alert('danger', error.toString());
                 }
             );
@@ -57,45 +59,45 @@ class Login extends React.Component {
     }
 
     authenticate(username, password) {
-        return Utils.postJson2(config.server.api.login, { username, password })
-            .then(response => Utils.handleResponse(response, User.remove()))
-            .then(user => {
-                // login successful if there's a jwt token in the response
-                if (user.token) {
-                    // store user details and jwt token in local storage to keep user logged in between page refreshes
-                    User.set(user);
+        return Utils.postJson(api.login, {username, password})
+            .then(res => {
+                console.log(res);
+                if(res.token){
+                    User.set(res.token);
                 }
-
-                return user;
+                else {
+                    throw new Error(res);
+                }
             });
     }
 
-    alert(type, message){
+    alert(type, message) {
         const alert = this.props.onAlert;
-        if(alert) {
+        if (alert) {
             alert({type, message});
         }
     }
 
     render() {
-        const { username, password, submitted, loggingIn } = this.state;
+        const {username, password, submitted, loggingIn} = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h2>Login</h2>
                 <Form name="form" onSubmit={this.handleSubmit}>
                     <FormGroup>
                         <Label for="username">Username</Label>
-                        <Input name="username" value={username} onChange={this.handleChange} invalid={submitted && !username}/>
+                        <Input name="username" value={username} onChange={this.handleChange}
+                               invalid={submitted && !username}/>
                         {submitted && !username && <FormFeedback valid={false}>Username is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>
                         <Label for="password">Password</Label>
-                        <Input name="password" value={password} onChange={this.handleChange} invalid={submitted && !password} />
+                        <Input type="password" name="password" value={password} onChange={this.handleChange}
+                               invalid={submitted && !password}/>
                         {submitted && !password && <FormFeedback valid={false}>Password is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>
-                        <Button color="primary">Login</Button>
-                        {loggingIn && <RiskLoader loading={true}/>}
+                        <Button color="primary" disabled={loggingIn}>{loggingIn ? <RiskLoader size="20" type="ThreeDots" loading={true}/>  : 'Login'}</Button>
                         <Link to="/register" className="btn btn-link">Register</Link>
                     </FormGroup>
                 </Form>
