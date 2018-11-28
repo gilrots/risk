@@ -5,6 +5,7 @@ const _ = require('lodash');
 const bodyParser = require('body-parser');
 const Bank = require('./modules/bank-logic');
 const Tables = require('./modules/tables-logic');
+const Ace = require('./modules/ace');
 const Logic = require('./modules/bussines-logic');
 const DB = require('./modules/database');
 const Auth = require('./modules/auth');
@@ -62,6 +63,8 @@ securedRouter.get(getPath(api.getExcludeList), (req, res) => Logic.getTableExclu
 securedRouter.get(getPath(api.getTableMakerData), (req, res) => Logic.getTableMakerData().then(result => res.send(result)));
 
 securedRouter.get(getPath(api.tableAction.url), (req, res) => Logic.tableAction(req.query).then(result => res.send(result)));
+
+securedRouter.get(getPath(api.searchAce), (req, res) => Ace.search(req.query).then(result => res.json(result)));
 
 app.get('/*', (req, res) => {
     res.sendFile(path.join(__dirname, 'dist/index.html'), function(err) {

@@ -14,6 +14,7 @@
       "getExcludeList":"/api/secured/getExclude",
       "setExcludeList":"/api/secured/setExclude",
       "createTable":"/api/secured/createTable",
+      "searchAce":"/api/secured/searchAce",
       "tableAction":{
         "url": "/api/secured/tableAction",
         "actions":{
@@ -52,6 +53,7 @@
   },
   "app": {
     "updateInterval": 5000,
+    "searchDebounce": 150,
     "defaultTable": {
       "name": "Position Report",
       "id": "-999"
@@ -69,7 +71,8 @@
       "stockField": "http://localhost:4071/aoc/core/AocRT/getdata?s=XXX&f=",
       "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=",
       "aceFields": "http://localhost:4071/Aoc/Core/AocRT/getallfields?",
-      "aceFieldsData": "http://localhost:4071/Aoc/Core/AocRT/getmultifieldinfo?s="
+      "aceFieldsData": "http://localhost:4071/Aoc/Core/AocRT/getmultifieldinfo?s=",
+      "searchStocks": "http://localhost:4071/Aoc/Core/AocRt/getclustervalues?s=select name,symbol from T_BONDS + CORP_BONDS where name contains \"XXX\" headers none, nototal top 10 name"
     }
   }
 }

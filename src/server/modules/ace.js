@@ -109,4 +109,24 @@ function getStocksNames(stockIds) {
     return Promise.all(promises);
 }
 
-module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames };
+function search(params){
+    const {search} = params;
+    const query = encodeURI(config.ace.queries.searchStocks.replace(idToken, search));
+    const queryResult = 'GetClusterValuesResult';
+    return new Promise((resolve) => {
+        Utils.fetchJsonBackend(query).then(res => {
+            const result = aceResponseValid(res, queryResult);
+            const items = [];
+            if (result !== errorField && _.isEmpty(result["Error"])){
+                const rows = result["Cells"];
+                for (let i = 2; i < rows.length; i+=3) {
+                    items.push({name:rows[i+1]["Value"], id:rows[i+2]["Value"]})
+                }
+            }
+
+            resolve({items});
+        });
+    })
+}
+
+module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames, search };
