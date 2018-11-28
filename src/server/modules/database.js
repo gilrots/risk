@@ -1,7 +1,8 @@
 const config = require('../../common/config');
 const sequelize = require("../db/db");
 const ADMIN = config.DB.admin;
-const Users = require('../db/users');
+const UsersDL = require('../db/users');
+const IntrasDL = require('../db/intras');
 const Auth = require('./auth');
 
 function connect() {
@@ -24,14 +25,14 @@ async function registerUser(params, res) {
         res.status(400).json({error: 'admin password wrong'});
     }
     else {
-        const user = await Users.exist(username);
+        const user = await UsersDL.exist(username);
         if (user !== null) {
             res.status(400).json({error: 'username already exist!'});
         }
         else {
             try {
                 const crypted = Auth.encryptPassword(password);
-                const newUser = await Users.create(username, crypted);
+                const newUser = await UsersDL.create(username, crypted);
                 res.status(200).json({success: true});
             }
             catch (e) {
@@ -42,4 +43,20 @@ async function registerUser(params, res) {
     }
 }
 
-module.exports = {connect, registerUser};
+async function getIntras(params) {
+    return await IntrasDL.getAll();
+}
+
+async function setIntras(params) {
+    const {intras} = params;
+    let res = true;
+    try {
+        await IntrasDL.setAll(intras);
+    }
+    catch (e) {
+        res = e.message;
+    }
+    return res
+}
+
+module.exports = {connect, registerUser, getIntras, setIntras};

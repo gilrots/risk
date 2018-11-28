@@ -33,43 +33,42 @@ app.listen(port, () => console.log(`Server is up on port: ${port}`));
 //Posts
 app.post(api.bankPost, (req, res) => Bank.updateStocksData(req.body));
 
-app.post(api.login, (req, res) => {
-    Auth.login(req.body).then(token => res.json(token)).catch(e => res.json(e.message));
-});
+app.post(api.login, (req, res) => Auth.login(req.body).then(token => res.json(token)).catch(e => res.json(e.message)));
 
-app.post(api.register, (req, res) => {
-    DB.registerUser(req.body, res).then();
-});
+app.post(api.register, (req, res) => DB.registerUser(req.body, res).then());
 
 const {getPath} = Utils;
 
 // Secured routes
-const securedRouter = express.Router();
-securedRouter.use(Auth.auth);
-app.use('/api/secured', securedRouter);
+const secured = express.Router();
+secured.use(Auth.auth);
+app.use('/api/secured', secured);
 
-securedRouter.post(getPath(api.createTable), (req, res) => Tables.createTable(req.body));
+//Secured posts
+secured.post(getPath(api.createTable), (req, res) => Tables.createTable(req.body));
 
-securedRouter.post(getPath(api.setExcludeList), (req, res) => {
-    const {tableId, exclude} = req.body;
-    res.send(JSON.stringify(Tables.updateTableExcludes(tableId, exclude)));
-});
+secured.post(getPath(api.setExcludeList), (req, res) => Tables.updateTableExcludes(req.body).then(result => res.json(result)));
 
-//Gets
-securedRouter.get(getPath(api.getData), (req, res) => Logic.getTable(req.query.tableId).then(result => res.send(result)));
+secured.post(getPath(api.setIntras), (req, res) => DB.setIntras(req.body).then(result => res.json(result)));
 
-securedRouter.get(getPath(api.getExcludeList), (req, res) => Logic.getTableExcludeList(req.query.tableId).then(result => res.send(result)));
+//Secured gets
+secured.get(getPath(api.getData), (req, res) => Logic.getTable(req.query.tableId).then(result => res.send(result)));
 
-securedRouter.get(getPath(api.getTableMakerData), (req, res) => Logic.getTableMakerData().then(result => res.send(result)));
+secured.get(getPath(api.getExcludeList), (req, res) => Logic.getTableExcludeList(req.query.tableId).then(result => res.send(result)));
 
-securedRouter.get(getPath(api.tableAction.url), (req, res) => Logic.tableAction(req.query).then(result => res.send(result)));
+secured.get(getPath(api.getTableMakerData), (req, res) => Logic.getTableMakerData().then(result => res.send(result)));
 
-securedRouter.get(getPath(api.searchAce), (req, res) => Ace.search(req.query).then(result => res.json(result)));
+secured.get(getPath(api.tableAction.url), (req, res) => Logic.tableAction(req.query).then(result => res.send(result)));
 
+secured.get(getPath(api.searchAce), (req, res) => Ace.search(req.query).then(result => res.json(result)));
+
+secured.get(getPath(api.getIntras), (req, res) => DB.getIntras(req.query).then(result => res.json(result)));
+
+//Redirect
 app.get('/*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist/index.html'), function(err) {
+    res.sendFile(path.join(__dirname, 'dist/index.html'), err => {
         if (err) {
-            res.status(500).send(err)
+            res.status(500).send(err);
         }
     })
 })

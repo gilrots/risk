@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import {
     Input,  UncontrolledDropdown,
-    DropdownToggle, DropdownMenu, DropdownItem
+    DropdownToggle, DropdownMenu, DropdownItem, Form,FormGroup
 } from 'reactstrap';
 import PropTypes from "prop-types";
 const Utils = require('../../../common/utils');
@@ -77,8 +77,25 @@ class RemoteSearchDropdown extends React.Component {
                 <DropdownToggle className="font-weight-bold">
                     {selected ? selected.name : 'Search...' }
                 </DropdownToggle>
-                <DropdownMenu right style={{maxHeight: 300}}>
-                    <Input placeholder="Search for..." value={search} onChange={e => this.searchChanged(e.target.value)}/>
+                <DropdownMenu right modifiers={{
+                    setMaxHeight: {
+                        enabled: true,
+                        order: 1000,
+                        fn: data => ({
+                                ...data,
+                                styles: {
+                                    ...data.styles,
+                                    overflow: 'auto',
+                                    maxHeight: 300,
+                                },
+                            })
+                    },
+                }}>
+                    <Form>
+                        <FormGroup>
+                            <Input placeholder="Search for..." value={search} onChange={e => this.searchChanged(e.target.value)}/>
+                        </FormGroup>
+                    </Form>
                     <DropdownItem divider/>
                     {items.map(item => (
                         <DropdownItem key={item.id} onClick={()=> this.selectionChanged(item)}>{item.name}</DropdownItem>

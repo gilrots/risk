@@ -71,7 +71,11 @@ function getAllSystemFields() {
                                 innerResolve(DB.allFields);
                             })
                         }
-                    });
+                    }).catch(e => {
+                        //TODO make this catch redundant
+                        console.error("Error at getAllSystemFields", e);
+                        innerResolve(undefined);
+                    });;
                 });
         }
         else {

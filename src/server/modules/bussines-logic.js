@@ -84,6 +84,9 @@ function getTableMakerData() {
             else {
                 resolve([]);
             }
+        }).catch(e => {
+            console.error("getTableMakerData error: ",e);
+            resolve([]);
         })
     });
 }

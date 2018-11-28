@@ -418,14 +418,15 @@ function getTable(tableId){
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-function updateTableExcludes(tableId, excluded){
+async function updateTableExcludes(params){
+    const {tableId, exclude} = params;
     const table = getTable(tableId);
     if(table) {
-        if(Array.isArray(excluded)){
-            table.filter.excluded = excluded;
+        if(Array.isArray(exclude)){
+            table.filter.excluded = exclude;
         }
         else {
-            table.filter.excluded.push(excluded);
+            table.filter.excluded.push(exclude);
         }
     }
     return table !== undefined;

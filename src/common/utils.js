@@ -60,11 +60,14 @@ function tryAtleast(resolve, reject, tries, maxTries, fallback, promiseFunc) {
             resolve(fallback);
         }
         else {
-            tryAtleast(resolve, reject, ++tries, maxTries, fallback, promiseFunc);
+            tryAtleast(resolve, reject, ++tries, maxTries, fallback, promiseFunc).catch(e => {
+                console.error("Error at tryAtleast", e);
+                resolve(fallback);
+            });
         }
     }).catch(e => {
-        //reject(e);
-        console.log(e);
+        console.error("Error at tryAtleast", e);
+        resolve(fallback);
     });
 }
 
@@ -145,6 +148,10 @@ function jsonError(message) {
 function jsonResult(boolean) {
     return {operation: boolean};
 }
+const dateOptions = { day: '2-digit', month: '2-digit',hour: '2-digit',minute: '2-digit', };
+function formatDate(date) {
+    return new Date(Date.parse(date.toString())).toLocaleDateString();;
+}
 
 function moveTo(parent, fromArr, toArr, item, deletedIndex) {
     const to = [...parent[toArr], item];
@@ -153,28 +160,10 @@ function moveTo(parent, fromArr, toArr, item, deletedIndex) {
     return {[toArr]: to, [fromArr]: from};
 }
 
-function handleResponse(response, notFoundCallback) {
-    return response.text().then(text => {
-        const data = text && JSON.parse(text);
-        if (!response.ok) {
-            if (response.status === 401) {
-                // auto logout if 401 response returned from api
-                notFoundCallback();
-                location.reload(true);
-            }
-
-            const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
-        }
-
-        return;
-    });
-}
-
 module.exports = {
     copy, treeForEach, performance, doUntilSuccess, getNumber,
     tryAtleast, divideUrl, replaceAll, setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult
-    , handleResponse, fetchJsonBackend, getPath
+    , fetchJsonBackend, getPath, formatDate
 };
 
 

@@ -1,5 +1,5 @@
-const sequelize = require("./db")
-const Sequelize = require('Sequelize')
+const sequelize = require("./db");
+const Sequelize = require('Sequelize');
 
 const Users = sequelize.define('Users', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
@@ -19,8 +19,9 @@ const Tables = sequelize.define('Tables', {
 const Intras = sequelize.define('Intras', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     stockId: Sequelize.STRING,
+    name: Sequelize.STRING,
     user: Sequelize.INTEGER,
-    amount: Sequelize.INTEGER,
+    amount: Sequelize.DOUBLE,
 });
 
 const IPO = sequelize.define('IPO', {
@@ -30,7 +31,8 @@ const IPO = sequelize.define('IPO', {
     time: Sequelize.INTEGER,
 });
 
-//Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'})
+Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'});
+Users.hasMany(Intras,{foreignKey:'user', sourceKey:'id'});
 //Tables.belongsTo(Users,{foreignKey:'user', targetKey:'id'})
 
 module.exports = {

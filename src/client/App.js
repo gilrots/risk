@@ -191,7 +191,7 @@ export default class App extends Component {
     render() {
         const {data, modal, tableMakerData} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
-        const hasData = !_.isEmpty(data);
+        const hasData = !_.isEmpty(data) && data && data.errors && data.errors.ace !== true;
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
