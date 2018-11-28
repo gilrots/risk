@@ -181,7 +181,7 @@ export default class App extends Component {
 
     openTableMaker = (hasTableData) => {
         if(hasTableData) {
-            this.toggleModal('Create new table', 'TableMaker');
+            this.toggleModal('Create new table', 0);
         }
         else {
             this.getTableMakerData();

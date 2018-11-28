@@ -37,37 +37,29 @@ function getNumber(val, fallback) {
     return Number.isNaN(num) ? fallback : num;
 }
 
-async function doUntilSuccess(promise) {
-    let response;
-    do {
-        try {
-            response = await promise;
-        }
-        catch (e) {
-            console.log(e);
-        }
-    } while (!response);
-
-    return response;
+function tryCounter(maxTries, fallback = undefined) {
+    const counter = {tries:0,maxTries,fallback};
+    counter.next = () => counter.tries++;
+    counter.done = () => counter.tries > counter.maxTries;
+    counter.almost = () => counter.tries === counter.maxTries;
+    return counter;
 }
 
-function tryAtleast(resolve, reject, tries, maxTries, fallback, promiseFunc) {
+function tryAtleast(resolve, counter, promiseFunc) {
     new Promise(promiseFunc).then(result => {
         if (result !== undefined) {
             resolve(result);
         }
-        else if (tries > maxTries) {
-            resolve(fallback);
+        else if (counter.done()) {
+            resolve(counter.fallback);
         }
         else {
-            tryAtleast(resolve, reject, ++tries, maxTries, fallback, promiseFunc).catch(e => {
-                console.error("Error at tryAtleast", e);
-                resolve(fallback);
-            });
+            counter.next();
+            tryAtleast(resolve, counter, promiseFunc);
         }
     }).catch(e => {
         console.error("Error at tryAtleast", e);
-        resolve(fallback);
+        resolve(counter.fallback);
     });
 }
 
@@ -161,9 +153,10 @@ function moveTo(parent, fromArr, toArr, item, deletedIndex) {
 }
 
 module.exports = {
-    copy, treeForEach, performance, doUntilSuccess, getNumber,
-    tryAtleast, divideUrl, replaceAll, setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult
-    , fetchJsonBackend, getPath, formatDate
+    copy, treeForEach, performance, getNumber,
+    tryAtleast, tryCounter, divideUrl, replaceAll,
+    setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
+    fetchJsonBackend, getPath, formatDate
 };
 
 

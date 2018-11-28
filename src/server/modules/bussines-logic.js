@@ -17,8 +17,9 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
     aceDB.data[stockId] = Tables.formatAceData(stockId,aceDB,aceData,aceFields);
 }
 
-function getTable(tableId) {
-    return new Promise((resolve, reject) => {
+function getTable(params) {
+    const {tableId} = params;
+    return new Promise(resolve => {
         const table =  Tables.getTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
@@ -31,46 +32,36 @@ function getTable(tableId) {
         else {
             Bank.filter(bankDB, table.filter.excluded);
             const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
-            getAllAceData(resolve, reject, {table, bankDB,aceDB,aceQuery, ids:bankDB.ids, tries:0});
-        }
-    });
-}
+            let ids = bankDB.ids;
+            const counter = Utils.tryCounter(config.ace.tries, []);
+            Utils.tryAtleast(resolve, counter,
+                innerResolve => {
+                    const promises = _.map(ids, stockId =>
+                        Utils.fetchJsonBackend(Ace.setQueryId(stockId, aceQuery))
+                            .then(aceData => handleAceData(aceDB, stockId, aceData, table.calculated.aceFields))
+                            .catch(e => handleAceError(aceDB, e)));
+                    Promise.all(promises).then(() => {
+                        const missingIds = _.keys(aceDB.errors.fieldsMissing);
+                        aceDB.errors.fieldsMissing = {};
+                        let result = undefined;
 
-function getAllAceData(resolve, reject, data) {
-    const t0 = new Date().getTime();
-    const {table, bankDB,aceDB,aceQuery,ids} = data;
-    const promises = _.map(ids, stockId =>
-        fetch(Ace.setQueryId(stockId, aceQuery))
-            .then(res => res.json())
-            .then(aceData => handleAceData(aceDB, stockId, aceData, table.calculated.aceFields))
-            .catch(e => handleAceError(aceDB, e)));
-
-    Promise.all(promises).then(() => {
-        const missingIds = _.keys(aceDB.errors.fieldsMissing);
-        aceDB.errors.fieldsMissing = {};
-        if(missingIds.length === 0 || data.tries > config.ace.tries) {
-            try {
-                const result = Tables.calculateTable(table,bankDB,aceDB);
-                const t1 = new Date().getTime();
-                console.log(`Call to table took ${t1 - t0} milliseconds`);
-                resolve(result);
-            }
-            catch (e) {
-                const error = Tables.getResultFormat();
-                error.errors.ace = true;
-                if( error.errors.errors) {
-                    error.errors.errors.push(e.message);
+                        if (missingIds.length === 0 || counter.almost()) {
+                            try {
+                                result = Tables.calculateTable(table, bankDB, aceDB);
+                            }
+                            catch (e) {
+                                result = Tables.getResultFormat();
+                                result.errors.ace = true;
+                                result.errors.generalError = e.message;
+                            }
+                        }
+                        else {
+                            ids = missingIds;
+                        }
+                        innerResolve(result);
+                    });
                 }
-                else {
-                    error.errors.errors = [e.message];
-                }
-                resolve(error);
-            }
-        }
-        else {
-            data.ids = missingIds;
-            data.tries++;
-            getAllAceData(resolve, reject, data);
+            );
         }
     });
 }
@@ -109,7 +100,8 @@ function tableAction(params) {
     });
 }
 
-function getTableExcludeList(tableId) {
+function getTableExcludeList(params) {
+    const {tableId} = params;
     return new Promise(resolve => {
         const table = Tables.getTable(tableId);
         if(table) {

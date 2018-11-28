@@ -38,6 +38,8 @@ app.post(api.login, (req, res) => Auth.login(req.body).then(token => res.json(to
 app.post(api.register, (req, res) => DB.registerUser(req.body, res).then());
 
 const {getPath} = Utils;
+const answer = (req,res,promise) => promise(req.body).then(result => res.json(result));
+const answer2 = (req,res,promise) => promise(req.query).then(result => res.json(result));
 
 // Secured routes
 const secured = express.Router();
@@ -47,22 +49,22 @@ app.use('/api/secured', secured);
 //Secured posts
 secured.post(getPath(api.createTable), (req, res) => Tables.createTable(req.body));
 
-secured.post(getPath(api.setExcludeList), (req, res) => Tables.updateTableExcludes(req.body).then(result => res.json(result)));
+secured.post(getPath(api.setExcludeList), (req, res) => answer(req,res,Tables.updateTableExcludes));
 
-secured.post(getPath(api.setIntras), (req, res) => DB.setIntras(req.body).then(result => res.json(result)));
+secured.post(getPath(api.setIntras), (req, res) => answer(req,res,DB.setIntras));
 
 //Secured gets
-secured.get(getPath(api.getData), (req, res) => Logic.getTable(req.query.tableId).then(result => res.send(result)));
+secured.get(getPath(api.getData), (req, res) => answer2(req,res,Logic.getTable));
 
-secured.get(getPath(api.getExcludeList), (req, res) => Logic.getTableExcludeList(req.query.tableId).then(result => res.send(result)));
+secured.get(getPath(api.getExcludeList), (req, res) => answer2(req,res,Logic.getTableExcludeList));
 
-secured.get(getPath(api.getTableMakerData), (req, res) => Logic.getTableMakerData().then(result => res.send(result)));
+secured.get(getPath(api.getTableMakerData), (req, res) => answer(req,res,Logic.getTableMakerData));
 
-secured.get(getPath(api.tableAction.url), (req, res) => Logic.tableAction(req.query).then(result => res.send(result)));
+secured.get(getPath(api.tableAction.url), (req, res) => answer2(req,res,Logic.tableAction));
 
-secured.get(getPath(api.searchAce), (req, res) => Ace.search(req.query).then(result => res.json(result)));
+secured.get(getPath(api.searchAce), (req, res) => answer2(req,res,Ace.search));
 
-secured.get(getPath(api.getIntras), (req, res) => DB.getIntras(req.query).then(result => res.json(result)));
+secured.get(getPath(api.getIntras), (req, res) => answer2(req,res,DB.getIntras));
 
 //Redirect
 app.get('/*', (req, res) => {

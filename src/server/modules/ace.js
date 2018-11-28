@@ -54,16 +54,18 @@ function setQueryId(id,query) {
 }
 
 function getAllSystemFields() {
-    return new Promise((resolve, reject) => {
+    const queryResult = 'GetAllFieldsResult';
+    return new Promise(resolve => {
         if (DB.allFields.length === 0) {
-            Utils.tryAtleast(resolve, reject, 0, config.ace.tries, [],
-                (innerResolve) => {
-                    fetch(config.ace.queries.aceFields).then(res => res.json()).then(fieldsResult => {
-                        if (fieldsResult === undefined || fieldsResult.GetAllFieldsResult === undefined || fieldsResult.GetAllFieldsResult === errorField) {
-                            innerResolve(undefined);//throw 'ace returned no fields!'
+            Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
+                innerResolve => {
+                    Utils.fetchJsonBackend(config.ace.queries.aceFields).then(fieldsResponse => {
+                        const responseValue = aceResponseValid(fieldsResponse, queryResult);
+                        if (responseValue === errorField) {
+                            innerResolve(undefined);
                         }
                         else {
-                            const urls = Utils.divideUrl(fieldsResult.GetAllFieldsResult, 1000, ',');
+                            const urls = Utils.divideUrl(responseValue, 1000, ',');
                             const promises = _.map(urls, urlParams => fetch(getFieldsDataQuery(urlParams)).then(res => res.json()));
                             Promise.all(promises).then(res => {
                                 const allFieldsData = _.reduce(res, (acc,curr) => acc.concat(curr.GetMultiFieldInfoResult),[]);
@@ -75,7 +77,7 @@ function getAllSystemFields() {
                         //TODO make this catch redundant
                         console.error("Error at getAllSystemFields", e);
                         innerResolve(undefined);
-                    });;
+                    });
                 });
         }
         else {
@@ -100,14 +102,13 @@ function getStocksNames(stockIds) {
     const aceQuery = getFieldQuery(config.ace.nameField);
     const queryResult = 'GetDataResult';
     const promises = stockIds.map(stockId =>
-        new Promise((resolve, reject) => {
-            Utils.tryAtleast(resolve, reject, 0, config.ace.tries, undefined,
+        new Promise(resolve =>
+            Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries),
                 innerResolve =>
                     Utils.fetchJsonBackend(setQueryId(stockId, aceQuery)).then(response => {
                         const result = aceResponseValid(response, queryResult);
-                        innerResolve(result !== errorField ? {id:stockId, name: result} : undefined);
-                    }));
-        })
+                        innerResolve(result !== errorField ? {id: stockId, name: result} : undefined);
+                    })))
     );
 
     return Promise.all(promises);
