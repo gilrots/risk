@@ -169,6 +169,7 @@ class TableMaker extends React.Component {
                                         </ButtonGroup>
                                     </Col>
                                     <Col>
+                                        {/*TODO: solve stock value index bug*/}
                                         <SearchDropdown id="items-dropdown" items={getItems(param.source, col.name)} selectedId={param.item.id}
                                                         onSelected={item => this.setColData(index, 'params', item, parIndex,'item')}/>
                                     </Col>

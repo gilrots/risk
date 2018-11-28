@@ -3,7 +3,7 @@ import _ from 'lodash';
 import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
-import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader, NavItem, Nav, TabContent, TabPane, NavLink } from 'reactstrap';
+import {Container, Row, Col, Button, Modal, ModalBody, ModalFooter, ModalHeader, NavItem, Nav, TabContent, TabPane, NavLink, Badge } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 import classnames from 'classnames';
 import * as Utils from '../common/utils';
@@ -11,6 +11,8 @@ import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
 import FilterMaker from "./components/filter-maker/filter-maker";
 import ExcludeList from "./components/exclude-list/exclude-list";
 import RiskLoader from "./components/loader/loader";
+import IntraDaysList from "./components/intra-days/intra-days-list";
+import IPOList from "./components/ipo-list/ipo-list";
 const config = require('../common/config');
 const api = config.server.api;
 const ta = api.tableAction;
@@ -94,6 +96,10 @@ export default class App extends Component {
                 return (<FilterMaker id="filter-maker"/>);
             case 2:
                 return (<ExcludeList id="exclude-list" tableId={activeTable}/>);
+            case 3:
+                return (<IntraDaysList id="intradays" tableId={activeTable}/>);
+            case 4:
+                return (<IPOList id="ipos" tableId={activeTable}/>);
             default:
                 return (<div>---</div>);
         }
@@ -126,7 +132,27 @@ export default class App extends Component {
               </ModalFooter>
           </Modal>
           <AppHeader>
-              {hasData && <Button color={data.errors.ace ? 'danger' : 'success'}>Ace</Button>}
+              {hasData &&
+              <Fragment>
+                  <NavItem className="d-flex align-items-center mr-1">
+                      <Badge color={data.errors.ace ? 'danger' : 'success'}>Ace</Badge>
+                  </NavItem>
+                  <NavItem className="d-flex align-items-center mr-1">
+                      <Badge color={data.errors.ubank ? 'danger' : 'success'}>U-Bank</Badge>
+                  </NavItem>
+                  <NavItem className="d-flex align-items-center mr-1">
+                      <Badge color={data.errors.poalim ? 'danger' : 'success'}>פועלים</Badge>
+                  </NavItem>
+                  <NavItem className="d-flex align-items-center mr-1">
+                      <Badge color={data.errors.igud ? 'danger' : 'success'}>איגוד</Badge>
+                  </NavItem>
+              </Fragment>}
+              <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("Intradays", 3)}>
+                  <NavLink className="font-weight-bold">IntraDay</NavLink>
+              </NavItem>
+              <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("IPO", 4)}>
+                  <NavLink className="font-weight-bold">IPO</NavLink>
+              </NavItem>
           </AppHeader>
           <RiskLoader loading={!hasData}>
               {hasData && <main className="my-5 py-5">
@@ -178,12 +204,10 @@ export default class App extends Component {
                       )}
                       {hasTableData &&
                       <NavItem>
-                          <NavLink>
-                              <Button className="rounded-circle" outline color="primary"
-                                      onClick={() => this.toggleModal('Create new table', 'TableMaker')}>
-                                  <i className="fa fa-plus"/>
-                              </Button>
-                          </NavLink>
+                          <Button className="rounded-circle mx-2" outline color="primary"
+                                  onClick={() => this.toggleModal('Create new table', 'TableMaker')}>
+                              <i className="fa fa-plus"/>
+                          </Button>
                       </NavItem>}
                   </Nav>
                   <TabContent activeTab={'0'}>

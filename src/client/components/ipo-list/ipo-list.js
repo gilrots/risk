@@ -4,10 +4,9 @@ import * as Utils from '../../../common/utils';
 import {Container, Row, Col, Button} from "reactstrap";
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
-import {StockList} from "./stock-list";
 const api = require('../../../common/config').server.api;
 
-class ExcludeList extends React.Component {
+class IPOList extends React.Component {
     static propTypes = {
         tableId: PropTypes.string.isRequired,
     };
@@ -66,4 +65,4 @@ class ExcludeList extends React.Component {
     }
 }
 
-export default ExcludeList;
+export default IPOList;
