@@ -126,10 +126,10 @@ export default class App extends Component {
 
     getTableActions = (table) => {
         return [{
-            name: 'Copy',
+            name: 'Duplicate',
             icon: 'copy',
             action: () => this.tableAction(ta.url, table.id, ta.actions.copy)
-        },
+            },
             {
                 name: 'Filter',
                 icon: 'filter',
@@ -149,6 +149,11 @@ export default class App extends Component {
                 name: 'Delete',
                 icon: 'times',
                 action: () => this.tableAction(ta.url, table.id, ta.actions.remove)
+            },
+            {
+                name: 'Export',
+                icon: 'file-excel',
+                action: () => {}
             },
         ];
     };
@@ -204,7 +209,7 @@ export default class App extends Component {
                         <Badge color={badge.ok ? 'danger' : 'success'}>{badge.name}</Badge>
                     </NavItem>
                 )}
-                <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("Intradays", 3)}>
+                <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("IntraDay", 3)}>
                     <NavLink className="font-weight-bold">IntraDay</NavLink>
                 </NavItem>
                 <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("IPO", 4)}>
