@@ -26,9 +26,13 @@ const Intras = sequelize.define('Intras', {
 
 const IPO = sequelize.define('IPO', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
-    data: Sequelize.JSON,
-    date: Sequelize.DATE,
-    time: Sequelize.INTEGER,
+    name: Sequelize.STRING,
+    data: Sequelize.ARRAY(Sequelize.JSON),
+});
+
+const IPOFavorites = sequelize.define('IPOFavorites', {
+    id:{type:Sequelize.STRING, primaryKey:true},
+    name: Sequelize.STRING,
 });
 
 Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'});
@@ -41,3 +45,4 @@ module.exports = {
     Intras,
     IPO
 }
+

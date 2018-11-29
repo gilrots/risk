@@ -14,36 +14,28 @@ class RemoteSearchDropdown extends React.Component {
         searchParam:PropTypes.string.isRequired,
         onSelected: PropTypes.func,
         debounceTime: PropTypes.number,
-        //selectedId: PropTypes.string,
+        selected: PropTypes.shape({
+            name: PropTypes.string.isRequired,
+            id: PropTypes.string.isRequired
+        }),
     };
 
     constructor(props) {
         super(props);
-        this.state = this.initState();
+        this.state = {
+            search: '',
+            items: [],
+            selected: props.selected
+        };
         this.remoteSearch = _.debounce(this.remoteSearch, props.debounceTime ? props.debounceTime : 150);
     }
 
-    initState() {
-        return {
-            search: '',
-            items: [],
-        };
+    componentWillReceiveProps(nextProps) {
+        const {selected} = nextProps;
+        if (selected && selected !== this.props.selected) {
+            this.setState({selected});
+        }
     }
-
-    // componentWillReceiveProps(nextProps) {
-    //     if (nextProps.items && nextProps.items !== this.props.items) {
-    //         this.setState(this.initState(nextProps));
-    //     }
-    //     if (nextProps.selectedId && nextProps.selectedId !== this.props.selectedId) {
-    //         const item = nextProps.items.find(item => item.id === nextProps.selectedId);
-    //         if(item){
-    //             this.selectionChanged(item);
-    //         }
-    //         else {
-    //             console.log(`No such item id:${nextProps.selectedId}`);
-    //         }
-    //     }
-    // }
 
     searchChanged = value => {
         if( _.isEmpty(value)){

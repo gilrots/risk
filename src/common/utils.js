@@ -45,6 +45,17 @@ function tryCounter(maxTries, fallback = undefined) {
     return counter;
 }
 
+function setMixins() {
+    const limit = function(collection, predicate, limit = 1) {
+        return _.transform(collection, function(result, value) {
+          predicate(value) && result.push(value);
+          return result.length < limit;
+        });
+      };
+
+    _.mixin({limit});
+}
+
 function tryAtleast(resolve, counter, promiseFunc) {
     new Promise(promiseFunc).then(result => {
         if (result !== undefined) {
@@ -156,7 +167,7 @@ module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
-    fetchJsonBackend, getPath, formatDate
+    fetchJsonBackend, getPath, formatDate, setMixins
 };
 
 

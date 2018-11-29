@@ -73,7 +73,7 @@ function getTableMakerData() {
                 resolve({ace:result, bank: Bank.getFields()});
             }
             else {
-                resolve([]);
+                resolve([]); 
             }
         }).catch(e => {
             console.error("getTableMakerData error: ",e);
@@ -81,6 +81,18 @@ function getTableMakerData() {
         })
     });
 }
+
+async function searchAceFields(params) {
+    const {search} = params;
+    const fields = await getTableMakerData();
+    const result = {items:[]};
+    if(_.isEmpty(fields))
+        return result;
+    result.items = _.limit(fields.ace, item => item.id.includes(search) || item.name.includes(search), 10);
+    return result;
+}
+
+
 
 function tableAction(params) {
     return new Promise(resolve => {
@@ -119,4 +131,4 @@ function getTableExcludeList(params) {
     });
 }
 
-module.exports = {getTable, getTableMakerData, tableAction, getTableExcludeList};
+module.exports = {getTable, getTableMakerData, tableAction, getTableExcludeList, searchAceFields};

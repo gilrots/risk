@@ -10,13 +10,13 @@ const Logic = require('./modules/bussines-logic');
 const DB = require('./modules/database');
 const Auth = require('./modules/auth');
 const Utils = require('../common/utils');
+Utils.setMixins();
 
 const config = require('../common/config.json');
 const mockData = _.values(require('../mocks/mock-table.json'));
 const api = config.server.api;
 const mock = config.server.mock;
 const port = config.server.port;
-
 DB.connect();
 Tables.init();
 // Generate mock data
@@ -53,6 +53,8 @@ secured.post(getPath(api.setExcludeList), (req, res) => answer(req,res,Tables.up
 
 secured.post(getPath(api.setIntras), (req, res) => answer(req,res,DB.setIntras));
 
+secured.post(getPath(api.setIPOs), (req, res) => answer(req,res,DB.setIPOs));
+
 //Secured gets
 secured.get(getPath(api.getData), (req, res) => answer2(req,res,Logic.getTable));
 
@@ -64,7 +66,11 @@ secured.get(getPath(api.tableAction.url), (req, res) => answer2(req,res,Logic.ta
 
 secured.get(getPath(api.searchAce), (req, res) => answer2(req,res,Ace.search));
 
+secured.get(getPath(api.searchAceFields), (req, res) => answer2(req,res,Logic.searchAceFields));
+
 secured.get(getPath(api.getIntras), (req, res) => answer2(req,res,DB.getIntras));
+
+secured.get(getPath(api.getIPOs), (req, res) => answer2(req,res,DB.getIPOs));
 
 //Redirect
 app.get('/*', (req, res) => {

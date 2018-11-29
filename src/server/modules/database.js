@@ -3,6 +3,7 @@ const sequelize = require("../db/db");
 const ADMIN = config.DB.admin;
 const UsersDL = require('../db/users');
 const IntrasDL = require('../db/intras');
+const IposDL = require('../db/ipo');
 const Auth = require('./auth');
 
 function connect() {
@@ -59,4 +60,20 @@ async function setIntras(params) {
     return res
 }
 
-module.exports = {connect, registerUser, getIntras, setIntras};
+async function getIPOs(params) {
+    return await IposDL.getAll();
+}
+
+async function setIPOs(params) {
+    const {ipos} = params;
+    let res = true;
+    try {
+        await IposDL.setAll(ipos);
+    }
+    catch (e) {
+        res = e.message;
+    }
+    return res
+}
+
+module.exports = {connect, registerUser, getIntras, setIntras, getIPOs, setIPOs};
