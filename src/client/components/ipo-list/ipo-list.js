@@ -12,16 +12,23 @@ const debTime = config.app.searchDebounce;
 class IPOList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { ipos: [], selectedIndex: undefined, newIpo: '' };
+        this.state = { ipos: [], favs:[], selectedIndex: undefined, newIpo: '' };
     }
 
     componentDidMount() {
         this.getIpos();
+        this.getIPOFavs();
     }
 
     getIpos = () => {
         Utils.fetchJson(api.getIPOs).then(ipos => {
             this.setState({ ipos });
+        })
+    }
+
+    getIPOFavs = () => {
+        Utils.fetchJson(api.getIPOFavs).then(favs => {
+            this.setState({ favs });
         })
     }
 
@@ -34,11 +41,19 @@ class IPOList extends React.Component {
         });
     };
 
+    setFav = (favorite, remove=false) => {
+        Utils.postJson(api.updateIPOFav, { favorite, remove }).then(response => {
+            if (response === true) {
+                this.getIPOFavs();
+            }
+        });
+    };
+
     addIPO = () => {
         this.setState(ps => ({
             ipos: [...ps.ipos, {
                 name: ps.newIpo,
-                data: [{ field: undefined, value: undefined }],
+                data: ps.favs.length > 0 ? Utils.copy(ps.favs).map(fav => ({field:fav, value:''})) : [{ field: undefined, value: '' }],
             }],
             selectedIndex: ps.ipos.length,
         }));
@@ -80,7 +95,7 @@ class IPOList extends React.Component {
 
 
     render() {
-        const { ipos, newIpo, selectedIndex } = this.state;
+        const { ipos, newIpo, selectedIndex, favs } = this.state;
         const selectedIpo = ipos[selectedIndex];
         const addDisabled = _.isEmpty(newIpo) || _.some(ipos, ipo => ipo.name === newIpo);
         return (<Container>
@@ -99,12 +114,11 @@ class IPOList extends React.Component {
                                             <th>Name</th>
                                             <th>Date</th>
                                             <th></th>
-                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {ipos.map((ipo, index) =>
-                                            <tr className={`pop-box ${selectedIndex === index ? 'active' : ''}`} key={ipo.stockId} 
+                                            <tr className={`pop-box ${selectedIndex === index ? 'active' : ''}`} key={ipo.name} 
                                                 onClick={(e) => {e.preventDefault(); this.setState({selectedIndex:index});}}>
                                                 <th scope="row">{index + 1}</th>
                                                 <td>{ipo.name}</td>
@@ -117,7 +131,7 @@ class IPOList extends React.Component {
                                                 </td>
                                             </tr>)}
                                         <tr>
-                                            <td colSpan="4"><Input type="text" value={newIpo}
+                                            <td colSpan="3"><Input type="text" value={newIpo}
                                                 onChange={e => this.setState({ newIpo: e.target.value })} /></td>
                                             <td align="center">
                                                 <Button color="success" onClick={() => this.addIPO()} disabled={addDisabled}>Add</Button>
@@ -140,8 +154,9 @@ class IPOList extends React.Component {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {selectedIpo.data.map((dataField, index) =>
-                                                <tr className="pop-box" key={index.toString()}>
+                                            {selectedIpo.data.map((dataField, index) => {
+                                               const isFav =  dataField.field && _.some(favs,f => f.id === dataField.field.id);
+                                               return <tr className="pop-box" key={index}>
                                                     <td>
                                                         <RemoteSearchDropdown query={api.searchAceFields} debounceTime={debTime}
                                                             searchParam="search"
@@ -153,20 +168,20 @@ class IPOList extends React.Component {
                                                             onChange={e => this.updateIPOData(index, 'value', e.target.value)} />
                                                     </td>
                                                     <td align="center" style={{verticalAlign: "center"}}>
+                                                        <Badge color={isFav ? "primary" : "secondary"}
+                                                            onClick={() => this.setFav(dataField.field,isFav)}>
+                                                            <i className="fa fa-thumbtack"/>
+                                                        </Badge>
+                                                    </td>
+                                                    <td align="center" style={{verticalAlign: "center"}}>
                                                         <Badge className="pop-item" color="danger"
                                                             onClick={() => this.deleteIPODataField(index)}>
                                                             <i className="fa fa-times"/>
                                                         </Badge>
                                                     </td>
-                                                    <td align="center" style={{verticalAlign: "center"}}>
-                                                        <Badge className="pop-item" color="secondary"
-                                                            onClick={() => this.pinDataField(dataField.field)}>
-                                                            <i className="fa fa-thumbtack"/>
-                                                        </Badge>
-                                                    </td>
-                                                </tr>)}
+                                            </tr>;})}
                                             <tr>
-                                                <td colSpan="3" align="right">
+                                                <td colSpan="4" align="right">
                                                     <Button outline className="rounded-circle" color="success" onClick={() => this.addIPODataField()}><i className="fa fa-plus"/></Button>
                                                 </td>
                                             </tr>

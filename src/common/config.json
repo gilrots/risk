@@ -18,6 +18,8 @@
       "searchAceFields":"/api/secured/searchAceFields",
       "getIntras":"/api/secured/getIntras",
       "setIntras":"/api/secured/setIntras",
+      "getIPOFavs":"/api/secured/getIPOFavs",
+      "updateIPOFav":"/api/secured/updateIPOFav",
       "getIPOs":"/api/secured/getIPOs",
       "setIPOs":"/api/secured/setIPOs",
       "tableAction":{

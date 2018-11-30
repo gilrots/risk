@@ -55,6 +55,8 @@ secured.post(getPath(api.setIntras), (req, res) => answer(req,res,DB.setIntras))
 
 secured.post(getPath(api.setIPOs), (req, res) => answer(req,res,DB.setIPOs));
 
+secured.post(getPath(api.updateIPOFav), (req, res) => answer(req,res,DB.updateIPOFavorite));
+
 //Secured gets
 secured.get(getPath(api.getData), (req, res) => answer2(req,res,Logic.getTable));
 
@@ -71,6 +73,8 @@ secured.get(getPath(api.searchAceFields), (req, res) => answer2(req,res,Logic.se
 secured.get(getPath(api.getIntras), (req, res) => answer2(req,res,DB.getIntras));
 
 secured.get(getPath(api.getIPOs), (req, res) => answer2(req,res,DB.getIPOs));
+
+secured.get(getPath(api.getIPOFavs), (req, res) => answer2(req,res,DB.getIPOFavorites));
 
 //Redirect
 app.get('/*', (req, res) => {

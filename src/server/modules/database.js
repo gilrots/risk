@@ -4,6 +4,7 @@ const ADMIN = config.DB.admin;
 const UsersDL = require('../db/users');
 const IntrasDL = require('../db/intras');
 const IposDL = require('../db/ipo');
+const FavsDL = require('../db/ipofavorites');
 const Auth = require('./auth');
 
 function connect() {
@@ -76,4 +77,25 @@ async function setIPOs(params) {
     return res
 }
 
-module.exports = {connect, registerUser, getIntras, setIntras, getIPOs, setIPOs};
+async function getIPOFavorites() {
+    return await FavsDL.getAll();
+}
+
+async function updateIPOFavorite(params) {
+    const {favorite, remove} = params;
+    let res = true;
+    try {
+        if(remove) {
+            await FavsDL.deleteOne(favorite);
+        }
+        else {
+            await FavsDL.createOne(favorite);
+        }
+    }
+    catch (e) {
+        res = e.message;
+    }
+    return res
+}
+
+module.exports = {connect, registerUser, getIntras, setIntras, getIPOs, setIPOs, getIPOFavorites, updateIPOFavorite};

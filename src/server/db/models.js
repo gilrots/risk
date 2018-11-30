@@ -32,17 +32,20 @@ const IPO = sequelize.define('IPO', {
 
 const IPOFavorites = sequelize.define('IPOFavorites', {
     id:{type:Sequelize.STRING, primaryKey:true},
+    user: Sequelize.INTEGER,
     name: Sequelize.STRING,
 });
 
 Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'});
 Users.hasMany(Intras,{foreignKey:'user', sourceKey:'id'});
+Users.hasMany(IPOFavorites,{foreignKey:'user', sourceKey:'id'});
 //Tables.belongsTo(Users,{foreignKey:'user', targetKey:'id'})
 
 module.exports = {
     Users,
     Tables,
     Intras,
-    IPO
+    IPO,
+    IPOFavorites
 }
 
