@@ -2,9 +2,8 @@ import React from 'react';
 const logo = require('../../assests/logo.jpg');
 
 import {
-    Container, Row, Col, Form, Input, Button, Navbar, Nav,
-    NavbarBrand, NavLink, NavItem, UncontrolledDropdown,
-    DropdownToggle, DropdownMenu, DropdownItem
+    Container, Row, Col, Navbar, Nav,
+    NavbarBrand, NavLink, NavItem, 
 } from 'reactstrap';
 
 const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
@@ -25,7 +24,7 @@ class AppHeader extends React.Component {
                                                  style={{width: 36}}/>
                                         </NavLink>
                                     </NavItem>
-                                    {this.props.children}
+                                    {this.props.children.slice(1)}
                                 </Nav>
                             </Col>
 
@@ -36,11 +35,8 @@ class AppHeader extends React.Component {
                             </Col>
 
                             <Col className="d-none d-lg-flex justify-content-end">
-                                <Form inline>
-                                    <Input type="search" className="mr-3" placeholder="Search bonds"/>
-                                </Form>
+                                {this.props.children[0]}
                             </Col>
-
                         </Row>
                     </Container>
 

@@ -51,11 +51,11 @@ class ExcludeList extends React.Component {
                 <Container>
                     <Row>
                         <Col>
-                            <StockList title="Included" items={included} color="danger"
+                            <StockList title="Included" stocks={included} color="danger"
                                        icon="fa fa-times" func={this.exclude}/>
                         </Col>
                         <Col>
-                            <StockList title="Excluded" items={excluded} color="success"
+                            <StockList title="Excluded" stocks={excluded} color="success"
                                        icon="fa fa-check" func={this.include}/>
                         </Col>
                     </Row>

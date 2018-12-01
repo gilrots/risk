@@ -15,6 +15,8 @@ import ExcludeList from "./components/exclude-list/exclude-list";
 import RiskLoader from "./components/loader/loader";
 import IntraDaysList from "./components/intra-days/intra-days-list";
 import IPOList from "./components/ipo-list/ipo-list";
+import RiskSettings from './components/settings/settings';
+import { IconedMenu } from './components/func-components';
 
 const config = require('../common/config');
 const api = config.server.api;
@@ -28,6 +30,7 @@ export default class App extends Component {
             activeTable: config.app.defaultTable.id,
             tableMakerData: {},
             editedTable: {},
+            excludeMode: false,
             modal: {
                 isOpen: false,
                 newTable: false
@@ -108,6 +111,8 @@ export default class App extends Component {
                 return (<IntraDaysList id="intradays" tableId={activeTable}/>);
             case 4:
                 return (<IPOList id="ipos" tableId={activeTable}/>);
+            case 5:
+                return (<RiskSettings id="risk-settings"/>);
             default:
                 return (<div>---</div>);
         }
@@ -158,6 +163,30 @@ export default class App extends Component {
         ];
     };
 
+    getNavMenuActions = () => {
+        return [{
+                name: 'IntraDay',
+                icon: 'phone',
+                action: () => this.toggleModal("IntraDay", 3)
+            },
+            {
+                name: 'IPO',
+                icon: 'plus',
+                action: () => this.toggleModal("IPO", 4)
+            },
+            {
+                name: 'Exclude Mode',
+                icon: 'ban',
+                action: () => this.setState(ps => ({excludeMode:!ps.excludeMode}))
+            },
+            {
+                name: 'User Settings',
+                icon: 'user-cog',
+                action: () => this.toggleModal("Settings", 5)
+            }
+        ];
+    };
+
     getSystemIndication = (data) => {
         return data && data.errors ? [{
             name: 'Ace',
@@ -192,6 +221,8 @@ export default class App extends Component {
         const {data, modal, tableMakerData} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = !_.isEmpty(data) && data && data.errors && data.errors.ace !== true;
+        const systemInds = this.getSystemIndication(data);
+        const navItems = this.getNavMenuActions();
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
@@ -203,35 +234,20 @@ export default class App extends Component {
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>
-            <AppHeader>
-                {this.getSystemIndication(data).map(badge =>
+        <AppHeader>
+                {systemInds.map(badge =>
                     <NavItem key={badge.name} className="d-flex align-items-center mr-1">
                         <Badge color={badge.ok ? 'danger' : 'success'}>{badge.name}</Badge>
                     </NavItem>
                 )}
-                <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("IntraDay", 3)}>
-                    <NavLink className="font-weight-bold">IntraDay</NavLink>
-                </NavItem>
-                <NavItem className="d-flex align-items-center" onClick={() => this.toggleModal("IPO", 4)}>
-                    <NavLink className="font-weight-bold">IPO</NavLink>
-                </NavItem>
+                <IconedMenu items={navItems} title="Menu"/>
             </AppHeader>
             <RiskLoader loading={!hasData}>
                 {hasData && <main className="my-5 py-5">
                     <Nav tabs>
                         {data.tables.map((table) =>
-                            <UncontrolledDropdown key={table.id} className="d-flex align-items-center" nav inNavbar
-                                                  onClick={() => this.toggleTab(table.id)}>
-                                <DropdownToggle className="font-weight-bold" nav caret>{table.name}</DropdownToggle>
-                                <DropdownMenu right>
-                                    {this.getTableActions(table).map(item =>
-                                        <DropdownItem key={item.name} onClick={item.action}>
-                                            <i className={`fa fa-${item.icon} mr-2`}/>{item.name}
-                                        </DropdownItem>
-                                    )}
-                                </DropdownMenu>
-                            </UncontrolledDropdown>
-                        )}
+                        <IconedMenu key={table.id} items={this.getTableActions(table)} 
+                        title={table.name} menuClick={() => this.toggleTab(table.id)} />)}
                         <NavItem>
                             <Button className="rounded-circle mx-2" outline color="primary"
                                     onClick={() => this.openTableMaker(hasTableData)}>

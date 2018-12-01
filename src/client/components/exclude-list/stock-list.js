@@ -2,7 +2,7 @@ import React, {Fragment} from "react";
 import {ListGroup, ListGroupItem, Button} from "reactstrap";
 
 export function StockList(props) {
-    const {title, items: stocks, icon, color, func} = props;
+    const {title, stocks, icon, color, func} = props;
     return <Fragment>
         <h3>{title}</h3>
         <ListGroup style={{maxHeight:'30rem',overflowY:'scroll'}}>
