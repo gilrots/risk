@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import {Button, Form, Label, Input, FormGroup, FormFeedback } from 'reactstrap';
+import { Button, Form, Label, Input, FormGroup, FormFeedback } from 'reactstrap';
 import RiskLoader from "../loader/loader";
 import * as Utils from "../../../common/utils";
 import PropTypes from "prop-types";
@@ -27,7 +27,7 @@ class Register extends React.Component {
 
     handleChange = e => {
         const { name, value } = e.target;
-        this.setState({[name]: value});
+        this.setState({ [name]: value });
     };
 
     handleSubmit = e => {
@@ -37,27 +37,28 @@ class Register extends React.Component {
         const { admin, username, password } = this.state;
         if (admin && username && password) {
             this.setState({ registering: true }, () => {
-                this.register(admin,username,password).then(() => { this.setState({ registering: false})});
+                this.register(admin, username, password).then(() => { this.setState({ registering: false }) });
             });
         }
     }
 
     register(admin, username, password) {
-        return Utils.postJson(api.register, { admin, username, password }, false)
-            .then(response => {
-                if (response.ok) {
-                    this.alert('success', "User registered successfully!");
-                }
-                else {
-                    response.json().then(({error}) => this.alert('danger', error));
-                }
-            });
+        return Utils.postJson(api.register, { admin, username, password }, response => {
+            if (response.ok) {
+                this.alert('success', "User registered successfully!");
+            }
+        }).then(result => {
+            const {error} = result;
+            if(error){
+                this.alert('danger', error);
+            }
+        });
     }
 
     alert(type, message) {
         const alert = this.props.onAlert;
         if (alert) {
-            alert({type, message});
+            alert({ type, message });
         }
     }
 
@@ -69,12 +70,12 @@ class Register extends React.Component {
                 <Form name="form" onSubmit={this.handleSubmit}>
                     <FormGroup>
                         <Label for="admin">Admin password</Label>
-                        <Input type="password" name="admin" value={admin} onChange={this.handleChange} invalid={submitted && !admin}/>
+                        <Input type="password" name="admin" value={admin} onChange={this.handleChange} invalid={submitted && !admin} />
                         {submitted && !admin && <FormFeedback valid={false}>Admin password is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>
                         <Label for="username">Username</Label>
-                        <Input name="username" type="text" value={username} onChange={this.handleChange} invalid={submitted && !username}/>
+                        <Input name="username" type="text" value={username} onChange={this.handleChange} invalid={submitted && !username} />
                         {submitted && !username && <FormFeedback valid={false}>Username is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>
@@ -84,7 +85,7 @@ class Register extends React.Component {
                     </FormGroup>
                     <FormGroup>
                         <Button color="primary" disabled={registering}>
-                            {registering ? <RiskLoader size="20" type="ThreeDots" loading={true}/>  : 'Register'}
+                            {registering ? <RiskLoader size="20" type="ThreeDots" loading={true} /> : 'Register'}
                         </Button>
                         <Link to="/login" className="btn btn-link">Login</Link>
                     </FormGroup>

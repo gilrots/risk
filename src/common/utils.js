@@ -109,17 +109,6 @@ function setUrl(link, params) {
     return _.reduce(keys, (acc, key, index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1) ? '' : '&'}`), url);
 }
 
-function fetchJson(url, params) {
-    const headers = {...buildAuthHeader()};
-    let link = params ? setUrl(url, params) : url;
-    return fetch(link, {headers}).then(res => res.json());
-}
-
-function fetchJsonBackend(url, params) {
-    let link = params ? setUrl(url, params) : url;
-    return fetch(link).then(res => res.json());
-}
-
 function buildAuthHeader() {
     // return authorization header with jwt token
     let token = User.get();
@@ -131,7 +120,19 @@ function getPath(fullPath) {
     return `/${_.last(fullPath.split('/'))}`;
 }
 
-function postJson(url, object, asJson = true) {
+
+function fetchJsonBackend(url, params) {
+    let link = params ? setUrl(url, params) : url;
+    return fetch(link).then(res => res.json());
+}
+
+function fetchJson(api, params, handler) {
+    const headers = {...buildAuthHeader()};
+    const url = params ? setUrl(api, params) : api;
+    return fetch(url, {headers}).then(res => handleResponse(res, handler));
+}
+
+function postJson(url, object, handler) {
     const authHeader = buildAuthHeader();
 
     return fetch(url, {
@@ -141,7 +142,22 @@ function postJson(url, object, asJson = true) {
             'Content-Type': 'application/json',
             ...authHeader,
         }
-    }).then(res => asJson ? res.json() : res);
+    }).then(res => handleResponse(res, handler));
+}
+
+function handleResponse(response, handler){
+    if(response.status === 401){
+        User.remove();
+        history.push('/');
+        return JSON.stringify(null);
+    }
+    else if(response.status === 200 && response.headers.get("token")){
+        User.set(response.headers.get("token"));
+    }
+    if(handler) {
+        handler(response);
+    }
+    return response.json();
 }
 
 function jsonError(message) {

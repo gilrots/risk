@@ -9,20 +9,27 @@ function login(params) {
         where: { username: params.username},
         Row: true
     }).then(user => {
-        if (!user)
+        if (!user){
             throw new Error(errorMessage);
-        if (!bcrypt.compareSync(params.password, user.password))
+        }
+        if (!bcrypt.compareSync(params.password, user.password)){
             throw new Error(errorMessage);
-        const payload = {
-            login: user.username,
-            id: user.id,
-            time: new Date()
-        };
-        const token = jwt.sign(payload, config.jwtSecret, {
-            expiresIn: config.tokenExpireTime
-        });
-        return {token};
+        }
+        return {token:generateToken(user)};
     });
+}
+
+function generateToken(user) {
+    const payload = {
+        login: user.username,
+        id: user.id,
+        time: new Date()
+    };
+    const token = jwt.sign(payload, config.jwtSecret, {
+        expiresIn: config.tokenExpireTime
+    });
+
+    return token;
 }
 
 function encryptPassword(password) {
@@ -36,14 +43,16 @@ function auth(req, res, next) {
     }
 
     jwt.verify(token, config.jwtSecret, (err, decoded) => {
-        if (err) {
-            res.status(500).json({ auth: false, message: 'Failed to authenticate token.' });
+        if (err || !decoded) {
+            res.status(401).json({ auth: false, message: 'Failed to authenticate token.' });
         }
-        req.user = {
-            login: decoded.login,
-            id: decoded.id
-        };
-        next();
+        else {
+            const {id, login} = decoded;
+            req.user = {id, login};
+            const newToken = generateToken(req.user);
+            res.set("token",newToken);
+            next();
+        }
     });
 }
 
