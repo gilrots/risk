@@ -49,24 +49,24 @@ app.use('/api/secured', secured);
 
 const securedApi = {
     post: {
-        [api.createTable]:Tables.createTable,
-        [api.setExcludeList]:Tables.updateTableExcludes,
-        [api.setUserAccounts]:DB.setUserAccounts,
-        [api.setIntras]:DB.setIntras,
-        [api.setIPOs]:DB.setIPOs,
-        [api.updateIPOFav]:DB.updateIPOFavorite
+        [api.createTable]:      Tables.createTable,
+        [api.setExcludeList]:   Tables.updateTableExcludes,
+        [api.setUserAccounts]:  DB.setUserAccounts,
+        [api.setIntras]:        DB.setIntras,
+        [api.setIPOs]:          DB.setIPOs,
+        [api.updateIPOFav]:     DB.updateIPOFavorite,
     },
     get: {
-        [api.getData]:Logic.getTable,
-        [api.getExcludeList]:Logic.getTableExcludeList,
-        [api.getUserAccounts]:DB.setUserAccounts,
-        [api.getIntras]:DB.getIntras,
-        [api.getIPOs]:DB.getIPOs,
-        [api.getIPOFavs]:DB.getIPOFavorites,
-        [api.tableAction.url]:Logic.tableAction,
-        [api.searchAce]:Ace.search,
-        [api.searchAceFields]:Logic.searchAceFields,
-        [api.getTableMakerData]:Logic.getTableMakerData
+        [api.getData]:          Logic.getTable,
+        [api.getExcludeList]:   Logic.getTableExcludeList,
+        [api.searchAceFields]:  Logic.searchAceFields,
+        [api.getTableMakerData]:Logic.getTableMakerData,
+        [api.tableAction.url]:  Logic.tableAction,
+        [api.getUserAccounts]:  DB.setUserAccounts,
+        [api.getIntras]:        DB.getIntras,
+        [api.getIPOs]:          DB.getIPOs,
+        [api.getIPOFavs]:       DB.getIPOFavorites,
+        [api.searchAce]:        Ace.search,
     }
 }
 const methodParamsMap = {
@@ -74,8 +74,6 @@ const methodParamsMap = {
     get: "query"
 };
 _.forEach(_.keys(securedApi), key => _.forEach(_.toPairs(securedApi[key]), apiUrl => secured[key](getPath(apiUrl[0]), (req, res) => answer(req,res,apiUrl[1],methodParamsMap[key]))));
-//_.forEach(_.toPairs(securedApi.post), apiPost => secured.post(getPath(apiPost[0]), (req, res) => answer(req,res,apiPost[1],"body")));
-//_.forEach(_.toPairs(securedApi.get), apiGet => secured.get(getPath(apiGet[0]), (req, res) => answer(req,res,apiGet[1],"query")));
 
 
 //Redirect
