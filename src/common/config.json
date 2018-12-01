@@ -16,6 +16,8 @@
       "createTable":"/api/secured/createTable",
       "searchAce":"/api/secured/searchAce",
       "searchAceFields":"/api/secured/searchAceFields",
+      "getUserAccounts":"/api/secured/getUserAccounts",
+      "setUserAccounts":"/api/secured/setUserAccounts",
       "getIntras":"/api/secured/getIntras",
       "setIntras":"/api/secured/setIntras",
       "getIPOFavs":"/api/secured/getIPOFavs",

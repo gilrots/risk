@@ -18,6 +18,7 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
 }
 
 function getTable(params) {
+    console.log(params);
     const {tableId} = params;
     return new Promise(resolve => {
         const table =  Tables.getTable(tableId);

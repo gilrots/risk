@@ -4,18 +4,18 @@ const Ace = require('./ace');
 const Utils = require('../../common/utils.js');
 
 const DB = {
-    types: ['long','short'],
+    types: ['long', 'short'],
     subTypes: ['risk'],
     replaceToken: '$$$',
     tables: [{
         id: config.app.defaultTable.id,
         name: config.app.defaultTable.name,
-        cols:  [
+        cols: [
             {
                 name: 'Name',
                 key: 'name',
-                func:{
-                    exp:'{a:0}',
+                func: {
+                    exp: '{a:0}',
                     arguments: {
                         stock: [],
                         bank: [],
@@ -27,11 +27,11 @@ const DB = {
             {
                 name: '$$$ Value',
                 key: 'value',
-                func:{
-                    exp:'{a:0}*({b:0}+{b:1})',
+                func: {
+                    exp: '{a:0}*({b:0}+{b:1})',
                     arguments: {
-                        stock:[],
-                        bank: [config.bank.fields[3],config.bank.fields[6]],
+                        stock: [],
+                        bank: [config.bank.fields[3], config.bank.fields[6]],
                         ace: ['last']
                     },
                     aggregations: [],
@@ -41,22 +41,22 @@ const DB = {
             {
                 name: '$$$ Value %',
                 key: 'valuePer',
-                func:{
-                    exp:'{s:0}/{t:0}',
+                func: {
+                    exp: '{s:0}/{t:0}',
                     arguments: {
-                        stock:['value'],
+                        stock: ['value'],
                         bank: [],
                         ace: []
                     },
-                    aggregations: [{key:'$$$_total_value', exp:'acc + {s:0}'}],
+                    aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }],
                 },
                 format: 0
             },
             {
                 name: 'Amount',
                 key: 'amount',
-                func:{
-                    exp:'{b:0}+{b:1}',
+                func: {
+                    exp: '{b:0}+{b:1}',
                     arguments: {
                         stock: [],
                         bank: [config.bank.fields[3], config.bank.fields[6]],
@@ -68,8 +68,8 @@ const DB = {
             {
                 name: 'Syn Diff',
                 key: 'syn_diff',
-                func:{
-                    exp:'{a:0}',
+                func: {
+                    exp: '{a:0}',
                     arguments: {
                         stock: [],
                         bank: [],
@@ -79,20 +79,20 @@ const DB = {
                 },
                 format: 1
             }],
-        risk:[
+        risk: [
             {
                 name: 'Total $$$',
                 key: '$$$_total_value',
                 type: '$$$',
                 order: 0,
-                func:{
-                    exp:'{t:0}',
+                func: {
+                    exp: '{t:0}',
                     arguments: {
-                        stock:['value'],
+                        stock: ['value'],
                         bank: [],
                         ace: []
                     },
-                    aggregations: [{key:'$$$_total_value', exp:'acc + {s:0}'}]
+                    aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }]
                 }
             },
             {
@@ -100,17 +100,17 @@ const DB = {
                 key: '$$$_total_risk',
                 type: '$$$',
                 order: 1,
-                func:{
-                    exp:'({t:1} / {t:0}) * {t:2}',
+                func: {
+                    exp: '({t:1} / {t:0}) * {t:2}',
                     arguments: {
-                        stock:['valuePer', 'value'],
+                        stock: ['valuePer', 'value'],
                         bank: [],
                         ace: ['duration_bruto']
                     },
                     aggregations: [
-                        {key:'$$$_total_duration', exp:'acc + {a:0}'},
-                        {key:'$$$_total_duration_per', exp:'acc + ({s:0} * {a:0})'},
-                        {key:'$$$_total_value', exp:'acc + {s:1}'}],
+                        { key: '$$$_total_duration', exp: 'acc + {a:0}' },
+                        { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' },
+                        { key: '$$$_total_value', exp: 'acc + {s:1}' }],
                 }
             },
             {
@@ -118,16 +118,16 @@ const DB = {
                 key: '$$$_total_duration',
                 type: '$$$',
                 order: 2,
-                func:{
-                    exp:'{t:1} / {t:0}',
+                func: {
+                    exp: '{t:1} / {t:0}',
                     arguments: {
-                        stock:['valuePer'],
+                        stock: ['valuePer'],
                         bank: [],
                         ace: ['duration_bruto']
                     },
                     aggregations: [
-                        {key:'$$$_total_duration', exp:'acc + {a:0}'},
-                        {key:'$$$_total_duration_per', exp:'acc + ({s:0} * {a:0})'}],
+                        { key: '$$$_total_duration', exp: 'acc + {a:0}' },
+                        { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' }],
                 }
             },
             {
@@ -135,25 +135,25 @@ const DB = {
                 key: 'risk',
                 type: 'risk',
                 order: 3,
-                func:{
-                    exp:'{t:0} / {t:1}',
+                func: {
+                    exp: '{t:0} / {t:1}',
                     arguments: {
                         stock: [],
                         bank: [],
                         ace: []
                     },
                     aggregations: [
-                        {key:'long_total_risk', exp:''},
-                        {key:'short_total_risk', exp:''}],
+                        { key: 'long_total_risk', exp: '' },
+                        { key: 'short_total_risk', exp: '' }],
                 }
             }
         ],
-        filter:{
+        filter: {
             excluded: [],
             predicate: []
         }
     }],
-    riskCols:[
+    riskCols: [
         {
             name: 'Name',
             key: 'name',
@@ -163,17 +163,17 @@ const DB = {
             key: 'value',
         },
     ],
-    calculated:{
-        cols:{
-            long:[],
-            short:[],
-            risk:[]
+    calculated: {
+        cols: {
+            long: [],
+            short: [],
+            risk: []
         },
         aceFields: [],
         aggregations: {
         }
     },
-    generator:{
+    generator: {
         actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
         operators: ['None', 'And', 'Or']
     }
@@ -188,10 +188,10 @@ const argsMap = {
 };
 
 const clientTableFormat = {
-    name:'',
+    name: '',
     id: '',
     cols: [],
-    risk:[]
+    risk: []
 };
 
 function replaceToken(obj, key, args) {
@@ -204,15 +204,15 @@ function replaceToken(obj, key, args) {
 
 function setExpressions(obj, key, argsMap) {
     const val = obj[key];
-    if (key === 'exp')  {
-        if(obj['arguments']){
+    if (key === 'exp') {
+        if (obj['arguments']) {
             argsMap.args = obj['arguments'];
             argsMap.aggs = obj['aggregations'];
         }
 
         const regEx = new RegExp(argsMap.regEx);
         const matches = val.match(regEx);
-        if(matches !== null) {
+        if (matches !== null) {
             obj[key] = _.reduce(matches, (res, match) => {
                 const groups = regEx.exec(matches);
                 const source = argsMap[groups[1]];
@@ -226,11 +226,11 @@ function setExpressions(obj, key, argsMap) {
 
 function formatResult(bank, ace) {
     const id = bank.securityID;
-    return {'stock':{id:id}, 'bank':bank, 'ace':ace[id]};
+    return { 'stock': { id: id }, 'bank': bank, 'ace': ace[id] };
 }
 
 function formatAceData(stockId, aceDB, aceData, aceFields) {
-    return _.reduce(aceFields, (res, field, index) => {res[field] = Ace.getFieldValue(stockId, aceDB, aceData, index); return res;}, {});
+    return _.reduce(aceFields, (res, field, index) => { res[field] = Ace.getFieldValue(stockId, aceDB, aceData, index); return res; }, {});
 }
 
 function parseTable(table) {
@@ -238,12 +238,12 @@ function parseTable(table) {
     table.riskCols = Utils.copy(DB.riskCols);
     table.calculated = Utils.copy(DB.calculated);
     //Sums (optimize) all ace fields required for the table
-    table.calculated.aceFields = _.uniq(_.reduce([...table.cols,...table.risk],(sum,col) => sum.concat(...col.func.arguments.ace),[]));
+    table.calculated.aceFields = _.uniq(_.reduce([...table.cols, ...table.risk], (sum, col) => sum.concat(...col.func.arguments.ace), []));
 
     _.forEach(DB.types, type => {
         //TODO convert to foreach with risk sub type
         const name = type.charAt(0).toUpperCase() + type.slice(1);
-        const data = {name, part: type, token};
+        const data = { name, part: type, token };
         table.calculated.cols[type] = Utils.copy(table.cols);
         table.calculated.cols.risk = table.calculated.cols.risk.concat(Utils.copy(table.risk));
 
@@ -251,23 +251,23 @@ function parseTable(table) {
         Utils.treeForEach(table.calculated.cols, 'risk', replaceToken, data);
 
         //Sums (optimize) all aggregations value from al cols
-        _.forEach(_.uniq(_.reduce(table.calculated.cols[type],(sum, col) => sum.concat(_.map(col.func.aggregations,'key')),[])), key => table.calculated.aggregations[key] = undefined);
-        _.forEach(_.uniq(_.reduce(table.calculated.cols.risk,(sum, col) => sum.concat(_.map(col.func.aggregations,'key')),[])), key => table.calculated.aggregations[key] = undefined);
+        _.forEach(_.uniq(_.reduce(table.calculated.cols[type], (sum, col) => sum.concat(_.map(col.func.aggregations, 'key')), [])), key => table.calculated.aggregations[key] = undefined);
+        _.forEach(_.uniq(_.reduce(table.calculated.cols.risk, (sum, col) => sum.concat(_.map(col.func.aggregations, 'key')), [])), key => table.calculated.aggregations[key] = undefined);
 
         Utils.treeForEach(table.calculated.cols, type, setExpressions, argsMap);
         Utils.treeForEach(table.calculated.cols, 'risk', setExpressions, argsMap)
     });
-    table.calculated.cols.risk = _.orderBy(_.uniqBy(table.calculated.cols.risk, col => col.name),['order'],['asc']);
+    table.calculated.cols.risk = _.orderBy(_.uniqBy(table.calculated.cols.risk, col => col.name), ['order'], ['asc']);
     //console.log(table.calculated.aggregations);
 }
 
 function getResultFormat() {
-    return  {
-        short:{cols:[], data:[], dataKey:'stock'},
-        long:{cols:[], data:[], dataKey:'stock'},
-        risk:{cols:[], data:[]},
-        aggs:[],
-        tables: _.map(DB.tables, table => ({id: table.id, name:table.name})),
+    return {
+        short: { cols: [], data: [], dataKey: 'stock' },
+        long: { cols: [], data: [], dataKey: 'stock' },
+        risk: { cols: [], data: [] },
+        aggs: [],
+        tables: _.map(DB.tables, table => ({ id: table.id, name: table.name })),
         errors: {}
     };
 }
@@ -289,17 +289,17 @@ function calculateTable(table, bankDB, aceDB) {
             const res = formatResult(bank, aceDB.data);
 
             _.forEach(table.calculated.cols[type], col => {
-               res.stock[col.key] = undefined;
-               // if stock needs a value based on aggregation of all stock, saves it for later
-               if(col.func.aggregations.length === 0){
-                   // these values may seem redundant but the eval func needs them
-                   const {stock, ace, bank} = res;
-                   const val = eval(col.func.exp);
-                   res.stock[col.key] = val;
-               }
-               else {
-                   aggs.push(col);
-               }
+                res.stock[col.key] = undefined;
+                // if stock needs a value based on aggregation of all stock, saves it for later
+                if (col.func.aggregations.length === 0) {
+                    // these values may seem redundant but the eval func needs them
+                    const { stock, ace, bank } = res;
+                    const val = eval(col.func.exp);
+                    res.stock[col.key] = val;
+                }
+                else {
+                    aggs.push(col);
+                }
             });
 
             //console.log(res.stock);
@@ -310,18 +310,18 @@ function calculateTable(table, bankDB, aceDB) {
         _.forEach(aggs, col => {
             // calculate the aggregations
             _.forEach(col.func.aggregations, agg => {
-                result.aggs[agg.key] =_.reduce(result[type].data, (acc, dat) => {
+                result.aggs[agg.key] = _.reduce(result[type].data, (acc, dat) => {
                     // these values may seem redundant but the eval func needs them
-                    const {stock, ace, bank} = dat;
+                    const { stock, ace, bank } = dat;
                     const val = eval(agg.exp);
-                    return Utils.getNumber(val,acc);
+                    return Utils.getNumber(val, acc);
                 }, 0);
             });
             // now that aggregations values are computed, recalculate stock values that needed them
             _.forEach(result[type].data, dat => {
-                    const {stock, ace, bank} = dat;
-                    const val = eval(col.func.exp);
-                    dat.stock[col.key] = Utils.getNumber(val,Number.NaN);
+                const { stock, ace, bank } = dat;
+                const val = eval(col.func.exp);
+                dat.stock[col.key] = Utils.getNumber(val, Number.NaN);
             });
         });
         //console.log(result[type].data);
@@ -332,13 +332,13 @@ function calculateTable(table, bankDB, aceDB) {
         // after all stocks are set with basic data, its time to calculate aggregations
         // calculate the aggregations
         _.forEach(col.func.aggregations, agg => {
-            if((result.aggs[agg.key] === undefined || result.aggs[col.key] === undefined) && col.type !== DB.subTypes[0]) {
+            if ((result.aggs[agg.key] === undefined || result.aggs[col.key] === undefined) && col.type !== DB.subTypes[0]) {
                 const stocks = result[col.type].data;
-                const aggResult =_.reduce(stocks, (acc, dat) => {
+                const aggResult = _.reduce(stocks, (acc, dat) => {
                     // these values may seem redundant but the eval func needs them
-                    const {stock, ace, bank} = dat;
+                    const { stock, ace, bank } = dat;
                     const val = eval(agg.exp);
-                    return Utils.getNumber(val,acc);
+                    return Utils.getNumber(val, acc);
                 }, 0);
                 result.aggs[col.key] = aggResult;
                 result.aggs[agg.key] = aggResult;
@@ -347,82 +347,99 @@ function calculateTable(table, bankDB, aceDB) {
 
         // now that aggregations values are computed, recalculate stock values that needed them
         const value = eval(col.func.exp);
-        result.risk.data.push({name: col.name, value});
+        result.risk.data.push({ name: col.name, value });
     });
 
     return result;
 }
 
-function generateId(){
-    const ids = _.map(DB.tables,tab => ({[tab.id]:true}));
+function generateId() {
+    const ids = _.map(DB.tables, tab => ({ [tab.id]: true }));
     let id = Math.floor(Math.random() * 100000).toString();
-    while (ids[id]){
+    while (ids[id]) {
         id = Math.floor(Math.random() * 100000).toString();
     }
     return id;
 }
 
-function parseExpression(exp,argsMap) {
+function parseExpression(exp, argsMap) {
     return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp)
 }
 
 function createTable(data) {
-  const formatKey = name => Utils.replaceAll(name.toLowerCase(),' ', '_');
-  const update = !_.isEmpty(data.id);
-  const newTable = {
-      name: data.name,
-      id: update ? data.id : generateId(),
-      cols: _.map(data.cols, col => {
-          const calc = _.reduce(col.params,(acc, param, index) => {
-              if(param.source === 'stock') {
-                  param.item.id = Utils.replaceAll(formatKey(param.item.id),DB.replaceToken,'')
-              }
-              acc.arguments[param.source].push(param.item.id)
-              acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
-              return acc;
-          },{arguments:{stock: [], bank: [], ace: []},argsMap:{}, aggregations:[]});
+    return new Promise(resolve => {
+        const update = !_.isEmpty(data.id);
+        try {
+            const formatKey = name => Utils.replaceAll(name.toLowerCase(), ' ', '_');
+            const newTable = {
+                name: data.name,
+                id: update ? data.id : generateId(),
+                cols: _.map(data.cols, col => {
+                    const calc = _.reduce(col.params, (acc, param, index) => {
+                        if (param.source === 'stock') {
+                            param.item.id = Utils.replaceAll(formatKey(param.item.id), DB.replaceToken, '')
+                        }
+                        acc.arguments[param.source].push(param.item.id)
+                        acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
+                        return acc;
+                    }, { arguments: { stock: [], bank: [], ace: [] }, argsMap: {}, aggregations: [] });
 
-          _.forEach(col.aggregations, (agg, index) => {
-              calc.argsMap[`Y${index}`] = `{t:${index}}`;
-              calc.aggregations.push({ key:formatKey(agg.key), exp: `acc ${parseExpression(agg.exp,calc.argsMap)}`})
-          });
-          return {
-              name: col.name,
-              key: Utils.replaceAll(formatKey(col.name),DB.replaceToken,''),
-              func:{
-                  exp: parseExpression(col.exp,calc.argsMap),
-                  arguments: calc.arguments,
-                  aggregations: calc.aggregations
-              },
-              format: col.format
-          };}),
-      risk: []
-  };
-  parseTable(newTable);
-  if(update){
-      const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
-      if(updateIndex > -1) {
-          DB.tables[updateIndex] = newTable;
-      }
-  }
-  else {
-      DB.tables.push(newTable);
-  }
+                    _.forEach(col.aggregations, (agg, index) => {
+                        calc.argsMap[`Y${index}`] = `{t:${index}}`;
+                        calc.aggregations.push({ key: formatKey(agg.key), exp: `acc ${parseExpression(agg.exp, calc.argsMap)}` })
+                    });
+                    return {
+                        name: col.name,
+                        key: Utils.replaceAll(formatKey(col.name), DB.replaceToken, ''),
+                        func: {
+                            exp: parseExpression(col.exp, calc.argsMap),
+                            arguments: calc.arguments,
+                            aggregations: calc.aggregations
+                        },
+                        format: col.format
+                    };
+                }),
+                risk: []
+            };
+            parseTable(newTable);
+        }
+        catch (e) {
+            console.error(e);
+            return resolve(false);
+        }
+        try {
+            if (update) {
+                const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
+                if (updateIndex > -1) {
+                    DB.tables[updateIndex] = newTable;
+                }
+            }
+            else {
+                DB.tables.push(newTable);
+            }
+        }
+        catch (e) {
+            console.error(e);
+            return resolve(false);
+        }
+        
+        resolve(true);
+    });
 }
 
 function init() {
     _.forEach(DB.tables, parseTable);
 }
 
-function getTable(tableId){
+function getTable(tableId) {
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-async function updateTableExcludes(params){
-    const {tableId, exclude} = params;
+function updateTableExcludes(params) {
+    const { tableId, exclude } = params;
     const table = getTable(tableId);
-    if(table) {
-        if(Array.isArray(exclude)){
+    if (table) {
+        if (Array.isArray(exclude)) {
             table.filter.excluded = exclude;
         }
         else {
@@ -432,9 +449,9 @@ async function updateTableExcludes(params){
     return table !== undefined;
 }
 
-function copyTable(tableId){
+function copyTable(tableId) {
     const table = getTable(tableId);
-    if(table) {
+    if (table) {
         const copy = Utils.copy(table);
         copy.id = generateId();
 
@@ -446,9 +463,9 @@ function copyTable(tableId){
     return `No such table with id ${tableId}`;
 }
 
-function removeTable(tableId){
+function removeTable(tableId) {
     const index = _.findIndex(DB.tables, table => tableId === table.id);
-    if(index > -1){
+    if (index > -1) {
         DB.tables.splice(index);
         return `Removed table with id: ${tableId}`;
     }
@@ -457,34 +474,37 @@ function removeTable(tableId){
 
 function tableToClient(table) {
     const result = Utils.copy(clientTableFormat);
-    if(table){
+    if (table) {
         result.name = table.name;
         result.id = table.id;
-        result. cols =_.map(table.cols, col => {
-            const calc = _.reduce(_.keys(col.func.arguments),(acc, source) => {
-                _.forEach(col.func.arguments[source], (id,index) => {
-                    acc.params.push({source, item:{id}});
+        result.cols = _.map(table.cols, col => {
+            const calc = _.reduce(_.keys(col.func.arguments), (acc, source) => {
+                _.forEach(col.func.arguments[source], (id, index) => {
+                    acc.params.push({ source, item: { id } });
                     acc.argsMap[`{${source[0]}:${index}}`] = `X${acc.index++}`;
                 });
                 return acc;
-            },{params:[],argsMap:{},index: 0, aggregations:[]});
+            }, { params: [], argsMap: {}, index: 0, aggregations: [] });
             calc.agglen = col.func.aggregations.length;
-            _.forEach(col.func.aggregations.reverse(), (agg,index) => {
+            _.forEach(col.func.aggregations.reverse(), (agg, index) => {
                 const revInd = calc.agglen - 1 - index;
                 calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
-                calc.aggregations.push({key:Utils.replaceAll(agg.key,'_',' '), exp: parseExpression(agg.exp,calc.argsMap).slice(3)});
+                calc.aggregations.push({ key: Utils.replaceAll(agg.key, '_', ' '), exp: parseExpression(agg.exp, calc.argsMap).slice(3) });
             });
             return {
                 name: col.name,
-                exp: parseExpression(col.func.exp,calc.argsMap),
+                exp: parseExpression(col.func.exp, calc.argsMap),
                 params: calc.params,
                 aggregations: calc.aggregations.reverse(),
                 format: col.format
-            };});
+            };
+        });
     }
     return result;
 }
 
-module.exports = {init, getTable, calculateTable, formatAceData,
-                  getResultFormat, createTable, copyTable, removeTable,
-                  tableToClient, updateTableExcludes};
+module.exports = {
+    init, getTable, calculateTable, formatAceData,
+    getResultFormat, createTable, copyTable, removeTable,
+    tableToClient, updateTableExcludes
+};

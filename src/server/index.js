@@ -30,58 +30,59 @@ app.use(bodyParser.json())
 
 app.listen(port, () => console.log(`Server is up on port: ${port}`));
 
-//Posts
+//Unsecurd Posts
 app.post(api.bankPost, (req, res) => Bank.updateStocksData(req.body));
 
 app.post(api.login, (req, res) => Auth.login(req.body).then(token => res.json(token)).catch(e => res.json(e.message)));
 
 app.post(api.register, (req, res) => DB.registerUser(req.body, res).then());
 
+
 const {getPath} = Utils;
-const chainUser = (params,user) =>  _.assign(params,{user});
-const answer = (req,res,promise) => promise(chainUser(req.body,req.user)).then(result => res.json(result));
-const answer2 = (req,res,promise) => promise(chainUser(req.query,req.user)).then(result => res.json(result));
+const chainUser = (params,user) => _.assign(params,{user});
+const answer = (req,res,promise,prop) => promise(chainUser(req[prop],req.user)).then(result => res.json(result));
 
 // Secured routes
 const secured = express.Router();
 secured.use(Auth.auth);
 app.use('/api/secured', secured);
 
-//Secured posts
-secured.post(getPath(api.createTable), (req, res) => Tables.createTable(req.body));
+const securedApi = {
+    post: {
+        [api.createTable]:Tables.createTable,
+        [api.setExcludeList]:Tables.updateTableExcludes,
+        [api.setUserAccounts]:DB.setUserAccounts,
+        [api.setIntras]:DB.setIntras,
+        [api.setIPOs]:DB.setIPOs,
+        [api.updateIPOFav]:DB.updateIPOFavorite
+    },
+    get: {
+        [api.getData]:Logic.getTable,
+        [api.getExcludeList]:Logic.getTableExcludeList,
+        [api.getUserAccounts]:DB.setUserAccounts,
+        [api.getIntras]:DB.getIntras,
+        [api.getIPOs]:DB.getIPOs,
+        [api.getIPOFavs]:DB.getIPOFavorites,
+        [api.tableAction.url]:Logic.tableAction,
+        [api.searchAce]:Ace.search,
+        [api.searchAceFields]:Logic.searchAceFields,
+        [api.getTableMakerData]:Logic.getTableMakerData
+    }
+}
+const methodParamsMap = {
+    post: "body",
+    get: "query"
+};
+_.forEach(_.keys(securedApi), key => _.forEach(_.toPairs(securedApi[key]), apiUrl => secured[key](getPath(apiUrl[0]), (req, res) => answer(req,res,apiUrl[1],methodParamsMap[key]))));
+//_.forEach(_.toPairs(securedApi.post), apiPost => secured.post(getPath(apiPost[0]), (req, res) => answer(req,res,apiPost[1],"body")));
+//_.forEach(_.toPairs(securedApi.get), apiGet => secured.get(getPath(apiGet[0]), (req, res) => answer(req,res,apiGet[1],"query")));
 
-secured.post(getPath(api.setExcludeList), (req, res) => answer(req,res,Tables.updateTableExcludes));
-
-secured.post(getPath(api.setIntras), (req, res) => answer(req,res,DB.setIntras));
-
-secured.post(getPath(api.setIPOs), (req, res) => answer(req,res,DB.setIPOs));
-
-secured.post(getPath(api.updateIPOFav), (req, res) => answer(req,res,DB.updateIPOFavorite));
-
-//Secured gets
-secured.get(getPath(api.getData), (req, res) => answer2(req,res,Logic.getTable));
-
-secured.get(getPath(api.getExcludeList), (req, res) => answer2(req,res,Logic.getTableExcludeList));
-
-secured.get(getPath(api.getTableMakerData), (req, res) => answer(req,res,Logic.getTableMakerData));
-
-secured.get(getPath(api.tableAction.url), (req, res) => answer2(req,res,Logic.tableAction));
-
-secured.get(getPath(api.searchAce), (req, res) => answer2(req,res,Ace.search));
-
-secured.get(getPath(api.searchAceFields), (req, res) => answer2(req,res,Logic.searchAceFields));
-
-secured.get(getPath(api.getIntras), (req, res) => answer2(req,res,DB.getIntras));
-
-secured.get(getPath(api.getIPOs), (req, res) => answer2(req,res,DB.getIPOs));
-
-secured.get(getPath(api.getIPOFavs), (req, res) => answer2(req,res,DB.getIPOFavorites));
 
 //Redirect
-app.get('/*', (req, res) => {
+app.get('/*', (req, res) => 
     res.sendFile(path.join(__dirname, 'dist/index.html'), err => {
         if (err) {
             res.status(500).send(err);
         }
     })
-})
+);

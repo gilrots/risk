@@ -45,6 +45,22 @@ async function registerUser(params, res) {
     }
 }
 
+async function getUserAccounts(params) {
+    return await UsersDL.getAccounts(params.user);
+}
+
+async function setUserAccounts(params) {
+    const {user,accounts} = params;
+    let res = true;
+    try {
+        await UsersDL.updateAccounts(user,accounts);
+    }
+    catch (e) {
+        res = e.message;
+    }
+    return res
+}
+
 async function getIntras(params) {
     return await IntrasDL.getAll();
 }
@@ -98,4 +114,5 @@ async function updateIPOFavorite(params) {
     return res
 }
 
-module.exports = {connect, registerUser, getIntras, setIntras, getIPOs, setIPOs, getIPOFavorites, updateIPOFavorite};
+module.exports = {connect, registerUser, getUserAccounts, setUserAccounts,
+    getIntras, setIntras, getIPOs, setIPOs, getIPOFavorites, updateIPOFavorite};
