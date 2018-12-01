@@ -25,9 +25,11 @@ function getTable(params) {
         const aceDB = Ace.getAceDB();
         if(table === undefined) {
             console.log("No such table id:", {tableId});
+            resolve([]);
         }
         else if(table.calculated.aceFields.length === 0){
             console.log("No ace fields", {name:table.name})
+            resolve([]);
         }
         else {
             Bank.filter(bankDB, table.filter.excluded);

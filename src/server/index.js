@@ -38,8 +38,9 @@ app.post(api.login, (req, res) => Auth.login(req.body).then(token => res.json(to
 app.post(api.register, (req, res) => DB.registerUser(req.body, res).then());
 
 const {getPath} = Utils;
-const answer = (req,res,promise) => promise(req.body).then(result => res.json(result));
-const answer2 = (req,res,promise) => promise(req.query).then(result => res.json(result));
+const chainUser = (params,user) =>  _.assign(params,{user});
+const answer = (req,res,promise) => promise(chainUser(req.body,req.user)).then(result => res.json(result));
+const answer2 = (req,res,promise) => promise(chainUser(req.query,req.user)).then(result => res.json(result));
 
 // Secured routes
 const secured = express.Router();

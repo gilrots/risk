@@ -21,7 +21,7 @@ function login(params) {
 
 function generateToken(user) {
     const payload = {
-        login: user.username,
+        username: user.username,
         id: user.id,
         time: new Date()
     };
@@ -37,22 +37,25 @@ function encryptPassword(password) {
 }
 
 function auth(req, res, next) {
-    const token = req.headers['authorization'].replace(/^Bearer\s/, '');
+    let token = undefined;
+    const auth = req.headers['authorization'];
+    if(auth){
+        token = auth.replace(/^Bearer\s/, '');
+    }
     if (!token) {
         return res.status(403).send({auth: false, message: 'No token provided.'});
     }
 
     jwt.verify(token, config.jwtSecret, (err, decoded) => {
         if (err || !decoded) {
-            res.status(401).json({ auth: false, message: 'Failed to authenticate token.' });
+            return res.status(401).json({ auth: false, message: 'Failed to authenticate token.' });
         }
-        else {
-            const {id, login} = decoded;
-            req.user = {id, login};
-            const newToken = generateToken(req.user);
-            res.set("token",newToken);
-            next();
-        }
+        
+        const {id, username} = decoded;
+        req.user = {id, username};
+        const newToken = generateToken(req.user);
+        res.set("token",newToken);
+        next();
     });
 }
 

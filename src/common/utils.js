@@ -146,7 +146,7 @@ function postJson(url, object, handler) {
 }
 
 function handleResponse(response, handler){
-    if(response.status === 401){
+    if(response.status === 401 || response.status === 403){
         User.remove();
         history.push('/');
         return JSON.stringify(null);
