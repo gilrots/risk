@@ -52,9 +52,17 @@ function setMixins() {
           return result.length < limit;
         });
       };
+    const mapKeys = function(collection, getter) {
+        return _.reduce(collection, function(result, curr) {
+          result[curr] = getter(curr);
+          return result;
+        },{});
+      };
 
-    _.mixin({limit});
+    _.mixin({limit, mapKeys});
 }
+
+setMixins();
 
 function tryAtleast(resolve, counter, promiseFunc) {
     new Promise(promiseFunc).then(result => {
@@ -183,7 +191,7 @@ module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
-    fetchJsonBackend, getPath, formatDate, setMixins
+    fetchJsonBackend, getPath, formatDate
 };
 
 

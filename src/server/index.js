@@ -1,5 +1,5 @@
+const Utils = require('../common/utils'); //Important to keep utils first in order to init itself before other use
 const path = require("path");
-const fetch = require("node-fetch");
 const express = require('express');
 const _ = require('lodash');
 const bodyParser = require('body-parser');
@@ -9,8 +9,6 @@ const Ace = require('./modules/ace');
 const Logic = require('./modules/bussines-logic');
 const DB = require('./modules/database');
 const Auth = require('./modules/auth');
-const Utils = require('../common/utils');
-Utils.setMixins();
 
 const config = require('../common/config.json');
 const mockData = _.values(require('../mocks/mock-table.json'));

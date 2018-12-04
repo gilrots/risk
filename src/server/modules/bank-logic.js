@@ -2,6 +2,8 @@ const config = require('../../common/config.json');
 const Utils = require('../../common/utils.js');
 const _ = require('lodash');
 const banks = config.bank.banks;
+const idField = config.bank.fields[1];
+const accntField = config.bank.fields[0];
 const bankField = config.bank.bankField;
 const timeout = config.bank.timeout;
 const rn = () => new Date().getTime(); // Right-now
@@ -12,7 +14,7 @@ const DB = {
     ids: undefined
 };
 
-const BankLatency = _.chain(banks).keys().reduce((acc, key) => ({ ...acc, [key]: rn()}),{}).value();
+const BankLatency = _.chain(banks).keys().mapKeys(rn).value();
 
 function getDBSnap(){
     const snap = Utils.copy(DB);
@@ -64,13 +66,20 @@ function updateStocksData(bankData) {
     }
 }
 
-function filter(bankSnap, ids){
-    _.forEach(ids, id => {
+function filter(bankSnap, ids, accounts){
+    const accntMap = _.chain(accounts).mapKeys(()=>true).value();
+    const filteredIds = _.chain(bankSnap.all)
+                            .values()
+                            .filter(s => !accntMap[s[accntField]])
+                            .map(idField)
+                            .concat(ids)
+                            .value();
+    _.forEach(filteredIds, id => {
         delete bankSnap.long[id];
         delete bankSnap.short[id];
         delete bankSnap.all[id];
     });
-    bankSnap.ids = _.difference(bankSnap.ids, ids);
+    bankSnap.ids = _.difference(bankSnap.ids, filteredIds);
 }
 
 function updateBankLatency(bankData){
