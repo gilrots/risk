@@ -10,6 +10,7 @@ import * as Utils from '../../../common/utils';
 class StockViewer extends React.Component {
     static propTypes = {
         stocks: PropTypes.object.isRequired,
+        excludeMode: PropTypes.bool,
         reverse: PropTypes.bool,
         onRowActionClicked: PropTypes.func
     };
@@ -52,7 +53,8 @@ class StockViewer extends React.Component {
                 this.sortRef.current.handleSort(this.lastSort.sortColumn, this.lastSort.sortDirection);
             }
         }
-        if(nextProps.stocks.cols !== this.props.stocks.cols) {
+        if(nextProps.stocks.cols !== this.props.stocks.cols || 
+           nextProps.excludeMode !== this.props.excludeMode) {
             this.setState({cols: this.createColumns(nextProps)});
         }
     }
@@ -73,9 +75,9 @@ class StockViewer extends React.Component {
             resizable: true,
             formatter: col.format != undefined ? Formatters[col.format] : undefined
         }));
-        this.cellActions = {
+        this.cellActions = props.excludeMode ? {
             [res[0].key]: this.rowActions
-        };
+        } : {};
         return props.reverse ? res.reverse() : res;
     }
 

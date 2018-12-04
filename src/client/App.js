@@ -5,8 +5,7 @@ import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
 import {
     Container, Row, Col, Button, Modal, ModalBody, ModalFooter,
-    ModalHeader, NavItem, Nav, TabContent, TabPane, NavLink, Badge,
-    UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem
+    ModalHeader, NavItem, Nav, TabContent, TabPane, Alert, Badge
 } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 import * as Utils from '../common/utils';
@@ -218,7 +217,7 @@ export default class App extends Component {
     };
 
     render() {
-        const {data, modal, tableMakerData} = this.state;
+        const {data, modal, tableMakerData, excludeMode} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = !_.isEmpty(data) && data && data.errors && data.errors.ace !== true;
         const systemInds = this.getSystemIndication(data);
@@ -258,18 +257,26 @@ export default class App extends Component {
                     <TabContent activeTab={'0'} className="jumbo">
                         <TabPane tabId={'0'}>
                             <Container className="max">
+                                <Row className="justify-content-center">
+                                    <Alert color="warning" className="m-2" isOpen={excludeMode}>Exclude Mode On</Alert>
+                                </Row>
                                 <Row>
                                     <Col xs={{order: 1}} md={{size: 2}}
                                          className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                        {<StockViewer className="risk" stocks={data.risk} id="risk"/>}
+                                        {<StockViewer className="risk" 
+                                         stocks={data.risk} id="risk"/>}
                                     </Col>
                                     <Col xs={{order: 2}} md={{size: 5}}
                                          className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                        {<StockViewer className="longs" stocks={data.long} id="longs"
+                                        {<StockViewer id="longs" className="longs"
+                                                      stocks={data.long}
+                                                      excludeMode={excludeMode} 
                                                       onRowActionClicked={this.stockAction} reverse/>}
                                     </Col>
                                     <Col xs={{order: 3}} md={{size: 5}} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                                        {<StockViewer className="shorts" stocks={data.short} id="shorts"
+                                        {<StockViewer id="shorts" className="shorts"
+                                                      stocks={data.short}
+                                                      excludeMode={excludeMode} 
                                                       onRowActionClicked={this.stockAction}/>}
                                     </Col>
                                 </Row>
