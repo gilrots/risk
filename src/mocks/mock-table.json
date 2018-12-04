@@ -10,7 +10,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01140169": {
     "AcntNo": "60000385977",
@@ -23,7 +24,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139492": {
     "AcntNo": "60000385977",
@@ -36,7 +38,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138114": {
     "AcntNo": "60000385977",
@@ -49,7 +52,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -219247.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06990196": {
     "AcntNo": "60000385977",
@@ -62,7 +66,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139542": {
     "AcntNo": "60000355830",
@@ -75,7 +80,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -110849.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07390149": {
     "AcntNo": "60000385977",
@@ -88,7 +94,8 @@
     "CostPrice": 108.82,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01142603": {
     "AcntNo": "60000355830",
@@ -101,7 +108,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02310225": {
     "AcntNo": "60000385977",
@@ -114,7 +122,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139252": {
     "AcntNo": "60000385985",
@@ -127,7 +136,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01126747": {
     "AcntNo": "60000355857",
@@ -140,7 +150,8 @@
     "CostPrice": 119.89,
     "UpdateTime": null,
     "TotalWorth": -20105920.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02260487": {
     "AcntNo": "60000355830",
@@ -153,7 +164,8 @@
     "CostPrice": 107.12,
     "UpdateTime": null,
     "TotalWorth": 1312911.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07230345": {
     "AcntNo": "60000355830",
@@ -166,7 +178,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 1330.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02300176": {
     "AcntNo": "60000385977",
@@ -179,7 +192,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143411": {
     "AcntNo": "60000355830",
@@ -192,7 +206,8 @@
     "CostPrice": 0.61,
     "UpdateTime": null,
     "TotalWorth": -8629331.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03900362": {
     "AcntNo": "60000355830",
@@ -205,7 +220,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -4543636.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02590388": {
     "AcntNo": "60000355830",
@@ -218,7 +234,8 @@
     "CostPrice": 112.23,
     "UpdateTime": null,
     "TotalWorth": -2923778.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02510204": {
     "AcntNo": "60000385977",
@@ -231,7 +248,8 @@
     "CostPrice": 106.75,
     "UpdateTime": null,
     "TotalWorth": -121069.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135888": {
     "AcntNo": "60000355849",
@@ -244,7 +262,8 @@
     "CostPrice": 100.59,
     "UpdateTime": null,
     "TotalWorth": 12235200.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135417": {
     "AcntNo": "60000355830",
@@ -257,7 +276,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -403261.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01142595": {
     "AcntNo": "60000355830",
@@ -270,7 +290,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -399300.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01150879": {
     "AcntNo": "60000355857",
@@ -296,7 +317,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141696": {
     "AcntNo": "60000355830",
@@ -309,7 +331,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -3244788.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07230352": {
     "AcntNo": "60000355830",
@@ -335,7 +358,8 @@
     "CostPrice": 56.37,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02590396": {
     "AcntNo": "60000355830",
@@ -348,7 +372,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -92187.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01153071": {
     "AcntNo": "60000355830",
@@ -361,7 +386,8 @@
     "CostPrice": 99.79,
     "UpdateTime": null,
     "TotalWorth": -554642.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01151117": {
     "AcntNo": "60000355830",
@@ -374,7 +400,8 @@
     "CostPrice": 99.49,
     "UpdateTime": null,
     "TotalWorth": 2449657.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01147578": {
     "AcntNo": "60000355830",
@@ -387,7 +414,8 @@
     "CostPrice": 100.0,
     "UpdateTime": null,
     "TotalWorth": 4913000.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139781": {
     "AcntNo": "60000355830",
@@ -413,7 +441,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 1104557.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01152453": {
     "AcntNo": "60000355849",
@@ -426,7 +455,8 @@
     "CostPrice": 99.5,
     "UpdateTime": null,
     "TotalWorth": 17947427.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01260603": {
     "AcntNo": "60000355830",
@@ -452,7 +482,8 @@
     "CostPrice": 99.09,
     "UpdateTime": null,
     "TotalWorth": 1.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132927": {
     "AcntNo": "60000385977",
@@ -465,7 +496,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 1.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141639": {
     "AcntNo": "60000355830",
@@ -478,7 +510,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -1215842.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01133149": {
     "AcntNo": "60000385977",
@@ -491,7 +524,8 @@
     "CostPrice": 90.22,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07770191": {
     "AcntNo": "60000385977",
@@ -504,7 +538,8 @@
     "CostPrice": 109.59,
     "UpdateTime": null,
     "TotalWorth": 112050.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "05050265": {
     "AcntNo": "60000385985",
@@ -517,7 +552,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01410307": {
     "AcntNo": "60000355830",
@@ -530,7 +566,8 @@
     "CostPrice": 102.84,
     "UpdateTime": null,
     "TotalWorth": 4640981.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01140136": {
     "AcntNo": "60000355830",
@@ -556,7 +593,8 @@
     "CostPrice": 101.45,
     "UpdateTime": null,
     "TotalWorth": 2073318.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01260546": {
     "AcntNo": "60000385977",
@@ -569,7 +607,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138171": {
     "AcntNo": "60000355830",
@@ -582,7 +621,8 @@
     "CostPrice": 11.67,
     "UpdateTime": null,
     "TotalWorth": -110862.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03230208": {
     "AcntNo": "60000385977",
@@ -595,7 +635,8 @@
     "CostPrice": 41.8,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132836": {
     "AcntNo": "60000385977",
@@ -608,7 +649,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135656": {
     "AcntNo": "60000355830",
@@ -634,7 +676,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01820190": {
     "AcntNo": "60000385977",
@@ -647,7 +690,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143130": {
     "AcntNo": "60000355830",
@@ -660,7 +704,8 @@
     "CostPrice": 93.01,
     "UpdateTime": null,
     "TotalWorth": -785893.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141225": {
     "AcntNo": "60000355857",
@@ -673,7 +718,8 @@
     "CostPrice": 101.41,
     "UpdateTime": null,
     "TotalWorth": -480695.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132059": {
     "AcntNo": "60000355830",
@@ -686,7 +732,8 @@
     "CostPrice": 96.97,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02310191": {
     "AcntNo": "60000385977",
@@ -699,7 +746,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132323": {
     "AcntNo": "60000385977",
@@ -712,7 +760,8 @@
     "CostPrice": 84.75,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01133891": {
     "AcntNo": "60000385977",
@@ -725,7 +774,8 @@
     "CostPrice": 28.33,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06130199": {
     "AcntNo": "60000385977",
@@ -738,7 +788,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138650": {
     "AcntNo": "60000385977",
@@ -751,7 +802,8 @@
     "CostPrice": 25.72,
     "UpdateTime": null,
     "TotalWorth": -477793.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135557": {
     "AcntNo": "60000355857",
@@ -764,7 +816,8 @@
     "CostPrice": 99.59,
     "UpdateTime": null,
     "TotalWorth": 18315171.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02260446": {
     "AcntNo": "60000385977",
@@ -777,7 +830,8 @@
     "CostPrice": 97.21,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136316": {
     "AcntNo": "60000355830",
@@ -790,7 +844,8 @@
     "CostPrice": 13.85,
     "UpdateTime": null,
     "TotalWorth": -5314592.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139344": {
     "AcntNo": "60000385985",
@@ -803,7 +858,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138668": {
     "AcntNo": "60000385977",
@@ -816,7 +872,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139823": {
     "AcntNo": "60000385985",
@@ -829,7 +886,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139815": {
     "AcntNo": "60000355830",
@@ -842,7 +900,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -415402.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141852": {
     "AcntNo": "60000355830",
@@ -855,7 +914,8 @@
     "CostPrice": 94.77,
     "UpdateTime": null,
     "TotalWorth": 1405048.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141589": {
     "AcntNo": "60000355830",
@@ -868,7 +928,8 @@
     "CostPrice": 113.62,
     "UpdateTime": null,
     "TotalWorth": -1991258.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139286": {
     "AcntNo": "60000385977",
@@ -881,7 +942,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138544": {
     "AcntNo": "60000355830",
@@ -894,7 +956,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -1222430.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01130467": {
     "AcntNo": "60000385985",
@@ -907,7 +970,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06130223": {
     "AcntNo": "60000355830",
@@ -920,7 +984,8 @@
     "CostPrice": 100.74,
     "UpdateTime": null,
     "TotalWorth": 1226634.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07460389": {
     "AcntNo": "60000355830",
@@ -933,7 +998,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -616068.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03230232": {
     "AcntNo": "60000385977",
@@ -946,7 +1012,8 @@
     "CostPrice": 43.44,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141829": {
     "AcntNo": "60000355830",
@@ -959,7 +1026,8 @@
     "CostPrice": 95.82,
     "UpdateTime": null,
     "TotalWorth": 6462249.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01134048": {
     "AcntNo": "60000355830",
@@ -972,7 +1040,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -524029.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01410299": {
     "AcntNo": "60000355830",
@@ -985,7 +1054,8 @@
     "CostPrice": 99.56,
     "UpdateTime": null,
     "TotalWorth": 60062.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01133487": {
     "AcntNo": "60000385977",
@@ -998,7 +1068,8 @@
     "CostPrice": 82.38,
     "UpdateTime": null,
     "TotalWorth": 677675.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01137975": {
     "AcntNo": "60000355830",
@@ -1011,7 +1082,8 @@
     "CostPrice": 102.72,
     "UpdateTime": null,
     "TotalWorth": -14073055.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03230166": {
     "AcntNo": "60000385977",
@@ -1024,7 +1096,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 1.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06940167": {
     "AcntNo": "60000385977",
@@ -1037,7 +1110,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07200124": {
     "AcntNo": "60000355830",
@@ -1050,7 +1124,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 11970.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01133529": {
     "AcntNo": "60000385977",
@@ -1063,7 +1138,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07770217": {
     "AcntNo": "60000385977",
@@ -1076,7 +1152,8 @@
     "CostPrice": 30.28,
     "UpdateTime": null,
     "TotalWorth": -72646.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07590128": {
     "AcntNo": "60000385977",
@@ -1089,7 +1166,8 @@
     "CostPrice": 41.69,
     "UpdateTime": null,
     "TotalWorth": 107762.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143015": {
     "AcntNo": "60000355830",
@@ -1115,7 +1193,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -143204.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01150903": {
     "AcntNo": "60000355830",
@@ -1128,7 +1207,8 @@
     "CostPrice": 98.51,
     "UpdateTime": null,
     "TotalWorth": 441589.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139849": {
     "AcntNo": "60000355849",
@@ -1141,7 +1221,8 @@
     "CostPrice": 104.6,
     "UpdateTime": null,
     "TotalWorth": 17754803.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141050": {
     "AcntNo": "60000385977",
@@ -1154,7 +1235,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01129899": {
     "AcntNo": "60000385977",
@@ -1167,7 +1249,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01145564": {
     "AcntNo": "60000355830",
@@ -1180,7 +1263,8 @@
     "CostPrice": 99.49,
     "UpdateTime": null,
     "TotalWorth": 2812969.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02310217": {
     "AcntNo": "60000385977",
@@ -1193,7 +1277,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136084": {
     "AcntNo": "60000385977",
@@ -1206,7 +1291,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "05760269": {
     "AcntNo": "60000355830",
@@ -1219,7 +1305,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -3355454.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01150812": {
     "AcntNo": "60000355830",
@@ -1232,7 +1319,8 @@
     "CostPrice": 101.09,
     "UpdateTime": null,
     "TotalWorth": 6921372.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135664": {
     "AcntNo": "60000355830",
@@ -1245,7 +1333,8 @@
     "CostPrice": 95.93,
     "UpdateTime": null,
     "TotalWorth": 1983335.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01410281": {
     "AcntNo": "60000385985",
@@ -1258,7 +1347,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01115823": {
     "AcntNo": "60000385977",
@@ -1271,7 +1361,8 @@
     "CostPrice": 125.16,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136050": {
     "AcntNo": "60000355830",
@@ -1284,7 +1375,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -297771.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02260495": {
     "AcntNo": "60000385977",
@@ -1297,7 +1389,8 @@
     "CostPrice": 103.29,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141274": {
     "AcntNo": "60000385977",
@@ -1310,7 +1403,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141332": {
     "AcntNo": "60000355830",
@@ -1323,7 +1417,8 @@
     "CostPrice": 98.77,
     "UpdateTime": null,
     "TotalWorth": 2408799.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01129733": {
     "AcntNo": "60000355830",
@@ -1336,7 +1431,8 @@
     "CostPrice": 105.88,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02510170": {
     "AcntNo": "60000385977",
@@ -1349,7 +1445,8 @@
     "CostPrice": 25.95,
     "UpdateTime": null,
     "TotalWorth": 119066.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06990204": {
     "AcntNo": "60000355830",
@@ -1362,7 +1459,8 @@
     "CostPrice": 107.5,
     "UpdateTime": null,
     "TotalWorth": -1267221.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01140102": {
     "AcntNo": "60000385977",
@@ -1375,7 +1473,8 @@
     "CostPrice": 101.39,
     "UpdateTime": null,
     "TotalWorth": 40484.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03900354": {
     "AcntNo": "60000385977",
@@ -1388,7 +1487,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132331": {
     "AcntNo": "60000385977",
@@ -1401,7 +1501,8 @@
     "CostPrice": 62.18,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03230190": {
     "AcntNo": "60000385977",
@@ -1414,7 +1515,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136068": {
     "AcntNo": "60000385977",
@@ -1427,7 +1529,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01550052": {
     "AcntNo": "60000355830",
@@ -1440,7 +1543,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136324": {
     "AcntNo": "60000385977",
@@ -1453,7 +1557,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01132950": {
     "AcntNo": "60000385977",
@@ -1466,7 +1571,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01142645": {
     "AcntNo": "60000355830",
@@ -1479,7 +1585,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -50550.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01130632": {
     "AcntNo": "60000385985",
@@ -1492,7 +1599,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01147495": {
     "AcntNo": "60000355830",
@@ -1505,7 +1613,8 @@
     "CostPrice": 99.23,
     "UpdateTime": null,
     "TotalWorth": 9125228.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06990154": {
     "AcntNo": "60000385977",
@@ -1518,7 +1627,8 @@
     "CostPrice": 140.78,
     "UpdateTime": null,
     "TotalWorth": -76743.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01136753": {
     "AcntNo": "60000385977",
@@ -1531,7 +1641,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06040372": {
     "AcntNo": "60000355830",
@@ -1544,7 +1655,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -110719.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143544": {
     "AcntNo": "60000355830",
@@ -1557,7 +1669,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141647": {
     "AcntNo": "60000355830",
@@ -1570,7 +1683,8 @@
     "CostPrice": 102.38,
     "UpdateTime": null,
     "TotalWorth": 23908564.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03130291": {
     "AcntNo": "60000385977",
@@ -1583,7 +1697,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139476": {
     "AcntNo": "60000355830",
@@ -1596,7 +1711,8 @@
     "CostPrice": 22.33,
     "UpdateTime": null,
     "TotalWorth": -2050399.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "03230265": {
     "AcntNo": "60000355830",
@@ -1609,7 +1725,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -189108.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02260479": {
     "AcntNo": "60000385977",
@@ -1622,7 +1739,8 @@
     "CostPrice": 59.71,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143304": {
     "AcntNo": "60000355830",
@@ -1635,7 +1753,8 @@
     "CostPrice": 0.95,
     "UpdateTime": null,
     "TotalWorth": -6089810.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01135862": {
     "AcntNo": "60000385977",
@@ -1648,7 +1767,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07150360": {
     "AcntNo": "60000385977",
@@ -1661,7 +1781,8 @@
     "CostPrice": 81.71,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02510238": {
     "AcntNo": "60000355830",
@@ -1674,7 +1795,8 @@
     "CostPrice": 99.05,
     "UpdateTime": null,
     "TotalWorth": 493633.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "02310175": {
     "AcntNo": "60000385977",
@@ -1687,7 +1809,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01124080": {
     "AcntNo": "60000385985",
@@ -1700,7 +1823,8 @@
     "CostPrice": 116.53,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01142009": {
     "AcntNo": "60000355830",
@@ -1713,7 +1837,8 @@
     "CostPrice": 100.14,
     "UpdateTime": null,
     "TotalWorth": 19258746.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06000210": {
     "AcntNo": "60000385977",
@@ -1726,7 +1851,8 @@
     "CostPrice": 100.84,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01142504": {
     "AcntNo": "60000355830",
@@ -1739,7 +1865,8 @@
     "CostPrice": 2.47,
     "UpdateTime": null,
     "TotalWorth": -3455451.0,
-    "TradeSum": -9944.0
+    "TradeSum": -9944.0,
+    "Bank": "poalim"
   },
   "01140607": {
     "AcntNo": "60000385977",
@@ -1752,7 +1879,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "07590151": {
     "AcntNo": "60000385977",
@@ -1765,7 +1893,8 @@
     "CostPrice": 97.31,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01980416": {
     "AcntNo": "60000385977",
@@ -1778,7 +1907,8 @@
     "CostPrice": 44.38,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01138163": {
     "AcntNo": "60000355830",
@@ -1791,7 +1921,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": -33165.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139898": {
     "AcntNo": "60000355849",
@@ -1804,7 +1935,8 @@
     "CostPrice": 104.65,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01123272": {
     "AcntNo": "60000355857",
@@ -1817,7 +1949,8 @@
     "CostPrice": 8.18,
     "UpdateTime": null,
     "TotalWorth": -40185147.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01260652": {
     "AcntNo": "60000355830",
@@ -1843,7 +1976,8 @@
     "CostPrice": 87.06,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01139583": {
     "AcntNo": "60000355830",
@@ -1856,7 +1990,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 3694124.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01143122": {
     "AcntNo": "60000355830",
@@ -1869,7 +2004,8 @@
     "CostPrice": 7.59,
     "UpdateTime": null,
     "TotalWorth": -959457.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "01141415": {
     "AcntNo": "60000385977",
@@ -1882,7 +2018,8 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 0.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   },
   "06990212": {
     "AcntNo": "60000385977",
@@ -1895,6 +2032,7 @@
     "CostPrice": 0.0,
     "UpdateTime": null,
     "TotalWorth": 1.0,
-    "TradeSum": 0.0
+    "TradeSum": 0.0,
+    "Bank": "poalim"
   }
 }

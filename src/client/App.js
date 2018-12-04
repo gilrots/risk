@@ -5,7 +5,8 @@ import StockViewer from './components/stock-viewer/stock-viewer';
 import AppHeader from "./components/header/app-header";
 import {
     Container, Row, Col, Button, Modal, ModalBody, ModalFooter,
-    ModalHeader, NavItem, Nav, TabContent, TabPane, Alert, Badge
+    ModalHeader, NavItem, Nav, TabContent, TabPane, Alert, Badge,
+    UncontrolledTooltip
 } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
 import * as Utils from '../common/utils';
@@ -186,27 +187,6 @@ export default class App extends Component {
         ];
     };
 
-    getSystemIndication = (data) => {
-        return data && data.errors ? [{
-            name: 'Ace',
-            ok: data.errors.ace,
-            tooltip: ''
-            },{
-            name: 'U-Bank',
-            ok: data.errors.ubank,
-            tooltip: ''
-            },{
-            name: 'פועלים',
-            ok: data.errors.poalim,
-            tooltip: ''
-            },{
-            name: 'איגוד',
-            ok: data.errors.igud,
-            tooltip: ''
-            },
-        ] : [];
-    };
-
     openTableMaker = (hasTableData) => {
         if(hasTableData) {
             this.toggleModal('Create new table', 0);
@@ -219,8 +199,7 @@ export default class App extends Component {
     render() {
         const {data, modal, tableMakerData, excludeMode} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
-        const hasData = !_.isEmpty(data) && data && data.errors && data.errors.ace !== true;
-        const systemInds = this.getSystemIndication(data);
+        const hasData = !_.isEmpty(data) && data && data.latency && !data.latency[0].error;
         const navItems = this.getNavMenuActions();
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
@@ -234,11 +213,16 @@ export default class App extends Component {
                 </ModalFooter>
             </Modal>
         <AppHeader>
-                {systemInds.map(badge =>
-                    <NavItem key={badge.name} className="d-flex align-items-center mr-1">
-                        <Badge color={badge.ok ? 'danger' : 'success'}>{badge.name}</Badge>
-                    </NavItem>
-                )}
+                <Fragment>
+                    {hasData && data.latency.map(badge =>
+                        <NavItem key={badge.name} className="d-flex align-items-center mr-1">
+                            <Badge id={`${badge.name}-indication`} color={badge.error ? 'danger' : 'success'}>{badge.name}</Badge>
+                           {badge.message && <UncontrolledTooltip placement="bottom" target={`${badge.name}-indication`}>
+                                {badge.message}
+                            </UncontrolledTooltip>}
+                        </NavItem>
+                    )}
+                </Fragment>
                 <IconedMenu items={navItems} title="Menu"/>
             </AppHeader>
             <RiskLoader loading={!hasData}>

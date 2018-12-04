@@ -1,13 +1,18 @@
 const config = require('../../common/config.json');
 const Utils = require('../../common/utils.js');
 const _ = require('lodash');
-
+const banks = config.bank.banks;
+const bankField = config.bank.bankField;
+const timeout = config.bank.timeout;
+const rn = () => new Date().getTime(); // Right-now
 const DB = {
     long: {},
     short: {},
     all:{},
     ids: undefined
 };
+
+const BankLatency = _.chain(banks).keys().reduce((acc, key) => ({ ...acc, [key]: rn()}),{}).value();
 
 function getDBSnap(){
     const snap = Utils.copy(DB);
@@ -44,6 +49,7 @@ function updateDB(stock, fromStocks, toStocks = undefined) {
 }
 
 function updateStocksData(bankData) {
+    updateBankLatency(bankData);
     const amount = getAmount(bankData);
 
     if(amount === 0) {
@@ -67,4 +73,27 @@ function filter(bankSnap, ids){
     bankSnap.ids = _.difference(bankSnap.ids, ids);
 }
 
-module.exports = {updateStocksData, getDBSnap, getFields, filter};
+function updateBankLatency(bankData){
+    const bank = bankData[bankField];
+    if(bank){
+        if(BankLatency[bank]){
+            BankLatency[bank] = rn();
+        }
+        else{
+            console.error(`Stock id: ${bankData.securityID} bank value isnt valid: ${bank}`);
+        }
+    }
+    else{
+        console.error(`Stock id: ${bankData.securityID} has no bank field`);
+    }
+}
+
+function getBankLatency(){
+    return _.chain(BankLatency).toPairs().reduce((acc, pair) => [...acc, {
+        name: banks[pair[0]],
+        error: (rn() - pair[1]) > timeout,
+        message: '' 
+    }],[]).value();
+}
+
+module.exports = {updateStocksData, getDBSnap, getFields, filter, getBankLatency};

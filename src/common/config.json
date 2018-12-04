@@ -69,7 +69,14 @@
     }
   },
   "bank": {
-    "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"]
+    "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"],
+    "bankField": "Bank",
+    "timeout": 5000,
+    "banks": {
+      "poalim": "פועלים",
+      "ubank": "U-Bank",
+      "igud": "איגוד"
+    }
   },
   "ace": {
     "idToken": "XXX",

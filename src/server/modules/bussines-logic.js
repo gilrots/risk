@@ -46,16 +46,18 @@ function getTable(params) {
                         const missingIds = _.keys(aceDB.errors.fieldsMissing);
                         aceDB.errors.fieldsMissing = {};
                         let result = undefined;
-
+                        
                         if (missingIds.length === 0 || counter.almost()) {
+                            const aceLatency = {name:"Ace", error:false, message: ''};
                             try {
                                 result = Tables.calculateTable(table, bankDB, aceDB);
                             }
                             catch (e) {
                                 result = Tables.getResultFormat();
-                                result.errors.ace = true;
-                                result.errors.generalError = e.message;
+                                aceLatency.error = true;
+                                aceLatency.message = e.message;
                             }
+                            result.latency = [aceLatency,...Bank.getBankLatency()];
                         }
                         else {
                             ids = missingIds;
