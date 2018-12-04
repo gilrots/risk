@@ -9,7 +9,7 @@ async function exist(username) {
 }
 
 async function getAccounts(user) {
-    return Users.findAll({attributes:'accounts'},{where:{id: user.id}});
+    return Users.findOne({where:{id: user.id}});
 }
 
 async function updateAccounts(user, accounts) {

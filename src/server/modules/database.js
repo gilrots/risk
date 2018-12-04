@@ -46,7 +46,8 @@ async function registerUser(params, res) {
 }
 
 async function getUserAccounts(params) {
-    return await UsersDL.getAccounts(params.user);
+    const {username, accounts} = await UsersDL.getAccounts(params.user);
+    return {username, accounts};
 }
 
 async function setUserAccounts(params) {

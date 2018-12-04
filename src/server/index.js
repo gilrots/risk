@@ -62,7 +62,7 @@ const securedApi = {
         [api.searchAceFields]:  Logic.searchAceFields,
         [api.getTableMakerData]:Logic.getTableMakerData,
         [api.tableAction.url]:  Logic.tableAction,
-        [api.getUserAccounts]:  DB.setUserAccounts,
+        [api.getUserAccounts]:  DB.getUserAccounts,
         [api.getIntras]:        DB.getIntras,
         [api.getIPOs]:          DB.getIPOs,
         [api.getIPOFavs]:       DB.getIPOFavorites,
