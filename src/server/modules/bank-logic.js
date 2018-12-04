@@ -4,6 +4,8 @@ const _ = require('lodash');
 const banks = config.bank.banks;
 const idField = config.bank.fields[1];
 const accntField = config.bank.fields[0];
+const sdqField = config.bank.fields[3];
+const fqField = config.bank.fields[6];
 const bankField = config.bank.bankField;
 const timeout = config.bank.timeout;
 const rn = () => new Date().getTime(); // Right-now
@@ -23,11 +25,11 @@ function getDBSnap(){
 }
 
 function getAmount(stock) {
-    return stock.StartDayQty + stock.FillQty;;
+    return stock[sdqField] + stock[fqField];;
 }
 
 function getId(stock) {
-    return stock.securityID;
+    return stock[idField];
 }
 
 function getStock(stockId) {
@@ -67,19 +69,21 @@ function updateStocksData(bankData) {
 }
 
 function filter(bankSnap, ids, accounts){
-    const accntMap = _.chain(accounts).mapKeys(()=>true).value();
-    const filteredIds = _.chain(bankSnap.all)
-                            .values()
-                            .filter(s => !accntMap[s[accntField]])
-                            .map(idField)
-                            .concat(ids)
-                            .value();
-    _.forEach(filteredIds, id => {
+    const deleteId = id => {
         delete bankSnap.long[id];
         delete bankSnap.short[id];
         delete bankSnap.all[id];
-    });
-    bankSnap.ids = _.difference(bankSnap.ids, filteredIds);
+    }
+    const accntMap = _.chain(accounts).mapKeys(()=>true).value();
+    bankSnap.ids = _.chain(bankSnap.all)
+                    .values()
+                    .filter(s => !accntMap[s[accntField]])
+                    .map(idField)
+                    .concat(ids)
+                    .uniq()
+                    .forEach(deleteId)
+                    .xor(bankSnap.ids)
+                    .value();
 }
 
 function updateBankLatency(bankData){
@@ -89,11 +93,11 @@ function updateBankLatency(bankData){
             BankLatency[bank] = rn();
         }
         else{
-            console.error(`Stock id: ${bankData.securityID} bank value isnt valid: ${bank}`);
+            console.error(`Stock id: ${getId(bankData)} bank value isnt valid: ${bank}`);
         }
     }
     else{
-        console.error(`Stock id: ${bankData.securityID} has no bank field`);
+        console.error(`Stock id: ${getId(bankData)} has no bank field`);
     }
 }
 
