@@ -3,14 +3,13 @@ import { Form, FormGroup, Input, UncontrolledDropdown, DropdownToggle,
     DropdownMenu,DropdownItem, ListGroup, ListGroupItem, Button } from "reactstrap";
 
 export function IconedMenu(props) {
-    const { title, items, menuClick } = props;
+    const { title, items, menuClick, active } = props;
     const click = e => {
-        e.preventDefault();
         if(menuClick) {
             menuClick();
         }
     } 
-    return <UncontrolledDropdown className="d-flex align-items-center" onClick={click} nav inNavbar>
+    return <UncontrolledDropdown className="d-flex align-items-center" active={active} onClick={click} nav inNavbar>
         <DropdownToggle className="font-weight-bold" nav caret>{title}</DropdownToggle>
         <DropdownMenu right>
             {items.map(item =>

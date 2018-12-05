@@ -79,6 +79,9 @@ export default class App extends Component {
                     {modal: {isOpen: true, title: title, component: component}},
             () => {
                 this.polling = !this.state.modal.isOpen
+                if(this.polling){
+                    this.getData();
+                }
             });
     }
 
@@ -197,7 +200,7 @@ export default class App extends Component {
     };
 
     render() {
-        const {data, modal, tableMakerData, excludeMode} = this.state;
+        const {data, modal, tableMakerData, excludeMode, activeTable} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = !_.isEmpty(data) && data && data.latency && !data.latency[0].error;
         const hasLatency = data && data.latency;
@@ -231,7 +234,8 @@ export default class App extends Component {
                     <Nav tabs>
                         {data.tables.map((table) =>
                         <IconedMenu key={table.id} items={this.getTableActions(table)} 
-                        title={table.name} menuClick={() => this.toggleTab(table.id)} />)}
+                        title={table.name} active={table.id === activeTable}
+                        menuClick={() => {this.setState({activeTable:table.id});this.toggleTab(table.id)}} />)}
                         <NavItem>
                             <Button className="rounded-circle mx-2" outline color="primary"
                                     onClick={() => this.openTableMaker(hasTableData)}>

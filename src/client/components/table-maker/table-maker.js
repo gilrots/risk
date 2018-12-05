@@ -84,12 +84,12 @@ class TableMaker extends React.Component {
     }
 
     render() {
-        const {name, cols, selectedColIndex} = this.state;
+        const {name, cols, selectedColIndex, risk} = this.state;
         const tabAct = _.isEmpty(this.state.id) ? 'Create Table' : 'Update Table';
         let col = _.get(cols,selectedColIndex.toString(), undefined);
         let index = selectedColIndex;
         if(!col) {
-            col = _.get(cols, '0', undefined)
+            col = _.get(cols, '0', undefined);
             index = 0;
         }
         
@@ -113,6 +113,19 @@ class TableMaker extends React.Component {
                             </InputGroupAddon>
                             <Input value={name} placeholder="New Table..." onChange={e => this.setState({name:e.target.value})}/>
                         </InputGroup>
+                    </Col>
+                </Row>
+                <Row className="my-2">
+                    <Col className="align-self-center">
+                        {cols.map((col, colIndex) => (
+                            <Button key={colIndex} className="mr-2 pop-box" color="primary" active={colIndex === index}
+                                    onClick={() => this.setState({selectedColIndex:colIndex})}>{col.name ? col.name : `Col ${colIndex}`}
+                                <Badge className="ml-2 pop-item" color="danger" onClick={(e) => this.deleteCol(e, colIndex)} disabled={cols.length < 2}><i className="fa fa-times"/></Badge>
+                            </Button>
+                        ))}
+                    </Col>
+                    <Col xs="auto" className="align-self-center">
+                        <Button color="primary" outline className="rounded-circle" onClick={() => this.addCol()}><i className="fa fa-plus"/></Button>
                     </Col>
                 </Row>
                 <Row className="my-2">
