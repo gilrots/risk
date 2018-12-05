@@ -61,6 +61,7 @@
   "app": {
     "updateInterval": 5000,
     "searchDebounce": 150,
+    "searchLimit": 10,
     "defaultTable": {
       "name": "Position Report",
       "id": "-999"
@@ -81,6 +82,7 @@
     "error": "!error!",
     "tries": 3,
     "nameField": "name",
+    "defaultTableFields": ["name", "last", "syn_diff", "duration_bruto"],
     "queries" :{
       "stockField": "http://localhost:4071/aoc/core/AocRT/getdata?s=XXX&f=",
       "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=",

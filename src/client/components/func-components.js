@@ -1,5 +1,6 @@
 import React from "react";
-import { UncontrolledDropdown,DropdownToggle,DropdownMenu,DropdownItem, ListGroup, ListGroupItem, Button } from "reactstrap";
+import { Form, FormGroup, Input, UncontrolledDropdown, DropdownToggle,
+    DropdownMenu,DropdownItem, ListGroup, ListGroupItem, Button } from "reactstrap";
 
 export function IconedMenu(props) {
     const { title, items, menuClick } = props;
@@ -19,4 +20,20 @@ export function IconedMenu(props) {
             )}
         </DropdownMenu>
     </UncontrolledDropdown>;
+}
+
+export function SearchInput(props) {
+    const { value, onChange } = props;
+    const searchChanged = e => {
+        e.preventDefault();
+        if(onChange) {
+            onChange(e.target.value);
+        }
+    } 
+
+    return <Form inline className="px-2">
+                <FormGroup>
+                    <Input placeholder="Search for..." value={value} onChange={searchChanged}/>
+                </FormGroup>
+            </Form>;
 }

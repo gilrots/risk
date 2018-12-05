@@ -88,12 +88,12 @@ export default class App extends Component {
         }
     }
 
-    tableAction(url, tableId, action) {
+    tableAction(url, tableId, action, title) {
         Utils.fetchJson(url, {tableId, action})
             .then(response => {
                 if (typeof response !== 'string' && response.id !== '') {
                     this.setState({editedTable: response, activeTable: response.id});
-                    this.toggleModal(action, 0);
+                    this.toggleModal(title, 0);
                 }
             });
     }
@@ -148,7 +148,7 @@ export default class App extends Component {
             {
                 name: 'Settings',
                 icon: 'cog',
-                action: () => this.tableAction(ta.url, table.id, ta.actions.get)
+                action: () => this.tableAction(ta.url, table.id, ta.actions.get, 'Table editor')
             },
             {
                 name: 'Delete',
@@ -200,6 +200,7 @@ export default class App extends Component {
         const {data, modal, tableMakerData, excludeMode} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = !_.isEmpty(data) && data && data.latency && !data.latency[0].error;
+        const hasLatency = data && data.latency;
         const navItems = this.getNavMenuActions();
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
@@ -214,7 +215,7 @@ export default class App extends Component {
             </Modal>
         <AppHeader>
                 <Fragment>
-                    {hasData && data.latency.map(badge =>
+                    {hasLatency && data.latency.map(badge =>
                         <NavItem key={badge.name} className="d-flex align-items-center mr-1">
                             <Badge id={`${badge.name}-indication`} color={badge.error ? 'danger' : 'success'}>{badge.name}</Badge>
                            {badge.message && <UncontrolledTooltip placement="bottom" target={`${badge.name}-indication`}>

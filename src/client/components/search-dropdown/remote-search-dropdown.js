@@ -28,6 +28,20 @@ class RemoteSearchDropdown extends React.Component {
             selected: props.selected
         };
         this.remoteSearch = _.debounce(this.remoteSearch, props.debounceTime ? props.debounceTime : 150);
+        this.modifiers = {
+            setMaxHeight: {
+                enabled: true,
+                order: 1030,
+                fn: data => ({
+                        ...data,
+                        styles: {
+                            ...data.styles,
+                            overflow: 'auto',
+                            maxHeight: 300,
+                        },
+                    })
+            },
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -65,24 +79,12 @@ class RemoteSearchDropdown extends React.Component {
 
     render() {
         const {search, items, selected} = this.state;
+        const {modifiers} = this;
         return (<UncontrolledDropdown>
                 <DropdownToggle className="font-weight-bold">
                     {selected ? selected.name : 'Search...' }
                 </DropdownToggle>
-                <DropdownMenu right modifiers={{
-                    setMaxHeight: {
-                        enabled: true,
-                        order: 1030,
-                        fn: data => ({
-                                ...data,
-                                styles: {
-                                    ...data.styles,
-                                    overflow: 'auto',
-                                    maxHeight: 300,
-                                },
-                            })
-                    },
-                }}>
+                <DropdownMenu right modifiers={modifiers}>
                     <Form inline className="px-2">
                         <FormGroup>
                             <Input placeholder="Search for..." value={search} onChange={e => this.searchChanged(e.target.value)}/>

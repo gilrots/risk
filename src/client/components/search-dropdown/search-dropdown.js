@@ -1,10 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
-import {
-    Input,  UncontrolledDropdown,
-    DropdownToggle, DropdownMenu, DropdownItem
-} from 'reactstrap';
+import {SearchInput} from '../func-components';
+import {UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import PropTypes from "prop-types";
+const config = require('../../../common/config');
+const debTime = config.app.searchDebounce;
+const limit = config.app.searchLimit;
 
 class SearchDropdown extends React.Component {
 
@@ -19,16 +20,32 @@ class SearchDropdown extends React.Component {
 
     constructor(props) {
         super(props);
-        this.selectionChanged =  this.selectionChanged.bind(this);
-        this.searchChanged =  this.searchChanged.bind(this);//_.debounce(this.searchChanged())
         this.state = this.initState(this.props);
+        this.modifiers = {
+            setMaxHeight: {
+                enabled: true,
+                order: 1030,
+                fn: data => ({
+                        ...data,
+                        styles: {
+                            ...data.styles,
+                            overflow: 'auto',
+                            maxHeight: 300,
+                        },
+                    })
+            },
+        };
+        //_.debounce(this.searchChanged())
     }
 
     initState(props) {
+        const {items, selectedId} = props;
         return {
             search: '',
-            filtered: props.items.slice(0),
-            selected:  _.get(props.items,'[0]', undefined)
+            filtered: items.slice(0, 10),
+            selected:  !_.isEmpty(selectedId) ? 
+                items.find(item => item.id === selectedId) :
+                _.get(items,'0', undefined)
         };
     }
 
@@ -42,22 +59,24 @@ class SearchDropdown extends React.Component {
                 this.selectionChanged(item);
             }
             else {
-                console.log(`No such item id:${nextProps.selectedId}`);
+                console.log(`No such item id: ${nextProps.selectedId}`);
             }
         }
     }
 
-    searchChanged(value){
+    searchChanged = value => {
         if(value !== this.state.search){
             const search = value;
-            const filtered = search === '' ? this.props.items.slice(0) : _.filter(this.props.items, item => (item.name.includes(search) || item.id.includes(search)));
+            const filtered = _.isEmpty(search) ? 
+            this.props.items.slice(0, 10) : 
+            _.limit(this.props.items, item => (item.name.includes(search) || item.id.includes(search)), limit);
             this.setState({search, filtered});
         }
     }
 
-    selectionChanged(item) {
-        if(!this.state.selected || item.id !== this.state.selected.id) {
-            this.setState({selected:item},()=>{
+    selectionChanged = item => {
+        if(!this.state.selected || item && item.id !== this.state.selected.id) {
+            this.setState({selected:item},() => {
                 const delegate = this.props.onSelected;
                 if(delegate) {
                     delegate(item);
@@ -68,12 +87,13 @@ class SearchDropdown extends React.Component {
 
     render() {
         const {search, filtered,selected} = this.state;
-        return (<UncontrolledDropdown className="d-flex align-items-center">
+        const {modifiers} = this;
+        return (<UncontrolledDropdown>
                     <DropdownToggle className="font-weight-bold">
                         {selected ? selected.name : 'Search field' }
                     </DropdownToggle>
-                    <DropdownMenu right style={{maxHeight: 300}}>
-                        <Input placeholder="Search for..." value={search} onChange={e => this.searchChanged(e.target.value)}/>
+                    <DropdownMenu direction="right" modifiers={modifiers}>
+                        <SearchInput value={search} onChange={this.searchChanged}/>
                         <DropdownItem divider/>
                         {filtered.map(item => (
                             <DropdownItem key={item.id} onClick={()=> this.selectionChanged(item)}>{item.name}</DropdownItem>

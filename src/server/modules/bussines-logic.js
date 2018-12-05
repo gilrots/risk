@@ -56,6 +56,7 @@ function getTable(params) {
                                     result = Tables.getResultFormat();
                                     aceLatency.error = true;
                                     aceLatency.message = e.message;
+                                    console.error(e);
                                 }
                                 result.latency = [aceLatency, ...Bank.getBankLatency()];
                             }

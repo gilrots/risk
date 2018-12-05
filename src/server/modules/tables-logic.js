@@ -7,152 +7,7 @@ const DB = {
     types: ['long', 'short'],
     subTypes: ['risk'],
     replaceToken: '$$$',
-    tables: [{
-        id: config.app.defaultTable.id,
-        name: config.app.defaultTable.name,
-        cols: [
-            {
-                name: 'Name',
-                key: 'name',
-                func: {
-                    exp: '{a:0}',
-                    arguments: {
-                        stock: [],
-                        bank: [],
-                        ace: ['name']
-                    },
-                    aggregations: [],
-                }
-            },
-            {
-                name: '$$$ Value',
-                key: 'value',
-                func: {
-                    exp: '{a:0}*({b:0}+{b:1})',
-                    arguments: {
-                        stock: [],
-                        bank: [config.bank.fields[3], config.bank.fields[6]],
-                        ace: ['last']
-                    },
-                    aggregations: [],
-                },
-                format: 2,
-            },
-            {
-                name: '$$$ Value %',
-                key: 'valuePer',
-                func: {
-                    exp: '{s:0}/{t:0}',
-                    arguments: {
-                        stock: ['value'],
-                        bank: [],
-                        ace: []
-                    },
-                    aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }],
-                },
-                format: 0
-            },
-            {
-                name: 'Amount',
-                key: 'amount',
-                func: {
-                    exp: '{b:0}+{b:1}',
-                    arguments: {
-                        stock: [],
-                        bank: [config.bank.fields[3], config.bank.fields[6]],
-                        ace: []
-                    },
-                    aggregations: []
-                }
-            },
-            {
-                name: 'Syn Diff',
-                key: 'syn_diff',
-                func: {
-                    exp: '{a:0}',
-                    arguments: {
-                        stock: [],
-                        bank: [],
-                        ace: ['syn_diff']
-                    },
-                    aggregations: []
-                },
-                format: 1
-            }],
-        risk: [
-            {
-                name: 'Total $$$',
-                key: '$$$_total_value',
-                type: '$$$',
-                order: 0,
-                func: {
-                    exp: '{t:0}',
-                    arguments: {
-                        stock: ['value'],
-                        bank: [],
-                        ace: []
-                    },
-                    aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }]
-                }
-            },
-            {
-                name: 'Total $$$ Risk',
-                key: '$$$_total_risk',
-                type: '$$$',
-                order: 1,
-                func: {
-                    exp: '({t:1} / {t:0}) * {t:2}',
-                    arguments: {
-                        stock: ['valuePer', 'value'],
-                        bank: [],
-                        ace: ['duration_bruto']
-                    },
-                    aggregations: [
-                        { key: '$$$_total_duration', exp: 'acc + {a:0}' },
-                        { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' },
-                        { key: '$$$_total_value', exp: 'acc + {s:1}' }],
-                }
-            },
-            {
-                name: '$$$ Duration',
-                key: '$$$_total_duration',
-                type: '$$$',
-                order: 2,
-                func: {
-                    exp: '{t:1} / {t:0}',
-                    arguments: {
-                        stock: ['valuePer'],
-                        bank: [],
-                        ace: ['duration_bruto']
-                    },
-                    aggregations: [
-                        { key: '$$$_total_duration', exp: 'acc + {a:0}' },
-                        { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' }],
-                }
-            },
-            {
-                name: 'Risk',
-                key: 'risk',
-                type: 'risk',
-                order: 3,
-                func: {
-                    exp: '{t:0} / {t:1}',
-                    arguments: {
-                        stock: [],
-                        bank: [],
-                        ace: []
-                    },
-                    aggregations: [
-                        { key: 'long_total_risk', exp: '' },
-                        { key: 'short_total_risk', exp: '' }],
-                }
-            }
-        ],
-        filter: {
-            excluded: [],
-            predicate: []
-        }
-    }],
+    tables: [],
     riskCols: [
         {
             name: 'Name',
@@ -178,6 +33,154 @@ const DB = {
         operators: ['None', 'And', 'Or']
     }
 };
+const defaultCols = ["Name",
+                    `${DB.replaceToken} Value`,
+                    `${DB.replaceToken} Value %`,
+                    "Amount",
+                    "Syn Diff"].map(name=> ({name, key:formatColKey(name)}));
+const defaultAce = config.ace.defaultTableFields;
+
+const defaultTable = {
+    id: config.app.defaultTable.id,
+    name: config.app.defaultTable.name,
+    cols: [
+        {
+            ...defaultCols[0],
+            func: {
+                exp: '{a:0}',
+                arguments: {
+                    stock: [],
+                    bank: [],
+                    ace: [defaultAce[0]]
+                },
+                aggregations: [],
+            }
+        },
+        {
+            ...defaultCols[1],
+            func: {
+                exp: '{a:0}*({b:0}+{b:1})',
+                arguments: {
+                    stock: [],
+                    bank: [config.bank.fields[3], config.bank.fields[6]],
+                    ace: [defaultAce[1]]
+                },
+                aggregations: [],
+            },
+            format: 2,
+        },
+        {
+            ...defaultCols[2],
+            func: {
+                exp: '{s:0}/{t:0}',
+                arguments: {
+                    stock: [defaultCols[1].key],
+                    bank: [],
+                    ace: []
+                },
+                aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }],
+            },
+            format: 0
+        },
+        {
+            ...defaultCols[3],
+            func: {
+                exp: '{b:0}+{b:1}',
+                arguments: {
+                    stock: [],
+                    bank: [config.bank.fields[3], config.bank.fields[6]],
+                    ace: []
+                },
+                aggregations: []
+            }
+        },
+        {
+            ...defaultCols[4],
+            func: {
+                exp: '{a:0}',
+                arguments: {
+                    stock: [],
+                    bank: [],
+                    ace: [defaultAce[2]]
+                },
+                aggregations: []
+            },
+            format: 1
+        }],
+    risk: [
+        {
+            name: 'Total $$$',
+            key: '$$$_total_value',
+            type: '$$$',
+            order: 0,
+            func: {
+                exp: '{t:0}',
+                arguments: {
+                    stock: [defaultCols[1].key],
+                    bank: [],
+                    ace: []
+                },
+                aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }]
+            }
+        },
+        {
+            name: 'Total $$$ Risk',
+            key: '$$$_total_risk',
+            type: '$$$',
+            order: 1,
+            func: {
+                exp: '({t:1} / {t:0}) * {t:2}',
+                arguments: {
+                    stock: [defaultCols[2].key, defaultCols[1].key],
+                    bank: [],
+                    ace: [defaultAce[3]]
+                },
+                aggregations: [
+                    { key: '$$$_total_duration', exp: 'acc + {a:0}' },
+                    { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' },
+                    { key: '$$$_total_value', exp: 'acc + {s:1}' }],
+            }
+        },
+        {
+            name: '$$$ Duration',
+            key: '$$$_total_duration',
+            type: '$$$',
+            order: 2,
+            func: {
+                exp: '{t:1} / {t:0}',
+                arguments: {
+                    stock: [defaultCols[2].key],
+                    bank: [],
+                    ace: [defaultAce[3]]
+                },
+                aggregations: [
+                    { key: '$$$_total_duration', exp: 'acc + {a:0}' },
+                    { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' }],
+            }
+        },
+        {
+            name: 'Risk',
+            key: 'risk',
+            type: 'risk',
+            order: 3,
+            func: {
+                exp: '{t:0} / {t:1}',
+                arguments: {
+                    stock: [],
+                    bank: [],
+                    ace: []
+                },
+                aggregations: [
+                    { key: 'long_total_risk', exp: '' },
+                    { key: 'short_total_risk', exp: '' }],
+            }
+        }
+    ],
+    filter: {
+        excluded: [],
+        predicate: []
+    }
+}
 
 const argsMap = {
     s: 'stock',
@@ -217,7 +220,7 @@ function setExpressions(obj, key, argsMap) {
                 const groups = regEx.exec(matches);
                 const source = argsMap[groups[1]];
                 const property = argsMap.args[source] ? argsMap.args[source][groups[2]] : argsMap.aggs[groups[2]].key;
-                const parsedExp = `${source}.${property}`;
+                const parsedExp = `${source}["${property}"]`;
                 return Utils.replaceAll(res, match, parsedExp);
             }, val);
         }
@@ -226,7 +229,7 @@ function setExpressions(obj, key, argsMap) {
 
 function formatResult(bank, ace) {
     const id = bank.securityID;
-    return { 'stock': { id: id }, 'bank': bank, 'ace': ace[id] };
+    return { 'stock': { id }, 'bank': bank, 'ace': ace[id] };
 }
 
 function formatAceData(stockId, aceDB, aceData, aceFields) {
@@ -366,41 +369,55 @@ function parseExpression(exp, argsMap) {
     return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp)
 }
 
+function formatKey(name){
+    return Utils.replaceAll(name.toLowerCase(), ' ', '_');
+}
+
+function formatColKey(name){
+    return Utils.replaceAll(formatKey(name), DB.replaceToken, '')
+}
+
 function createTable(data) {
     return new Promise(resolve => {
         const update = !_.isEmpty(data.id);
+        const newTable = {
+            name: data.name,
+            id: update ? data.id : generateId(),
+            cols:[],
+            risk:[],
+            filter: {
+                excluded: [],
+                predicate: []
+            }
+        };
         try {
-            const formatKey = name => Utils.replaceAll(name.toLowerCase(), ' ', '_');
-            const newTable = {
-                name: data.name,
-                id: update ? data.id : generateId(),
-                cols: _.map(data.cols, col => {
-                    const calc = _.reduce(col.params, (acc, param, index) => {
-                        if (param.source === 'stock') {
-                            param.item.id = Utils.replaceAll(formatKey(param.item.id), DB.replaceToken, '')
-                        }
-                        acc.arguments[param.source].push(param.item.id)
-                        acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
-                        return acc;
-                    }, { arguments: { stock: [], bank: [], ace: [] }, argsMap: {}, aggregations: [] });
+            newTable.cols = _.map(data.cols, col => {
+                const calc = _.reduce(col.params, (acc, param, index) => {
+                    if (param.source === 'stock') {
+                        param.item.id = formatColKey(param.item.id);
+                    }
+                    acc.arguments[param.source].push(param.item.id)
+                    acc.argsMap[`X${index}`] = `{${param.source[0]}:${acc.arguments[param.source].length - 1}}`;
+                    return acc;
+                }, { arguments: { stock: [], bank: [], ace: [] }, argsMap: {}, aggregations: [] });
 
-                    _.forEach(col.aggregations, (agg, index) => {
-                        calc.argsMap[`Y${index}`] = `{t:${index}}`;
-                        calc.aggregations.push({ key: formatKey(agg.key), exp: `acc ${parseExpression(agg.exp, calc.argsMap)}` })
-                    });
-                    return {
-                        name: col.name,
-                        key: Utils.replaceAll(formatKey(col.name), DB.replaceToken, ''),
-                        func: {
-                            exp: parseExpression(col.exp, calc.argsMap),
-                            arguments: calc.arguments,
-                            aggregations: calc.aggregations
-                        },
-                        format: col.format
-                    };
-                }),
-                risk: []
-            };
+                _.forEach(col.aggregations, (agg, index) => {
+                    calc.argsMap[`Y${index}`] = `{t:${index}}`;
+                    calc.aggregations.push({ key: formatKey(agg.key), exp: `acc ${parseExpression(agg.exp, calc.argsMap)}` })
+                });
+                return {
+                    name: col.name,
+                    key: formatColKey(col.name),
+                    func: {
+                        exp: parseExpression(col.exp, calc.argsMap),
+                        arguments: calc.arguments,
+                        aggregations: calc.aggregations
+                    },
+                    format: col.format
+                };
+            });
+            newTable.risk = data.risk;
+
             parseTable(newTable);
         }
         catch (e) {
@@ -412,10 +429,12 @@ function createTable(data) {
                 const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
                 if (updateIndex > -1) {
                     DB.tables[updateIndex] = newTable;
+                    console.log("table updated");
                 }
             }
             else {
                 DB.tables.push(newTable);
+                console.log("table created");
             }
         }
         catch (e) {
@@ -428,6 +447,7 @@ function createTable(data) {
 }
 
 function init() {
+    DB.tables.push(defaultTable);
     _.forEach(DB.tables, parseTable);
 }
 
@@ -477,10 +497,12 @@ function tableToClient(table) {
     if (table) {
         result.name = table.name;
         result.id = table.id;
+        const colNameToKey = _.reduce(table.cols, (acc, col) => ({...acc,[col.key]:col.name}),{});
         result.cols = _.map(table.cols, col => {
             const calc = _.reduce(_.keys(col.func.arguments), (acc, source) => {
                 _.forEach(col.func.arguments[source], (id, index) => {
-                    acc.params.push({ source, item: { id } });
+                    let paramId = source === 'stock' ? colNameToKey[id] : id;
+                    acc.params.push({ source, item: { id:paramId } });
                     acc.argsMap[`{${source[0]}:${index}}`] = `X${acc.index++}`;
                 });
                 return acc;

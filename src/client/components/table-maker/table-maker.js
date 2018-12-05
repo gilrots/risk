@@ -13,10 +13,6 @@ class TableMaker extends React.Component {
 
     constructor(props) {
         super(props);
-        this.addCol = this.addCol.bind(this);
-        this.deleteCol = this.deleteCol.bind(this);
-        this.setColData = this.setColData.bind(this);
-        this.createTable = this.createTable.bind(this);
         const e = props.edited;
         this.state = _.isEmpty(e) ?
             {name: '',id:'', cols: [], risk: [], selectedColIndex: 0} :
@@ -42,7 +38,7 @@ class TableMaker extends React.Component {
         }
     }
 
-    setColData(colIndex, colField, value, secIndex, secField){
+    setColData = (colIndex, colField, value, secIndex, secField) => {
         let assignVal = value;
         if(secIndex !== undefined) {
             const arr = this.state.cols[colIndex][colField];
@@ -55,7 +51,7 @@ class TableMaker extends React.Component {
     }
 
 
-    deleteElement(arr, index, keepOne = true){
+    deleteElement = (arr, index, keepOne = true) => {
         let deleted = [...arr];
         if(deleted.length > 1 || !keepOne) {
             deleted.splice(index,1);
@@ -63,44 +59,47 @@ class TableMaker extends React.Component {
         return deleted;
     }
 
-    addCol() {
+    addCol = () => {
         this.setState(pervState => ({
             cols: [...pervState.cols, this.defaultCol],
             selectedColIndex: pervState.cols.length
         }));
     }
 
-    deleteCol(colIndex){
+    deleteCol = (e, colIndex) => {
+        e.stopPropagation();
         this.setState(pervState => {
             let cols = [...pervState.cols];
             if(cols.length > 1) {
                 cols.splice(colIndex,1);
             }
-            return {cols: cols, selectedColIndex: Math.max(0,colIndex - 1)};
+            const selectedColIndex = Math.max(0,colIndex - 1);
+            return {selectedColIndex, cols};
         });
     }
 
-    createTable(){
-        Utils.postJson(api.createTable, this.state)
-        .then(response => console.log('Success:', JSON.stringify(response)))
-        .catch(error => console.error('Error:', error));
+    createTable = () => {
+        Utils.postJson(api.createTable, this.state).
+            then(result => console.log('Success:', result));
     }
 
     render() {
         const {name, cols, selectedColIndex} = this.state;
         const tabAct = _.isEmpty(this.state.id) ? 'Create Table' : 'Update Table';
-        const col = cols[selectedColIndex];
-        if(col === undefined)
-            return ('');
-
-        const index = selectedColIndex;
+        let col = _.get(cols,selectedColIndex.toString(), undefined);
+        let index = selectedColIndex;
+        if(!col) {
+            col = _.get(cols, '0', undefined)
+            index = 0;
+        }
+        
         const {bank, ace} = this.props.fields;
         const {defaultParam,defaultAgg, sources, sourcesLower} = this;
         const getItems = (source, colName) => {
             switch (source) {
                 case sourcesLower[0]: return ace;
                 case sourcesLower[1]: return bank;
-                case sourcesLower[2]: return cols.map((c,i) => ({name:c.name, id:i.toString()})).filter(c => c.name !== colName);
+                case sourcesLower[2]: return cols.map(c => ({name:c.name, id:c.name})).filter(c => c.name !== colName);
                 default: return [];
             }
         };
@@ -119,9 +118,9 @@ class TableMaker extends React.Component {
                 <Row className="my-2">
                     <Col className="align-self-center">
                         {cols.map((col, colIndex) => (
-                            <Button key={colIndex} className="mr-2 pop-box" color="primary" active={colIndex === selectedColIndex}
-                                    onClick={() => this.setState({selectedColIndex:colIndex})}>{col.name ? col.name : `Col${colIndex}`}
-                                <Badge className="ml-2 pop-item" color="danger" onClick={() => this.deleteCol(colIndex)} disabled={cols.length < 2}><i className="fa fa-times"/></Badge>
+                            <Button key={colIndex} className="mr-2 pop-box" color="primary" active={colIndex === index}
+                                    onClick={() => this.setState({selectedColIndex:colIndex})}>{col.name ? col.name : `Col ${colIndex}`}
+                                <Badge className="ml-2 pop-item" color="danger" onClick={(e) => this.deleteCol(e, colIndex)} disabled={cols.length < 2}><i className="fa fa-times"/></Badge>
                             </Button>
                         ))}
                     </Col>
@@ -131,7 +130,7 @@ class TableMaker extends React.Component {
                 </Row>
                 <Row className="group-box p-2">
                     <Col>
-                        <Container>
+                        {col ? <Container>
                             <Row className="my-3">
                                 <Col>
                                     <InputGroup>
@@ -154,7 +153,7 @@ class TableMaker extends React.Component {
                                 </Col>
                             </Row>
                             {col.params.map((param, parIndex) => (
-                                <Row  key={parIndex} className="my-1 hover-box">
+                                <Row key={parIndex} className="my-1 hover-box">
                                     <Col xs="auto"  className="align-self-center">
                                         X{parIndex}:
                                     </Col> {' '}
@@ -169,8 +168,7 @@ class TableMaker extends React.Component {
                                         </ButtonGroup>
                                     </Col>
                                     <Col>
-                                        {/*TODO: solve stock value index bug*/}
-                                        <SearchDropdown id="items-dropdown" items={getItems(param.source, col.name)} selectedId={param.item.id}
+                                        <SearchDropdown id={`items-dropdown-${parIndex}`} items={getItems(param.source, col.name)} selectedId={param.item.id}
                                                         onSelected={item => this.setColData(index, 'params', item, parIndex,'item')}/>
                                     </Col>
                                     <Col xs="auto" className="align-self-center">
@@ -204,7 +202,7 @@ class TableMaker extends React.Component {
                                     </Col>
                                     <Col>
                                         <InputGroup>
-                                            <InputGroupAddon addonType="prepend">ACC</InputGroupAddon>
+                                            <InputGroupAddon addonType="prepend">SUM</InputGroupAddon>
                                             <Input value={agg.exp} placeholder="Aggregation's expression"
                                                    onChange={e => this.setColData(index,'aggregations',e.target.value, aggIndex, 'exp')}/>
                                         </InputGroup>
@@ -227,7 +225,7 @@ class TableMaker extends React.Component {
                                     </InputGroup>
                                 </Col>
                             </Row>
-                        </Container>
+                        </Container>: "Choose column to view or edit"}
                     </Col>
                 </Row>
                 <Row className="my-3">
