@@ -37,11 +37,9 @@
   "DB":{
     "admin": "123",
     "JWT":{
-      "port": 9123,
-      "dbConnectionString": "your postgresql connection",
       "saltRounds": 2,
       "jwtSecret": "yo-its-a-secret",
-      "tokenExpireTime": "10h"
+      "tokenExpireTime": "3h"
     },
     "PG": {
       "database":"Risk",
