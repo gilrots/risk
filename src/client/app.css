@@ -17,6 +17,14 @@ html, body, #root {
     color: #9a0f07;
 }
 
+#risk-modal-body, .table-responsive {
+    overflow: visible !important;
+}
+
+.react-grid-Cell{
+    text-align: center;
+}
+
 .react-grid-HeaderCell {
     background: #f9f9f9;
     padding: 0.2em 0 0 0 !important;

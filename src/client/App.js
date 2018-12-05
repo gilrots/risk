@@ -204,7 +204,7 @@ export default class App extends Component {
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
-                <ModalBody>
+                <ModalBody id="risk-modal-body">
                     {this.modalComponent(modal.component)}
                 </ModalBody>
                 <ModalFooter>

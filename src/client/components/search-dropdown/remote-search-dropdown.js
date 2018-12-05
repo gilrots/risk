@@ -65,14 +65,14 @@ class RemoteSearchDropdown extends React.Component {
 
     render() {
         const {search, items, selected} = this.state;
-        return (<UncontrolledDropdown className="d-flex align-items-center">
+        return (<UncontrolledDropdown>
                 <DropdownToggle className="font-weight-bold">
                     {selected ? selected.name : 'Search...' }
                 </DropdownToggle>
                 <DropdownMenu right modifiers={{
                     setMaxHeight: {
                         enabled: true,
-                        order: 1000,
+                        order: 1030,
                         fn: data => ({
                                 ...data,
                                 styles: {
@@ -83,14 +83,14 @@ class RemoteSearchDropdown extends React.Component {
                             })
                     },
                 }}>
-                    <Form>
+                    <Form inline className="px-2">
                         <FormGroup>
                             <Input placeholder="Search for..." value={search} onChange={e => this.searchChanged(e.target.value)}/>
                         </FormGroup>
                     </Form>
                     <DropdownItem divider/>
-                    {items.map(item => (
-                        <DropdownItem key={item.id} onClick={()=> this.selectionChanged(item)}>{item.name}</DropdownItem>
+                    {items.map((item,i) => (
+                        <DropdownItem key={i} onClick={()=> this.selectionChanged(item)}>{item.name}</DropdownItem>
                     ))}
                 </DropdownMenu>
             </UncontrolledDropdown>
