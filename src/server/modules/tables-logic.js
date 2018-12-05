@@ -6,7 +6,7 @@ const Utils = require('../../common/utils.js');
 const DB = {
     types: ['long', 'short'],
     subTypes: ['risk'],
-    replaceToken: '$$$',
+    replaceToken: 'Long/Short',
     tables: [],
     riskCols: [
         {
@@ -37,7 +37,15 @@ const defaultCols = ["Name",
                     `${DB.replaceToken} Value`,
                     `${DB.replaceToken} Value %`,
                     "Amount",
-                    "Syn Diff"].map(name=> ({name, key:formatColKey(name)}));
+                    "Syn Diff"].map(name => ({name, key:formatColKey(name)}));
+const defaultRisk = [`${DB.replaceToken} Total Value`,
+                    `${DB.replaceToken} Total Risk`,
+                    `${DB.replaceToken} Duration`,
+                    "Risk"].map((name,i) => ({
+                        name,
+                        key:formatKey(name),
+                        type: name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0],
+                        order: i}));
 const defaultAce = config.ace.defaultTableFields;
 
 const defaultTable = {
@@ -78,7 +86,7 @@ const defaultTable = {
                     bank: [],
                     ace: []
                 },
-                aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }],
+                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:0}' }],
             },
             format: 0
         },
@@ -109,10 +117,7 @@ const defaultTable = {
         }],
     risk: [
         {
-            name: 'Total $$$',
-            key: '$$$_total_value',
-            type: '$$$',
-            order: 0,
+            ...defaultRisk[0],
             func: {
                 exp: '{t:0}',
                 arguments: {
@@ -120,14 +125,11 @@ const defaultTable = {
                     bank: [],
                     ace: []
                 },
-                aggregations: [{ key: '$$$_total_value', exp: 'acc + {s:0}' }]
+                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:0}' }]
             }
         },
         {
-            name: 'Total $$$ Risk',
-            key: '$$$_total_risk',
-            type: '$$$',
-            order: 1,
+            ...defaultRisk[1],
             func: {
                 exp: '({t:1} / {t:0}) * {t:2}',
                 arguments: {
@@ -136,16 +138,13 @@ const defaultTable = {
                     ace: [defaultAce[3]]
                 },
                 aggregations: [
-                    { key: '$$$_total_duration', exp: 'acc + {a:0}' },
-                    { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' },
-                    { key: '$$$_total_value', exp: 'acc + {s:1}' }],
+                    { key: `${DB.replaceToken}_total_duration`, exp: 'acc + {a:0}' },
+                    { key: `${DB.replaceToken}_total_duration_per`, exp: 'acc + ({s:0} * {a:0})' },
+                    { key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:1}' }],
             }
         },
         {
-            name: '$$$ Duration',
-            key: '$$$_total_duration',
-            type: '$$$',
-            order: 2,
+            ...defaultRisk[2],
             func: {
                 exp: '{t:1} / {t:0}',
                 arguments: {
@@ -154,15 +153,12 @@ const defaultTable = {
                     ace: [defaultAce[3]]
                 },
                 aggregations: [
-                    { key: '$$$_total_duration', exp: 'acc + {a:0}' },
-                    { key: '$$$_total_duration_per', exp: 'acc + ({s:0} * {a:0})' }],
+                    { key: `${DB.replaceToken}_total_duration`, exp: 'acc + {a:0}' },
+                    { key: `${DB.replaceToken}_total_duration_per`, exp: 'acc + ({s:0} * {a:0})' }],
             }
         },
         {
-            name: 'Risk',
-            key: 'risk',
-            type: 'risk',
-            order: 3,
+            ...defaultRisk[3],
             func: {
                 exp: '{t:0} / {t:1}',
                 arguments: {
@@ -245,7 +241,7 @@ function parseTable(table) {
 
     _.forEach(DB.types, type => {
         //TODO convert to foreach with risk sub type
-        const name = type.charAt(0).toUpperCase() + type.slice(1);
+        const name = _.startCase(type);
         const data = { name, part: type, token };
         table.calculated.cols[type] = Utils.copy(table.cols);
         table.calculated.cols.risk = table.calculated.cols.risk.concat(Utils.copy(table.risk));
@@ -348,7 +344,7 @@ function calculateTable(table, bankDB, aceDB) {
             }
         });
 
-        // now that aggregations values are computed, recalculate stock values that needed them
+        // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
         result.risk.data.push({ name: col.name, value });
     });
@@ -498,7 +494,7 @@ function tableToClient(table) {
         result.name = table.name;
         result.id = table.id;
         const colNameToKey = _.reduce(table.cols, (acc, col) => ({...acc,[col.key]:col.name}),{});
-        result.cols = _.map(table.cols, col => {
+        const deparseCol = (col, isRisk = false) => {
             const calc = _.reduce(_.keys(col.func.arguments), (acc, source) => {
                 _.forEach(col.func.arguments[source], (id, index) => {
                     let paramId = source === 'stock' ? colNameToKey[id] : id;
@@ -513,14 +509,21 @@ function tableToClient(table) {
                 calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
                 calc.aggregations.push({ key: Utils.replaceAll(agg.key, '_', ' '), exp: parseExpression(agg.exp, calc.argsMap).slice(3) });
             });
+            riskData = isRisk ? {
+                isGeneral: col.type === "risk",
+                order: col.order
+            } : {};
             return {
                 name: col.name,
+                ...riskData,
                 exp: parseExpression(col.func.exp, calc.argsMap),
                 params: calc.params,
                 aggregations: calc.aggregations.reverse(),
                 format: col.format
             };
-        });
+        };
+        result.cols = table.cols.map(deparseCol);
+        result.risk = table.risk.map(c => deparseCol(c,true));
     }
     return result;
 }

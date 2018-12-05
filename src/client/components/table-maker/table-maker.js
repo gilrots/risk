@@ -13,15 +13,13 @@ class TableMaker extends React.Component {
 
     constructor(props) {
         super(props);
-        const e = props.edited;
-        this.state = _.isEmpty(e) ?
-            {name: '',id:'', cols: [], risk: [], selectedColIndex: 0} :
-            {name: e.name, id:e.id, cols: e.cols, risk: e.risk, selectedColIndex: 0};
+        const data =  _.isEmpty(props.edited) ? {name: '',id:'', cols: [], risk: [] } : props.edited;
+        this.state = {...data, riskMode: false, selectedColIndex: 0};
         this.defaultParam = {source: "ace", item: {id:"name"}};
         this.defaultAgg = {key: '', exp: ''};
         this.defaultCol = {name: '', exp: '', params: [this.defaultParam], aggregations: [], format: undefined};
-        this.sources = ['Ace', 'Bank', 'Stock'];
-        this.sourcesLower = this.sources.map(x=>x.toLowerCase());
+        this.defaultRiskCol = {...this.defaultCol, isGeneral: true, order:0};
+        this.sources = ['ace', 'bank', 'stock'];
     }
 
     componentDidMount() {
@@ -94,12 +92,12 @@ class TableMaker extends React.Component {
         }
         
         const {bank, ace} = this.props.fields;
-        const {defaultParam,defaultAgg, sources, sourcesLower} = this;
+        const {defaultParam,defaultAgg, sources} = this;
         const getItems = (source, colName) => {
             switch (source) {
-                case sourcesLower[0]: return ace;
-                case sourcesLower[1]: return bank;
-                case sourcesLower[2]: return cols.map(c => ({name:c.name, id:c.name})).filter(c => c.name !== colName);
+                case sources[0]: return ace;
+                case sources[1]: return bank;
+                case sources[2]: return cols.map(c => ({name:c.name, id:c.name})).filter(c => c.name !== colName);
                 default: return [];
             }
         };
@@ -115,6 +113,12 @@ class TableMaker extends React.Component {
                         </InputGroup>
                     </Col>
                 </Row>
+                <Row>
+                    <ButtonGroup>
+                        <Button></Button>
+                    </ButtonGroup>
+                    <h6>columns</h6>
+                </Row>
                 <Row className="my-2">
                     <Col className="align-self-center">
                         {cols.map((col, colIndex) => (
@@ -128,9 +132,10 @@ class TableMaker extends React.Component {
                         <Button color="primary" outline className="rounded-circle" onClick={() => this.addCol()}><i className="fa fa-plus"/></Button>
                     </Col>
                 </Row>
+                <h6>Risk columns</h6>
                 <Row className="my-2">
                     <Col className="align-self-center">
-                        {cols.map((col, colIndex) => (
+                        {risk.map((col, colIndex) => (
                             <Button key={colIndex} className="mr-2 pop-box" color="primary" active={colIndex === index}
                                     onClick={() => this.setState({selectedColIndex:colIndex})}>{col.name ? col.name : `Col ${colIndex}`}
                                 <Badge className="ml-2 pop-item" color="danger" onClick={(e) => this.deleteCol(e, colIndex)} disabled={cols.length < 2}><i className="fa fa-times"/></Badge>
@@ -172,11 +177,11 @@ class TableMaker extends React.Component {
                                     </Col> {' '}
                                     <Col xs="auto">
                                         <ButtonGroup>
-                                            {sources.map((source, srcIndex) => (
+                                            {sources.map(source => (
                                                 <Button color="success" key={source}
-                                                        onClick={() => this.setColData(index, 'params', {source:sourcesLower[srcIndex], item:getItems(sourcesLower[srcIndex], col.name)[0]}, parIndex)}
-                                                        disabled={getItems(sourcesLower[srcIndex], col.name).length === 0}
-                                                        active={param.source === sourcesLower[srcIndex]}>{source}</Button>
+                                                        onClick={() => this.setColData(index, 'params', {source:source, item:getItems(source, col.name)[0]}, parIndex)}
+                                                        disabled={getItems(source, col.name).length === 0}
+                                                        active={param.source === source}>{_.startCase(source)}</Button>
                                             ))}
                                         </ButtonGroup>
                                     </Col>
