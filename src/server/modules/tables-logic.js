@@ -7,6 +7,7 @@ const DB = {
     types: ['long', 'short'],
     subTypes: ['risk'],
     replaceToken: 'Long/Short',
+    sum: 'acc',
     tables: [],
     riskCols: [
         {
@@ -33,6 +34,7 @@ const DB = {
         operators: ['None', 'And', 'Or']
     }
 };
+
 const defaultCols = ["Name",
                     `${DB.replaceToken} Value`,
                     `${DB.replaceToken} Value %`,
@@ -86,7 +88,7 @@ const defaultTable = {
                     bank: [],
                     ace: []
                 },
-                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:0}' }],
+                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: `${DB.sum} + {s:0}` }],
             },
             format: 0
         },
@@ -125,7 +127,7 @@ const defaultTable = {
                     bank: [],
                     ace: []
                 },
-                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:0}' }]
+                aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: `${DB.sum} + {s:0}` }]
             }
         },
         {
@@ -138,9 +140,9 @@ const defaultTable = {
                     ace: [defaultAce[3]]
                 },
                 aggregations: [
-                    { key: `${DB.replaceToken}_total_duration`, exp: 'acc + {a:0}' },
-                    { key: `${DB.replaceToken}_total_duration_per`, exp: 'acc + ({s:0} * {a:0})' },
-                    { key: `${DB.replaceToken}_total_value`, exp: 'acc + {s:1}' }],
+                    { key: `${DB.replaceToken}_total_duration`, exp: `${DB.sum} + {a:0}` },
+                    { key: `${DB.replaceToken}_total_duration_per`, exp: `${DB.sum} + ({s:0} * {a:0})` },
+                    { key: `${DB.replaceToken}_total_value`, exp: `${DB.sum} + {s:1}` }],
             }
         },
         {
@@ -153,8 +155,8 @@ const defaultTable = {
                     ace: [defaultAce[3]]
                 },
                 aggregations: [
-                    { key: `${DB.replaceToken}_total_duration`, exp: 'acc + {a:0}' },
-                    { key: `${DB.replaceToken}_total_duration_per`, exp: 'acc + ({s:0} * {a:0})' }],
+                    { key: `${DB.replaceToken}_total_duration`, exp: `${DB.sum} + {a:0}` },
+                    { key: `${DB.replaceToken}_total_duration_per`, exp: `${DB.sum} + ({s:0} * {a:0})` }],
             }
         },
         {
@@ -195,9 +197,9 @@ const clientTableFormat = {
 
 function replaceToken(obj, key, args) {
     const val = obj[key];
-    if (typeof val === 'string' && val.includes(args.token)) {
-        const replace = key === 'name' ? args.name : args.part;
-        obj[key] = Utils.replaceAll(val, args.token, replace);
+    if (typeof val === 'string' && val.toUpperCase().includes(DB.replaceToken.toUpperCase())) {
+        const replace = key === 'name' ? _.startCase(args.type) : args.type;
+        obj[key] = Utils.replaceAll(val, DB.replaceToken, replace);
     }
 }
 
@@ -225,7 +227,7 @@ function setExpressions(obj, key, argsMap) {
 
 function formatResult(bank, ace) {
     const id = bank.securityID;
-    return { 'stock': { id }, 'bank': bank, 'ace': ace[id] };
+    return { 'stock': { id }, bank, 'ace': ace[id] };
 }
 
 function formatAceData(stockId, aceDB, aceData, aceFields) {
@@ -233,7 +235,6 @@ function formatAceData(stockId, aceDB, aceData, aceFields) {
 }
 
 function parseTable(table) {
-    const token = DB.replaceToken;
     table.riskCols = Utils.copy(DB.riskCols);
     table.calculated = Utils.copy(DB.calculated);
     //Sums (optimize) all ace fields required for the table
@@ -241,20 +242,18 @@ function parseTable(table) {
 
     _.forEach(DB.types, type => {
         //TODO convert to foreach with risk sub type
-        const name = _.startCase(type);
-        const data = { name, part: type, token };
         table.calculated.cols[type] = Utils.copy(table.cols);
         table.calculated.cols.risk = table.calculated.cols.risk.concat(Utils.copy(table.risk));
 
-        Utils.treeForEach(table.calculated.cols, type, replaceToken, data);
-        Utils.treeForEach(table.calculated.cols, 'risk', replaceToken, data);
+        Utils.treeForEach(table.calculated.cols, type, replaceToken, {type});
+        Utils.treeForEach(table.calculated.cols, DB.subTypes[0], replaceToken, {type});
 
         //Sums (optimize) all aggregations value from al cols
         _.forEach(_.uniq(_.reduce(table.calculated.cols[type], (sum, col) => sum.concat(_.map(col.func.aggregations, 'key')), [])), key => table.calculated.aggregations[key] = undefined);
         _.forEach(_.uniq(_.reduce(table.calculated.cols.risk, (sum, col) => sum.concat(_.map(col.func.aggregations, 'key')), [])), key => table.calculated.aggregations[key] = undefined);
 
         Utils.treeForEach(table.calculated.cols, type, setExpressions, argsMap);
-        Utils.treeForEach(table.calculated.cols, 'risk', setExpressions, argsMap)
+        Utils.treeForEach(table.calculated.cols, DB.subTypes[0], setExpressions, argsMap)
     });
     table.calculated.cols.risk = _.orderBy(_.uniqBy(table.calculated.cols.risk, col => col.name), ['order'], ['asc']);
     //console.log(table.calculated.aggregations);
@@ -277,40 +276,39 @@ function calculateTable(table, bankDB, aceDB) {
     result.aggs = Utils.copy(table.calculated.aggregations);
     result.errors = aceDB.errors;
     _.forEach(DB.types, type => {
-        const aggs = [];
         // set presentation columns
         _.forEach(table.calculated.cols[type], col => {
             result[type].cols.push(col);
         });
 
+        const isRegularCol = col => _.isEmpty(col.func.aggregations) && _.isEmpty(col.func.arguments.stock);
+        const partition = _.partition(table.calculated.cols[type], isRegularCol);
+        const regularCols = partition[0];
+        const aggregationCols = partition[1];
+    
         //set stock values than can be computed from band data or ace
-        _.forEach(bankDB[type], bank => {
-            const res = formatResult(bank, aceDB.data);
-
-            _.forEach(table.calculated.cols[type], col => {
+        _.forEach(bankDB[type], bankStock => {
+            const res = formatResult(bankStock, aceDB.data);
+            _.forEach(regularCols, col => {
                 res.stock[col.key] = undefined;
-                // if stock needs a value based on aggregation of all stock, saves it for later
-                if (col.func.aggregations.length === 0) {
-                    // these values may seem redundant but the eval func needs them
-                    const { stock, ace, bank } = res;
-                    const val = eval(col.func.exp);
-                    res.stock[col.key] = val;
-                }
-                else {
-                    aggs.push(col);
-                }
+                // these values may seem redundant but the eval func needs them
+                const { stock, ace, bank } = res;
+                const val = eval(col.func.exp);
+                res.stock[col.key] = val;
+                
             });
-
-            //console.log(res.stock);
+            _.forEach(aggregationCols, col => res.stock[col.key] = undefined);
             result[type].data.push(res);
         });
+        console.log(aggregationCols.length)
 
         // after all stocks are set with basic data, its time to calculate aggregations
-        _.forEach(aggs, col => {
+        _.forEach(aggregationCols, col => {
             // calculate the aggregations
             _.forEach(col.func.aggregations, agg => {
                 result.aggs[agg.key] = _.reduce(result[type].data, (acc, dat) => {
                     // these values may seem redundant but the eval func needs them
+                    // also acc value
                     const { stock, ace, bank } = dat;
                     const val = eval(agg.exp);
                     return Utils.getNumber(val, acc);
@@ -346,9 +344,10 @@ function calculateTable(table, bankDB, aceDB) {
 
         // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
+        console.log({ name: col.name, value });
         result.risk.data.push({ name: col.name, value });
     });
-
+    console.log(result.aggs);
     return result;
 }
 
@@ -362,7 +361,7 @@ function generateId() {
 }
 
 function parseExpression(exp, argsMap) {
-    return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp)
+    return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
 }
 
 function formatKey(name){
@@ -370,7 +369,7 @@ function formatKey(name){
 }
 
 function formatColKey(name){
-    return Utils.replaceAll(formatKey(name), DB.replaceToken, '')
+    return Utils.replaceAll(formatKey(name), DB.replaceToken, '');
 }
 
 function createTable(data) {
@@ -387,7 +386,8 @@ function createTable(data) {
             }
         };
         try {
-            newTable.cols = _.map(data.cols, col => {
+            let isRisk = false;
+            const parseCol = col => {
                 const calc = _.reduce(col.params, (acc, param, index) => {
                     if (param.source === 'stock') {
                         param.item.id = formatColKey(param.item.id);
@@ -399,11 +399,17 @@ function createTable(data) {
 
                 _.forEach(col.aggregations, (agg, index) => {
                     calc.argsMap[`Y${index}`] = `{t:${index}}`;
-                    calc.aggregations.push({ key: formatKey(agg.key), exp: `acc ${parseExpression(agg.exp, calc.argsMap)}` })
+                    calc.aggregations.push({ key: formatKey(agg.key), exp: `${DB.sum} ${parseExpression(agg.exp, calc.argsMap)}` })
                 });
+                riskData = isRisk ? {
+                    order: col.order,
+                    type: col.name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0]
+                } : {};
+                isRisk = !isRisk;
                 return {
                     name: col.name,
                     key: formatColKey(col.name),
+                    ...riskData,
                     func: {
                         exp: parseExpression(col.exp, calc.argsMap),
                         arguments: calc.arguments,
@@ -411,8 +417,9 @@ function createTable(data) {
                     },
                     format: col.format
                 };
-            });
-            newTable.risk = data.risk;
+            };
+            newTable.cols = data.cols.map(parseCol);
+            newTable.risk = data.risk.map(parseCol);
 
             parseTable(newTable);
         }
@@ -494,7 +501,8 @@ function tableToClient(table) {
         result.name = table.name;
         result.id = table.id;
         const colNameToKey = _.reduce(table.cols, (acc, col) => ({...acc,[col.key]:col.name}),{});
-        const deparseCol = (col, isRisk = false) => {
+        let isRisk = false;
+        const deparseCol = col => {
             const calc = _.reduce(_.keys(col.func.arguments), (acc, source) => {
                 _.forEach(col.func.arguments[source], (id, index) => {
                     let paramId = source === 'stock' ? colNameToKey[id] : id;
@@ -507,12 +515,12 @@ function tableToClient(table) {
             _.forEach(col.func.aggregations.reverse(), (agg, index) => {
                 const revInd = calc.agglen - 1 - index;
                 calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
-                calc.aggregations.push({ key: Utils.replaceAll(agg.key, '_', ' '), exp: parseExpression(agg.exp, calc.argsMap).slice(3) });
+                calc.aggregations.push({ key: Utils.replaceAll(agg.key, '_', ' '), exp: parseExpression(agg.exp, calc.argsMap).replace(DB.sum,'') });
             });
             riskData = isRisk ? {
-                isGeneral: col.type === "risk",
                 order: col.order
             } : {};
+            isRisk = !isRisk;
             return {
                 name: col.name,
                 ...riskData,
@@ -523,7 +531,7 @@ function tableToClient(table) {
             };
         };
         result.cols = table.cols.map(deparseCol);
-        result.risk = table.risk.map(c => deparseCol(c,true));
+        result.risk = table.risk.map(deparseCol);
     }
     return result;
 }
