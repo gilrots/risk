@@ -35,6 +35,7 @@ const Intras = sequelize.define('Intras', {
 const IPO = sequelize.define('IPO', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     name: Sequelize.STRING,
+    amount: Sequelize.DOUBLE,
     data: {type:Sequelize.ARRAY(Sequelize.JSON), defaultValue: []},
     user: Sequelize.INTEGER,
 });

@@ -6,6 +6,8 @@ const idField = config.bank.fields[1];
 const accntField = config.bank.fields[0];
 const sdqField = config.bank.fields[3];
 const fqField = config.bank.fields[6];
+const originField = config.bank.originField;
+const origins = config.bank.origins;
 const bankField = config.bank.bankField;
 const timeout = config.bank.timeout;
 const rn = () => new Date().getTime(); // Right-now
@@ -28,8 +30,21 @@ function getAmount(stock) {
     return stock[sdqField] + stock[fqField];;
 }
 
+function setAmount(stock, amount) {
+    stock[sdqField] = amount;
+    stock[fqField] = 0;
+}
+
 function getId(stock) {
     return stock[idField];
+}
+
+function setId(stock) {
+    stock[idField] = id;
+}
+
+function setOrigin(stock, origin) {
+    return stock[originField] = origin;
 }
 
 function getStock(stockId) {
@@ -56,6 +71,7 @@ async function updateStocksData(bankData) {
     //console.log(getId(bankData));
     updateBankLatency(bankData);
     const amount = getAmount(bankData);
+    setOrigin(bankData, origins.bank);
 
     if (amount === 0) {
         updateDB(bankData, DB.short);
@@ -109,6 +125,14 @@ function getBankLatency(){
         error: (rn() - pair[1]) > timeout,
         message: '' 
     }],[]).value();
+}
+
+function formatOuter(id, amount, isIntra){
+    const stock = {}
+    setId(stock, id);
+    setAmount(stock, amount);
+    setOrigin(stock, isIntra ? origins.intra : origins.ipo);
+    return stock;
 }
 
 module.exports = {updateStocksData, getDBSnap, getFields, filter, getBankLatency};

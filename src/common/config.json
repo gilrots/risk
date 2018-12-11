@@ -75,6 +75,12 @@
     "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"],
     "bankField": "Bank",
     "timeout": 5000,
+    "originField": "Origin",
+    "origins": {
+      "bank": "BANK",
+      "ipo": "IPO",
+      "intra": "INTRA"
+    },
     "banks": {
       "poalim": "פועלים",
       "ubank": "U-Bank",
