@@ -31,4 +31,26 @@ class TableNotExistError extends Error {
     }
 }
 
-module.exports = { UserIsNotAllowedError, UserAlreadyExistError, ServerError, LoginError, TableNotExistError};
+class TableCouldNotBeUpdatedOrCreatedError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, TableCouldNotBeUpdatedOrCreatedError);
+    }
+}
+
+class TableCouldNotBeParsedError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, TableCouldNotBeParsedError);
+    }
+}
+
+module.exports = {
+    UserIsNotAllowedError,
+    UserAlreadyExistError,
+    ServerError,
+    LoginError,
+    TableNotExistError,
+    TableCouldNotBeParsedError,
+    TableCouldNotBeUpdatedOrCreatedError
+};

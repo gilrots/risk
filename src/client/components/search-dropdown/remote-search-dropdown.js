@@ -5,10 +5,9 @@ import {
     DropdownToggle, DropdownMenu, DropdownItem, Form,FormGroup
 } from 'reactstrap';
 import PropTypes from "prop-types";
-const Utils = require('../../../common/utils');
+import {get} from "../../helpers/client-utils";
 
 class RemoteSearchDropdown extends React.Component {
-
     static propTypes = {
         query:PropTypes.string.isRequired,
         searchParam:PropTypes.string.isRequired,

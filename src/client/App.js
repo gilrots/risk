@@ -9,7 +9,6 @@ import {
     UncontrolledTooltip
 } from 'reactstrap';
 import TableMaker from "./components/table-maker/table-maker";
-import * as Utils from '../common/utils';
 import FilterMaker from "./components/filter-maker/filter-maker";
 import ExcludeList from "./components/exclude-list/exclude-list";
 import RiskLoader from "./components/loader/loader";
@@ -28,7 +27,7 @@ export default class App extends Component {
         super(props);
         this.state = {
             data: {},
-            activeTable: config.app.defaultTable.id,
+            activeTable: undefined,
             tableMakerData: {},
             editedTable: {},
             excludeMode: false,
@@ -66,6 +65,10 @@ export default class App extends Component {
             .then((data) => {
                 console.log(data);
                 this.setState({data});
+                if(!tableId){
+                    const activeTable = _.get(data, "tables[0].id", undefined);
+                    this.setState({activeTable});
+                }
                 if (callback) {
                     callback();
                 }
@@ -93,10 +96,21 @@ export default class App extends Component {
 
     tableAction(url, tableId, action, title) {
         get(url, {tableId, action})
-            .then(response => {
-                if (typeof response !== 'string' && response.id !== '') {
-                    this.setState({editedTable: response, activeTable: response.id});
-                    this.toggleModal(title, 0);
+            .then(result => {
+                console.log(result);
+                if(_.isEmpty(result.error)){
+                    switch(action){
+                        case ta.actions.get:
+                        case ta.actions.copy:
+                            if(result.id){
+                                this.setState({editedTable: result, activeTable: result.id},
+                                    () => this.toggleModal(title, 0));
+                            }
+                            break;
+                        case ta.actions.remove:
+                            this.setState({editedTable: {}, activeTable: _.get(this.state,"data.tables[0].id",undefined)});
+                            break;
+                    }
                 }
             });
     }
@@ -149,8 +163,8 @@ export default class App extends Component {
                 action: () => this.toggleModal(`${table.name} Exclude List`, 2)
             },
             {
-                name: 'Settings',
-                icon: 'cog',
+                name: 'Edit',
+                icon: 'edit',
                 action: () => this.tableAction(ta.url, table.id, ta.actions.get, 'Table editor')
             },
             {

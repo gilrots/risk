@@ -4,7 +4,7 @@ const Tables = require('./models').Tables;
 const _ = require('lodash');
 
 async function getAll() {
-    return Tables.findAll({raw:true});
+    return Tables.findAll();
 }
 
 async function getOne(id) {

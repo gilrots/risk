@@ -4,7 +4,7 @@ const Intras = require('./models').Intras;
 const _ = require('lodash');
 
 async function getAll() {
-    return Intras.findAll({raw:true});
+    return Intras.findAll();
 }
 
 async function setAll(intras) {

@@ -23,7 +23,7 @@ async function getAdmin() {
 }
 
 async function getAll() {
-    return Priviliges.findAll({raw:true});
+    return Priviliges.findAll();
 }
 
 module.exports = { init, isAdmin, getSimpleUser, getAdmin, getAll }

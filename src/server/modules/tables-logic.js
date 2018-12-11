@@ -1,6 +1,7 @@
 const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
+const {TableCouldNotBeParsedError,TableCouldNotBeUpdatedOrCreatedError} = require('./errors');
 const Utils = require('../../common/utils');
 const TablesDL = require('../db/tables'); 
 const UsersDL = require('../db/users'); 
@@ -343,15 +344,6 @@ function calculateTable(table, bankDB, aceDB, user) {
     return result;
 }
 
-function generateId() {
-    const ids = _.map(DB.tables, tab => ({ [tab.id]: true }));
-    let id = Math.floor(Math.random() * 100000).toString();
-    while (ids[id]) {
-        id = Math.floor(Math.random() * 100000).toString();
-    }
-    return id;
-}
-
 function parseExpression(exp, argsMap) {
     return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
 }
@@ -364,17 +356,7 @@ function formatColKey(name){
     return Utils.replaceAll(formatKey(name), DB.replaceToken, '');
 }
 
-function createTable(data) {
-    return new Promise(resolve => {
-        const update = !_.isEmpty(data.id);
-        const newTable = {
-            name: data.name,
-            id: update ? data.id : generateId(),
-            cols:[],
-            risk:[],
-            excluded: [],
-            filter: {}
-        };
+async function createTable(data) {
         try {
             let isRisk = false;
             const parseCol = col => {
@@ -408,55 +390,55 @@ function createTable(data) {
                     format: col.format
                 };
             };
-            newTable.cols = data.cols.map(parseCol);
-            newTable.risk = data.risk.map(parseCol);
-
-            parseTable(newTable);
+            data.cols = data.cols.map(parseCol);
+            data.risk = data.risk.map(parseCol);
         }
         catch (e) {
             console.error(e);
-            return resolve(false);
+            throw new TableCouldNotBeParsedError(e.message);
         }
         try {
-            if (update) {
+            if (!_.isEmpty(data.id)) {
                 const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
                 if (updateIndex > -1) {
-                    DB.tables[updateIndex] = newTable;
+                    const updatedTable = await TablesDL.updateOne(data);
+                    parseTable(updatedTable);
+                    DB.tables[updateIndex] = updatedTable;
                     console.log("table updated");
                 }
             }
             else {
+                const newTable = await TablesDL.createOne(data);
+                parseTable(newTable);
                 DB.tables.push(newTable);
                 console.log("table created");
             }
         }
         catch (e) {
             console.error(e);
-            return resolve(false);
+            throw new TableCouldNotBeParsedError(e.message);
         }
         
-        resolve(true);
-    });
+        return true;
 }
 
 function getTable(tableId) {
-    console.log(_.map(DB.tables, 'id'));
     return _.find(DB.tables, table => tableId === table.id);
 }
 
-function updateTableExcludes(params) {
-    const { tableId, exclude } = params;
+async function updateTableExcludes(params) {
+    const {exclude} = params;
+    const tableId = parseInt(params.tableId);
     const table = getTable(tableId);
     if (table) {
         if (Array.isArray(exclude)) {
             table.excluded = exclude;
-            TablesDL.updateOne({id:tableId, excluded:exclude});
         }
         else {
             table.excluded.push(exclude);
         }
 
-        TablesDL.updateOne({id, excluded} = table);
+        await TablesDL.updateOne({id, excluded} = table);
     }
     return table !== undefined;
 }
@@ -469,6 +451,7 @@ async function copyTable(tableId) {
         const copy = Utils.copy(table);
         copy.id = dupe.id;
         copy.name = dupe.name;
+        parseTable(copy);
         DB.tables.push(copy);
         res = tableToClient(copy);
     }
@@ -480,10 +463,10 @@ async function copyTable(tableId) {
 }
 
 async function removeTable(tableId) {
-    const index = _.findIndex(DB.tables, table => tableId === table.id);
-    if (index > -1) {
-        await TablesDL.remove(tableId);
-        DB.tables.splice(index);
+    const table = getTable(tableId);
+    if (table) {
+        await TablesDL.remove(table.id);
+        _.pull(DB.tables,table);
         return `Removed table with id: ${tableId}`;
     }
     return `No such table with id ${tableId}`;
@@ -531,28 +514,22 @@ function tableToClient(table) {
 }
 
 async function createUserDefault(user) {
-    const newTable =_.assign(Utils.copy(defaultTable),{user:user.id});
+    const newTable = _.assign(Utils.copy(defaultTable),{user:user.id});
     const createdTable = await TablesDL.createOne(newTable);
     parseTable(createdTable);
     DB.tables.push(createdTable);
 }
 
 async function init() {
-    try{
-        let allTables = await TablesDL.getAll();
-        if(_.isEmpty(allTables)){
-            const allUsers = await UsersDL.getAll();
-            const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
-            await TablesDL.createAll(tables);
-            allTables = await TablesDL.getAll();
-        }
-        DB.tables = allTables;
-        _.forEach(DB.tables, parseTable);
+    let allTables = await TablesDL.getAll();
+    if(_.isEmpty(allTables)){
+        const allUsers = await UsersDL.getAll();
+        const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
+        await TablesDL.createAll(tables);
+        allTables = await TablesDL.getAll();
     }
-    catch (e) {
-        console.error("ERROR!!!!!!!!!!!!!!!!!!!!!\n",e);
-    }
-    
+    DB.tables = allTables;
+    _.forEach(DB.tables, parseTable);
 }
 
 module.exports = {

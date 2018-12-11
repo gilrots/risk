@@ -86,7 +86,7 @@ class TableMaker extends React.Component {
     }
 
     createTable = () => {
-        post(api.createTable, this.state).
+        post(api.createTable, {id, name, cols, risk} = this.state).
             then(result => console.log('Success:', result));
     }
 

@@ -17,6 +17,7 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
     aceDB.errors.ace = false;
     aceDB.data[stockId] = Tables.formatAceData(stockId, aceDB, aceData, aceFields);
 }
+
 function getTable(params) {
     const { user } = params;
     const  tableId = parseInt(params.tableId);
@@ -75,20 +76,20 @@ function getTable(params) {
     });
 }
 
-function getTableMakerData() {
-    return new Promise(resolve => {
-        let result = [];
-        Ace.getAllSystemFields().then(result => {
-            if (result.length > 0) {
-                result = { ace: result, bank: Bank.getFields() };
-            }
+async function getTableMakerData() {
+    let result = [];
 
-            resolve(result);
-        }).catch(e => {
-            console.error("getTableMakerData error: ", e);
-            resolve(result);
-        })
-    });
+    try {
+        const data = await Ace.getAllSystemFields();
+        if (data.length > 0) {
+            result = { ace: data, bank: Bank.getFields() };
+        }
+    }
+    catch(e){
+        console.error("getTableMakerData error: ", e);
+    }
+
+    return result;
 }
 
 async function searchAceFields(params) {
@@ -101,41 +102,36 @@ async function searchAceFields(params) {
     return result;
 }
 
-function tableAction(params) {
-    return new Promise(resolve => {
-        let result = 'No such action';
-        const tableId = parseInt(params.tableId);
-        switch (params.action) {
-            case config.server.api.tableAction.actions.copy:
-                result = Tables.copyTable(tableId);
-                break;
-            case config.server.api.tableAction.actions.get:
-                result = Tables.tableToClient(Tables.getTable(tableId));
-                break
-            case config.server.api.tableAction.actions.remove:
-                result = Tables.removeTable(tableId);
-                break;
-        }
-        resolve(result);
-    });
+async function tableAction(params) {
+    let result = 'No such action';
+    const tableId = parseInt(params.tableId);
+    switch (params.action) {
+        case config.server.api.tableAction.actions.copy:
+            result = await Tables.copyTable(tableId);
+            break;
+        case config.server.api.tableAction.actions.get:
+            result = Tables.tableToClient(Tables.getTable(tableId));
+            break
+        case config.server.api.tableAction.actions.remove:
+            result = await Tables.removeTable(tableId);
+            break;
+    }
+    return result;
 }
 
-function getTableExcludeList(params) {
+async function getTableExcludeList(params) {
     const tableId = parseInt(params.tableId);
-    return new Promise(resolve => {
-        const table = Tables.getTable(tableId);
-        if (_.isEmpty(table)) {
-            throw new TableNotExistError(`No such table id ${tableId}`);
-        }
+    const table = Tables.getTable(tableId);
+    if (_.isEmpty(table)) {
+        throw new TableNotExistError(`No such table id ${tableId}`);
+    }
 
-        const ids = Bank.getDBSnap().ids;
-        const excludes = table.excluded;
-        Ace.getStocksNames(ids).then(stocks => {
-            const filtered = _.filter(stocks, stock => stock && stock.name);
-            const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
-            resolve({ included: parts[0], excluded: parts[1] });
-        });
-    });
+    const ids = Bank.getDBSnap().ids;
+    const excludes = table.excluded;
+    const stocks = await Ace.getStocksNames(ids)
+    const filtered = _.filter(stocks, stock => stock && stock.name);
+    const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
+    return { included: parts[0], excluded: parts[1] };
 }
 
 module.exports = { getTable, getTableMakerData, tableAction, getTableExcludeList, searchAceFields };
