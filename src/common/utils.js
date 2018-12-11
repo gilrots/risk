@@ -1,6 +1,5 @@
 const _ = require('lodash');
 const fetch = require("node-fetch");
-const User = require('../client/helpers/user');
 
 function copy(obj) {
     return JSON.parse(JSON.stringify(obj));
@@ -120,73 +119,35 @@ function setUrl(link, params) {
     return _.reduce(keys, (acc, key, index) => acc.concat(`${key}=${params[key]}${index === (keys.length - 1) ? '' : '&'}`), url);
 }
 
-function buildAuthHeader() {
-    // return authorization header with jwt token
-    let token = User.get();
-
-    return token ? {'Authorization': 'Bearer ' + token} : {};
-}
-
 function getPath(fullPath) {
     return `/${_.last(fullPath.split('/'))}`;
 }
 
-function fetchJsonBackend(url, params) {
-    let link = params ? setUrl(url, params) : url;
-    return fetch(link).then(res => res.json());
-}
-
-function fetchJson(api, params, handler) {
-    const headers = {...buildAuthHeader()};
+function getJson(api, params, headers, handler) {
     const url = params ? setUrl(api, params) : api;
-    return fetch(url, {headers}).then(res => handleResponse(res, handler));
+    return utilsFetch(url, headers ? {headers} : undefined, handler);
 }
 
-function postJsonBackend(url, object) {
-    return fetch(url, {
+function postJson(url, object, headers = {}, handler) {
+    return utilsFetch(url, {
         method: 'POST',
         body: JSON.stringify(object),
         headers: {
             'Content-Type': 'application/json',
+            ...headers,
         }
-    }).then(res => res.json());
+    }, handler);
 }
 
-function postJson(url, object, handler) {
-    const authHeader = buildAuthHeader();
-
-    return fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(object),
-        headers: {
-            'Content-Type': 'application/json',
-            ...authHeader,
-        }
-    }).then(res => handleResponse(res, handler));
+function utilsFetch(url, object, handler) {
+    return fetch(url, object).then(res => {
+      if(handler){
+          handler(res);
+      } 
+      return res.json();
+    });
 }
 
-function handleResponse(response, handler){
-    if(response.status === 401 || response.status === 403){
-        User.remove();
-        history.push('/');
-        return JSON.stringify(null);
-    }
-    else if(response.status === 200 && response.headers.get("token")){
-        User.set(response.headers.get("token"));
-    }
-    if(handler) {
-        handler(response);
-    }
-    return response.json();
-}
-
-function jsonError(message) {
-    return {error: message};
-}
-
-function jsonResult(boolean) {
-    return {operation: boolean};
-}
 const dateOptions = { day: '2-digit', month: '2-digit',hour: '2-digit',minute: '2-digit', };
 function formatDate(date) {
     return new Date(Date.parse(date.toString())).toLocaleDateString();;
@@ -213,8 +174,8 @@ function wait(interval, predicate, callback) {
 module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
-    setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
-    fetchJsonBackend, postJsonBackend, getPath, formatDate, wait
+    setUrl, getJson, postJson, moveTo,
+    getPath, formatDate, wait
 };
 
 

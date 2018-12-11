@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Form, Label, Input, FormGroup, FormFeedback } from 'reactstrap';
 import RiskLoader from "../loader/loader";
-import * as Utils from "../../../common/utils";
+import {post} from "../../helpers/client-utils"
 import PropTypes from "prop-types";
 const config = require('../../../common/config');
 const api = config.server.api;
@@ -48,7 +48,7 @@ class Register extends React.Component {
             admin: { username: adminUser, password: adminPassword },
             newUser: { username, password }
         }
-        return Utils.postJson(api.register, data, response => {
+        return post(api.register, data, response => {
             if (response.ok) {
                 this.alert('success', "User registered successfully!");
             }

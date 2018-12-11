@@ -6,6 +6,7 @@ import * as Utils from "../../../common/utils";
 import * as User from "../../helpers/user";
 import PropTypes from "prop-types";
 import history from "../../helpers/history";
+import {post} from "../../helpers/client-utils"
 
 const config = require('../../../common/config');
 const api = config.server.api;
@@ -46,7 +47,7 @@ class Login extends React.Component {
 
     login(username, password) {
         this.setState({loggingIn: true}, () => {
-            Utils.postJson(api.login, {username, password})
+            post(api.login, {username, password})
                 .then(res => {
                     if(res.token){
                         User.set(res.token);

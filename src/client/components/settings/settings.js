@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import * as Utils from '../../../common/utils';
+import {get,post} from "../../helpers/client-utils"
 import { Container, Button, Input, Table, Badge, Form, FormGroup, Label, InputGroup, InputGroupAddon } from "reactstrap";
 
 const config = require('../../../common/config');
@@ -17,14 +17,14 @@ class RiskSettings extends React.Component {
     }
 
     getUser = () => {
-        Utils.fetchJson(api.getUserAccounts).then(user => {
+        get(api.getUserAccounts).then(user => {
             this.setState(user);
         })
     }
 
     save = () => {
         const { accounts } = this.state;
-        Utils.postJson(api.setUserAccounts, { accounts }).then(response => {
+        post(api.setUserAccounts, { accounts }).then(response => {
             if (response === true) {
                 this.getUser();
             }

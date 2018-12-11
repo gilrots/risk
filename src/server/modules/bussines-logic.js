@@ -4,6 +4,7 @@ const Tables = require('./tables-logic');
 const Ace = require('./ace');
 const DB = require('./database');
 const Utils = require('../../common/utils.js');
+const {TableNotExistError} = require('./errors');
 
 const _ = require('lodash');
 
@@ -41,7 +42,7 @@ function getTable(params) {
                 Utils.tryAtleast(resolve, counter,
                     innerResolve => {
                         const promises = _.map(ids, stockId =>
-                            Utils.fetchJsonBackend(Ace.setQueryId(stockId, aceQuery))
+                            Utils.getJson(Ace.setQueryId(stockId, aceQuery))
                                 .then(aceData => handleAceData(aceDB, stockId, aceData, table.calculated.aceFields))
                                 .catch(e => handleAceError(aceDB, e)));
                         Promise.all(promises).then(() => {
@@ -76,16 +77,16 @@ function getTable(params) {
 
 function getTableMakerData() {
     return new Promise(resolve => {
+        let result = [];
         Ace.getAllSystemFields().then(result => {
             if (result.length > 0) {
-                resolve({ ace: result, bank: Bank.getFields() });
+                result = { ace: result, bank: Bank.getFields() };
             }
-            else {
-                resolve([]);
-            }
+
+            resolve(result);
         }).catch(e => {
             console.error("getTableMakerData error: ", e);
-            resolve([]);
+            resolve(result);
         })
     });
 }
@@ -100,20 +101,19 @@ async function searchAceFields(params) {
     return result;
 }
 
-
-
 function tableAction(params) {
     return new Promise(resolve => {
         let result = 'No such action';
+        const tableId = parseInt(params.tableId);
         switch (params.action) {
             case config.server.api.tableAction.actions.copy:
-                result = Tables.copyTable(params.tableId);
+                result = Tables.copyTable(tableId);
                 break;
             case config.server.api.tableAction.actions.get:
-                result = Tables.tableToClient(Tables.getTable(params.tableId));
+                result = Tables.tableToClient(Tables.getTable(tableId));
                 break
             case config.server.api.tableAction.actions.remove:
-                result = Tables.removeTable(params.tableId);
+                result = Tables.removeTable(tableId);
                 break;
         }
         resolve(result);
@@ -121,21 +121,20 @@ function tableAction(params) {
 }
 
 function getTableExcludeList(params) {
-    const { tableId } = params;
+    const tableId = parseInt(params.tableId);
     return new Promise(resolve => {
         const table = Tables.getTable(tableId);
-        if (table) {
-            const ids = Bank.getDBSnap().ids;
-            const excludes = table.excluded;
-            Ace.getStocksNames(ids).then(stocks => {
-                const filtered = _.filter(stocks, stock => stock && stock.name);
-                const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
-                resolve({ included: parts[0], excluded: parts[1] });
-            });
+        if (_.isEmpty(table)) {
+            throw new TableNotExistError(`No such table id ${tableId}`);
         }
-        else {
-            resolve(Utils.jsonError(`No such table id ${tableId}`));
-        }
+
+        const ids = Bank.getDBSnap().ids;
+        const excludes = table.excluded;
+        Ace.getStocksNames(ids).then(stocks => {
+            const filtered = _.filter(stocks, stock => stock && stock.name);
+            const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);
+            resolve({ included: parts[0], excluded: parts[1] });
+        });
     });
 }
 

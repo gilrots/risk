@@ -17,6 +17,7 @@ import IntraDaysList from "./components/intra-days/intra-days-list";
 import IPOList from "./components/ipo-list/ipo-list";
 import RiskSettings from './components/settings/settings';
 import { IconedMenu } from './components/func-components';
+import {get,post} from "./helpers/client-utils"
 
 const config = require('../common/config');
 const api = config.server.api;
@@ -55,13 +56,13 @@ export default class App extends Component {
     }
 
     getTableMakerData = () => {
-        Utils.fetchJson(api.getTableMakerData).then(tableMakerData => this.setState({tableMakerData}));
+        get(api.getTableMakerData).then(tableMakerData => this.setState({tableMakerData}));
     };
 
     getData(callback) {
         const tableId = this.state.activeTable;
         console.log(tableId);
-        Utils.fetchJson(api.getData, {tableId})
+        get(api.getData, {tableId})
             .then((data) => {
                 console.log(data);
                 this.setState({data});
@@ -91,7 +92,7 @@ export default class App extends Component {
     }
 
     tableAction(url, tableId, action, title) {
-        Utils.fetchJson(url, {tableId, action})
+        get(url, {tableId, action})
             .then(response => {
                 if (typeof response !== 'string' && response.id !== '') {
                     this.setState({editedTable: response, activeTable: response.id});
@@ -124,7 +125,7 @@ export default class App extends Component {
         const {activeTable} = this.state;
         switch (action) {
             case 'remove':
-                Utils.postJson(api.setExcludeList, {tableId: activeTable, exclude: stockId}).then(response => {
+                post(api.setExcludeList, {tableId: activeTable, exclude: stockId}).then(response => {
                     console.log(response);
                     this.getData();
                 });

@@ -4,7 +4,7 @@ import * as Utils from '../../../common/utils';
 import { Container, Row, Col, Button, Input, Table, Badge } from "reactstrap";
 import RiskLoader from "../loader/loader";
 import RemoteSearchDropdown from "../search-dropdown/remote-search-dropdown";
-
+import {get,post} from "../../helpers/client-utils"
 const config = require('../../../common/config');
 const api = config.server.api;
 const debTime = config.app.searchDebounce;
@@ -21,20 +21,20 @@ class IPOList extends React.Component {
     }
 
     getIpos = () => {
-        Utils.fetchJson(api.getIPOs).then(ipos => {
+        get(api.getIPOs).then(ipos => {
             this.setState({ ipos });
         })
     }
 
     getIPOFavs = () => {
-        Utils.fetchJson(api.getIPOFavs).then(favs => {
+        get(api.getIPOFavs).then(favs => {
             this.setState({ favs });
         })
     }
 
     updateIPOs = () => {
         const { ipos } = this.state;
-        Utils.postJson(api.setIPOs, { ipos }).then(response => {
+        post(api.setIPOs, { ipos }).then(response => {
             if (response === true) {
                 this.getIpos();
             }
@@ -42,7 +42,7 @@ class IPOList extends React.Component {
     };
 
     setFav = (favorite, remove=false) => {
-        Utils.postJson(api.updateIPOFav, { favorite, remove }).then(response => {
+        post(api.updateIPOFav, { favorite, remove }).then(response => {
             if (response === true) {
                 this.getIPOFavs();
             }

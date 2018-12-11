@@ -62,7 +62,7 @@ class RemoteSearchDropdown extends React.Component {
         }
     };
 
-    remoteSearch = (query,param) => Utils.fetchJson(query,{[param]: this.state.search}).then(({items}) => {
+    remoteSearch = (query,param) => get(query,{[param]: this.state.search}).then(({items}) => {
         this.setState({items});
     });
 

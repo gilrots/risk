@@ -24,4 +24,11 @@ class LoginError extends Error {
     }
 }
 
-module.exports = { UserIsNotAllowedError, UserAlreadyExistError, ServerError, LoginError};
+class TableNotExistError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, TableNotExistError);
+    }
+}
+
+module.exports = { UserIsNotAllowedError, UserAlreadyExistError, ServerError, LoginError, TableNotExistError};

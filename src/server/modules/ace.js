@@ -1,5 +1,4 @@
 const config = require('../../common/config.json');
-const fetch = require("node-fetch");
 const Utils = require('../../common/utils.js');
 const _ = require('lodash');
 
@@ -59,14 +58,14 @@ function getAllSystemFields() {
         if (DB.allFields.length === 0) {
             Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
                 innerResolve => {
-                    Utils.fetchJsonBackend(config.ace.queries.aceFields).then(fieldsResponse => {
+                    Utils.getJson(config.ace.queries.aceFields).then(fieldsResponse => {
                         const responseValue = aceResponseValid(fieldsResponse, queryResult);
                         if (responseValue === errorField) {
                             innerResolve(undefined);
                         }
                         else {
                             const urls = Utils.divideUrl(responseValue, 1000, ',');
-                            const promises = _.map(urls, urlParams => fetch(getFieldsDataQuery(urlParams)).then(res => res.json()));
+                            const promises = _.map(urls, urlParams => Utils.getJson(getFieldsDataQuery(urlParams)));
                             Promise.all(promises).then(res => {
                                 const allFieldsData = _.reduce(res, (acc,curr) => acc.concat(curr.GetMultiFieldInfoResult),[]);
                                 DB.allFields = _.uniqBy(_.map(allFieldsData, fd => ({id: fd['Symbol'], name: fd['Name']})), 'id');
@@ -105,7 +104,7 @@ function getStocksNames(stockIds) {
         new Promise(resolve =>
             Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries),
                 innerResolve =>
-                    Utils.fetchJsonBackend(setQueryId(stockId, aceQuery)).then(response => {
+                    Utils.getJson(setQueryId(stockId, aceQuery)).then(response => {
                         const result = aceResponseValid(response, queryResult);
                         innerResolve(result !== errorField ? {id: stockId, name: result} : undefined);
                     })))
@@ -119,7 +118,7 @@ function search(params){
     const query = encodeURI(config.ace.queries.searchStocks.replace(idToken, search));
     const queryResult = 'GetClusterValuesResult';
     return new Promise((resolve) => {
-        Utils.fetchJsonBackend(query).then(res => {
+        Utils.getJson(query).then(res => {
             const result = aceResponseValid(res, queryResult);
             const items = [];
             if (result !== errorField && _.isEmpty(result["Error"])){

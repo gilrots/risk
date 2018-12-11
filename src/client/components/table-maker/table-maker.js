@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Container, Row, Col, Input, InputGroup, InputGroupAddon, InputGroupText, ButtonGroup, Button, Badge } from "reactstrap";
 import PropTypes from "prop-types";
 import SearchDropdown from "../search-dropdown/search-dropdown";
-import * as Utils from "../../../common/utils";
+import {post} from "../../helpers/client-utils"
 const api = require('../../../common/config').server.api;
 
 const defaults = {
@@ -86,7 +86,7 @@ class TableMaker extends React.Component {
     }
 
     createTable = () => {
-        Utils.postJson(api.createTable, this.state).
+        post(api.createTable, this.state).
             then(result => console.log('Success:', result));
     }
 

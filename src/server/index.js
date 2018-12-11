@@ -102,7 +102,7 @@ app.listen(port, () => console.log(`Server is up on port: ${port}`));
 
 // Generate mock data
 if (mock.allow) {
-    setInterval(() => Utils.postJsonBackend(`http://localhost:${port}${api.bankPost}`,_.sample(mockData)), mock.interval);
+    setInterval(() => Utils.postJson(`http://localhost:${port}${api.bankPost}`,_.sample(mockData)), mock.interval);
 }
 
 //Redirect
