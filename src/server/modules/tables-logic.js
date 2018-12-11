@@ -356,7 +356,9 @@ function formatColKey(name){
     return Utils.replaceAll(formatKey(name), DB.replaceToken, '');
 }
 
-async function createTable(data) {
+async function createTable(params) {
+        const {data,user} = params;
+        data.user = user.id;
         try {
             let isRisk = false;
             const parseCol = col => {

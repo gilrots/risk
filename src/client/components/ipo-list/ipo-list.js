@@ -41,8 +41,8 @@ class IPOList extends React.Component {
         });
     };
 
-    setFav = (favorite, remove=false) => {
-        post(api.updateIPOFav, { favorite, remove }).then(response => {
+    setFav = favorite => {
+        post(api.updateIPOFav, { favorite }).then(response => {
             if (response === true) {
                 this.getIPOFavs();
             }
@@ -154,9 +154,8 @@ class IPOList extends React.Component {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {selectedIpo.data.map((dataField, index) => {
-                                               const isFav =  dataField.field && _.some(favs,f => f.id === dataField.field.id);
-                                               return <tr className="pop-box" key={index}>
+                                            {selectedIpo.data.map((dataField, index) =>
+                                              <tr className="pop-box" key={index}>
                                                     <td>
                                                         <RemoteSearchDropdown query={api.searchAceFields} debounceTime={debTime}
                                                             searchParam="search"
@@ -168,8 +167,8 @@ class IPOList extends React.Component {
                                                             onChange={e => this.updateIPOData(index, 'value', e.target.value)} />
                                                     </td>
                                                     <td align="center" style={{verticalAlign: "center"}}>
-                                                        <Badge color={isFav ? "primary" : "secondary"}
-                                                            onClick={() => this.setFav(dataField.field,isFav)}>
+                                                        <Badge color={dataField.field && _.some(favs,f => f.id === dataField.field.id) ? "primary" : "secondary"}
+                                                            onClick={() => this.setFav(dataField.field)}>
                                                             <i className="fa fa-thumbtack"/>
                                                         </Badge>
                                                     </td>
@@ -179,7 +178,7 @@ class IPOList extends React.Component {
                                                             <i className="fa fa-times"/>
                                                         </Badge>
                                                     </td>
-                                            </tr>;})}
+                                            </tr>)}
                                             <tr>
                                                 <td colSpan="4" align="right">
                                                     <Button outline className="rounded-circle" color="success" onClick={() => this.addIPODataField()}><i className="fa fa-plus"/></Button>

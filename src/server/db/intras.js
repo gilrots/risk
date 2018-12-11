@@ -3,8 +3,8 @@ const Op = Sequelize.Op;
 const Intras = require('./models').Intras;
 const _ = require('lodash');
 
-async function getAll() {
-    return Intras.findAll();
+async function getAll(user) {
+    return Intras.findAll({where:{user:user.id}});
 }
 
 async function setAll(intras) {
@@ -29,8 +29,4 @@ async function setAll(intras) {
     }
 }
 
-async function createOne(intra) {
-    Intras.create(intra);
-}
-
-module.exports = { getAll, setAll, createOne }
+module.exports = { getAll, setAll }

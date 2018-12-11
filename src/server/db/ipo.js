@@ -4,8 +4,8 @@ const Op = Sequelize.Op;
 const IPO = require('./models').IPO;
 const _ = require('lodash');
 
-async function getAll() {
-    return IPO.findAll();
+async function getAll(user) {
+    return IPO.findAll({where:{user:user.id}});
 }
 
 async function setAll(ipos) {
@@ -30,9 +30,5 @@ async function setAll(ipos) {
     }
 }
 
-async function createOne(ipo) {
-    IPO.create(intra);
-}
-
-module.exports = { getAll, setAll, createOne }
+module.exports = { getAll, setAll }
 

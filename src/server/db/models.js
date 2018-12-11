@@ -40,8 +40,8 @@ const IPO = sequelize.define('IPO', {
 });
 
 const IPOFavorites = sequelize.define('IPOFavorites', {
-    id:{type:Sequelize.STRING, primaryKey:true},
-    user: Sequelize.INTEGER,
+    id:{type:Sequelize.STRING, unique:'ipoid', primaryKey:true},
+    user:{type:Sequelize.INTEGER, unique:'ipoid', primaryKey:true},
     name: Sequelize.STRING,
 });
 

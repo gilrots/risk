@@ -73,6 +73,18 @@ async function register(params) {
     }
 }
 
+function userify(data, user) {
+    const assign = item => _.assign(item, {user:user.id});
+    if(_.isArray(data)){
+        _.forEach(data, assign);
+    }
+    else{
+        assign(data);
+    }
+
+    return data;
+}
+
 async function getUserAccounts(params) {
     const {username, accounts} = await UsersDL.getAccounts(params.user);
     return {username, accounts};
@@ -91,14 +103,15 @@ async function setUserAccounts(params) {
 }
 
 async function getIntras(params) {
-    return await IntrasDL.getAll();
+    return await IntrasDL.getAll(params.user);
 }
 
 async function setIntras(params) {
-    const {intras} = params;
+    const {intras, user} = params;
+
     let res = true;
     try {
-        await IntrasDL.setAll(intras);
+        await IntrasDL.setAll(userify(intras,user));
     }
     catch (e) {
         res = e.message;
@@ -107,14 +120,14 @@ async function setIntras(params) {
 }
 
 async function getIPOs(params) {
-    return await IposDL.getAll();
+    return await IposDL.getAll(params.user);
 }
 
 async function setIPOs(params) {
-    const {ipos} = params;
+    const {ipos, user} = params;
     let res = true;
     try {
-        await IposDL.setAll(ipos);
+        await IposDL.setAll(userify(ipos,user));
     }
     catch (e) {
         res = e.message;
@@ -122,15 +135,16 @@ async function setIPOs(params) {
     return res
 }
 
-async function getIPOFavorites() {
-    return await FavsDL.getAll();
+async function getIPOFavorites(params) {
+    return await FavsDL.getAll(params.user);
 }
 
 async function updateIPOFavorite(params) {
-    const {favorite, remove} = params;
+    const {favorite, user} = params;
+    userify(favorite,user);
     let res = true;
     try {
-        if(remove) {
+        if(await FavsDL.exist(favorite)) {
             await FavsDL.deleteOne(favorite);
         }
         else {
@@ -139,6 +153,7 @@ async function updateIPOFavorite(params) {
     }
     catch (e) {
         res = e.message;
+        console.error(e);
     }
     return res
 }
