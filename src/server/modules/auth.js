@@ -1,22 +1,18 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Users = require('../db/models').Users;
+const UsersDL = require('../db/users');
 const config = require('../../common/config').DB.JWT;
+const {LoginError} = require('./errors');
+const errorMessage = 'Authentication failed. Wrong username or password.';
 
-function login(params) {
-    const errorMessage = 'Authentication failed. Wrong username or password.';
-    return Users.findOne({
-        where: { username: params.username},
-        Row: true
-    }).then(user => {
-        if (!user){
-            throw new Error(errorMessage);
-        }
-        if (!bcrypt.compareSync(params.password, user.password)){
-            throw new Error(errorMessage);
-        }
-        return {token:generateToken(user)};
-    });
+async function login(params) {
+    const user = await UsersDL.getOne(params);
+    if (!user || !isPasswordCorrect(params.password, user.password)){
+       throw new LoginError(errorMessage);
+    }
+
+    const token = generateToken(user)
+    return {token};
 }
 
 function generateToken(user) {
@@ -34,6 +30,10 @@ function generateToken(user) {
 
 function encryptPassword(password) {
     return bcrypt.hashSync(password,config.saltRounds);
+}
+
+function isPasswordCorrect(password, encrypted) {
+    return bcrypt.compareSync(password, encrypted);
 }
 
 function auth(req, res, next) {
@@ -59,4 +59,4 @@ function auth(req, res, next) {
     });
 }
 
-module.exports = {login, encryptPassword, auth};
+module.exports = {login, encryptPassword, isPasswordCorrect, auth};

@@ -46,29 +46,18 @@ class Login extends React.Component {
 
     login(username, password) {
         this.setState({loggingIn: true}, () => {
-            this.authenticate(username, password).then(
-                () => {
-                    history.push('/');
-                },
-                error => {
-                    this.setState({loggingIn:false});
-                    this.alert('danger', error.toString());
-                }
-            );
-        })
-    }
-
-    authenticate(username, password) {
-        return Utils.postJson(api.login, {username, password})
-            .then(res => {
-                console.log(res);
-                if(res.token){
-                    User.set(res.token);
-                }
-                else {
-                    throw new Error(res);
-                }
+            Utils.postJson(api.login, {username, password})
+                .then(res => {
+                    if(res.token){
+                        User.set(res.token);
+                        history.push('/');
+                    }
+                    else if (res.error) {
+                        this.setState({loggingIn:false});
+                        this.alert('danger', res.error);
+                    }
             });
+        })
     }
 
     alert(type, message) {

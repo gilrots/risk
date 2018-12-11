@@ -32,7 +32,7 @@ function getTable(params) {
         }
         else {
             DB.getUserAccounts(params).then(({accounts}) => {
-                Bank.filter(bankDB, table.filter.excluded, accounts);
+                Bank.filter(bankDB, table.excluded, accounts);
                 const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
                 let ids = bankDB.ids;
                 const counter = Utils.tryCounter(config.ace.tries, []);
@@ -124,7 +124,7 @@ function getTableExcludeList(params) {
         const table = Tables.getTable(tableId);
         if (table) {
             const ids = Bank.getDBSnap().ids;
-            const excludes = table.filter.excluded;
+            const excludes = table.excluded;
             Ace.getStocksNames(ids).then(stocks => {
                 const filtered = _.filter(stocks, stock => stock && stock.name);
                 const parts = _.partition(filtered, stock => excludes.indexOf(stock.id) < 0);

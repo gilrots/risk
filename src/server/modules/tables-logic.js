@@ -1,8 +1,9 @@
 const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const Utils = require('../../common/utils.js');
-
+const Utils = require('../../common/utils');
+const TablesDL = require('../db/tables'); 
+const UsersDL = require('../db/users'); 
 const DB = {
     types: ['long', 'short'],
     subTypes: ['risk'],
@@ -174,10 +175,8 @@ const defaultTable = {
             }
         }
     ],
-    filter: {
-        excluded: [],
-        predicate: []
-    }
+    filter: {},
+    excluded: []
 }
 
 const argsMap = {
@@ -266,7 +265,6 @@ function getResultFormat() {
         risk: { cols: [], data: [] },
         aggs: [],
         tables: _.map(DB.tables, table => ({ id: table.id, name: table.name })),
-        errors: {}
     };
 }
 
@@ -274,13 +272,11 @@ function calculateTable(table, bankDB, aceDB) {
     const result = getResultFormat();
     //console.log(table.calculated.aggregations)
     result.aggs = Utils.copy(table.calculated.aggregations);
-    result.errors = aceDB.errors;
     _.forEach(DB.types, type => {
         // set presentation columns
-        _.forEach(table.calculated.cols[type], col => {
-            result[type].cols.push(col);
-        });
+        result[type].cols = [...table.calculated.cols[type]];
 
+        // regular cols are ones that their value can be calculted only by ace & bank data
         const isRegularCol = col => _.isEmpty(col.func.aggregations) && _.isEmpty(col.func.arguments.stock);
         const partition = _.partition(table.calculated.cols[type], isRegularCol);
         const regularCols = partition[0];
@@ -449,11 +445,6 @@ function createTable(data) {
     });
 }
 
-function init() {
-    DB.tables.push(defaultTable);
-    _.forEach(DB.tables, parseTable);
-}
-
 function getTable(tableId) {
     return _.find(DB.tables, table => tableId === table.id);
 }
@@ -463,32 +454,40 @@ function updateTableExcludes(params) {
     const table = getTable(tableId);
     if (table) {
         if (Array.isArray(exclude)) {
-            table.filter.excluded = exclude;
+            table.excluded = exclude;
+            TablesDL.updateOne({id:tableId, excluded:exclude});
         }
         else {
-            table.filter.excluded.push(exclude);
+            table.excluded.push(exclude);
         }
+
+        TablesDL.updateOne({id, excluded} = table);
     }
     return table !== undefined;
 }
 
-function copyTable(tableId) {
+async function copyTable(tableId) {
     const table = getTable(tableId);
+    let res;
     if (table) {
+        const dupe = await TablesDL.duplicate(tableId);
         const copy = Utils.copy(table);
-        copy.id = generateId();
-
-        copy.name += ' Copy';
+        copy.id = dupe.id;
+        copy.name = dupe.name;
         DB.tables.push(copy);
-        return tableToClient(copy);
+        res = tableToClient(copy);
+    }
+    else {
+        res = `No such table with id ${tableId}`;
     }
 
-    return `No such table with id ${tableId}`;
+    return res;
 }
 
-function removeTable(tableId) {
+async function removeTable(tableId) {
     const index = _.findIndex(DB.tables, table => tableId === table.id);
     if (index > -1) {
+        await TablesDL.remove(tableId);
         DB.tables.splice(index);
         return `Removed table with id: ${tableId}`;
     }
@@ -534,6 +533,23 @@ function tableToClient(table) {
         result.risk = table.risk.map(deparseCol);
     }
     return result;
+}
+
+async function init() {
+    try{
+        let allTables = await TablesDL.getAll();
+        if(_.isEmpty(allTables)){
+            const allUsers = await UsersDL.getAll();
+            await TablesDL.setAll(allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id})));
+            allTables = await TablesDL.getAll();
+        }
+        DB.tables = allTables;
+        _.forEach(DB.tables, parseTable);
+    }
+    catch (e) {
+        console.error("ERROR!!!!!!!!!!!!!!!!!!!!!\n",e);
+    }
+    
 }
 
 module.exports = {

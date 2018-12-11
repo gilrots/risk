@@ -16,7 +16,8 @@ class Register extends React.Component {
         super(props);
 
         this.state = {
-            admin: '',
+            adminUser: '',
+            adminPassword: '',
             username: '',
             password: '',
             submitted: false,
@@ -34,16 +35,20 @@ class Register extends React.Component {
         e.preventDefault();
 
         this.setState({ submitted: true });
-        const { admin, username, password } = this.state;
-        if (admin && username && password) {
+        const { adminUser, adminPassword, username, password } = this.state;
+        if (adminUser && adminPassword && username && password) {
             this.setState({ registering: true }, () => {
-                this.register(admin, username, password).then(() => { this.setState({ registering: false }) });
+                this.register(adminUser, adminPassword, username, password).then(() => { this.setState({ registering: false }) });
             });
         }
     }
 
-    register(admin, username, password) {
-        return Utils.postJson(api.register, { admin, username, password }, response => {
+    register(adminUser, adminPassword, username, password) {
+        const data = {
+            admin: { username: adminUser, password: adminPassword },
+            newUser: { username, password }
+        }
+        return Utils.postJson(api.register, data, response => {
             if (response.ok) {
                 this.alert('success', "User registered successfully!");
             }
@@ -63,19 +68,24 @@ class Register extends React.Component {
     }
 
     render() {
-        const { username, password, admin, submitted, registering } = this.state;
+        const { username, password, adminUser, adminPassword, submitted, registering } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h2>Register</h2>
                 <Form name="form" onSubmit={this.handleSubmit}>
                     <FormGroup>
-                        <Label for="admin">Admin password</Label>
-                        <Input type="password" name="admin" value={admin} onChange={this.handleChange} invalid={submitted && !admin} />
-                        {submitted && !admin && <FormFeedback valid={false}>Admin password is required</FormFeedback>}
+                        <Label for="adminUser">Admin user</Label>
+                        <Input type="text" name="adminUser" value={adminUser} onChange={this.handleChange} invalid={submitted && !adminUser} />
+                        {submitted && !adminUser && <FormFeedback valid={false}>Admin username is required</FormFeedback>}
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="adminPassword">Admin password</Label>
+                        <Input type="password" name="adminPassword" value={adminPassword} onChange={this.handleChange} invalid={submitted && !adminPassword} />
+                        {submitted && !adminPassword && <FormFeedback valid={false}>Admin password is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>
                         <Label for="username">Username</Label>
-                        <Input name="username" type="text" value={username} onChange={this.handleChange} invalid={submitted && !username} />
+                        <Input type="text" name="username" value={username} onChange={this.handleChange} invalid={submitted && !username} />
                         {submitted && !username && <FormFeedback valid={false}>Username is required</FormFeedback>}
                     </FormGroup>
                     <FormGroup>

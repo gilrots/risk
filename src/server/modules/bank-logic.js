@@ -53,19 +53,22 @@ function updateDB(stock, fromStocks, toStocks = undefined) {
 }
 
 function updateStocksData(bankData) {
-    updateBankLatency(bankData);
-    const amount = getAmount(bankData);
+    return new Promise((resolve) => {
+        updateBankLatency(bankData);
+        const amount = getAmount(bankData);
 
-    if(amount === 0) {
-        updateDB(bankData, DB.short);
-        updateDB(bankData, DB.long);
-    }
-    else if(amount > 0) {
-        updateDB(bankData,DB.short, DB.long);
-    }
-    else {
-        updateDB(bankData, DB.long, DB.short);
-    }
+        if (amount === 0) {
+            updateDB(bankData, DB.short);
+            updateDB(bankData, DB.long);
+        }
+        else if (amount > 0) {
+            updateDB(bankData, DB.short, DB.long);
+        }
+        else {
+            updateDB(bankData, DB.long, DB.short);
+        }
+        resolve(true);
+    });
 }
 
 function filter(bankSnap, ids, accounts){

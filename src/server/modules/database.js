@@ -1,45 +1,64 @@
-const config = require('../../common/config');
+const _ = require('lodash');
 const sequelize = require("../db/db");
-const ADMIN = config.DB.admin;
 const UsersDL = require('../db/users');
+const PriviligesDL = require('../db/priviliges');
 const IntrasDL = require('../db/intras');
 const IposDL = require('../db/ipo');
 const FavsDL = require('../db/ipofavorites');
 const Auth = require('./auth');
+const {UserAlreadyExistError,UserIsNotAllowedError,ServerError} = require('./errors');
 
-function connect() {
-    sequelize.authenticate()
-        .then(() => {
-            console.log("Connected to DB!");
-            sequelize.sync().then(() => {
-                console.log("Tables Created!");
-            });
-        })
-        .catch(err => {
-            console.error("Can't connect to DB: ", err);
-        });
+const initModules = [PriviligesDL.init];
+const adminID = 'admin';
+
+async function connect() {
+    try {
+        await sequelize.authenticate();
+        console.log("Connected to DB!");
+        await sequelize.sync();
+        console.log("Sequelize synced!");
+        await Promise.all(initModules.map(promise => promise()));
+        await createOrDeleteAdmin();
+        console.log("DL Modules initialized!");
+    }
+    catch (err) {
+        console.error("Can't connect to DB: ", err);
+    }
 }
 
-async function registerUser(params, res) {
-    const {admin, password, username} = params;
-    console.log(admin);
-    if (admin !== ADMIN) {
-        res.status(400).json({error: 'admin password wrong'});
+async function createOrDeleteAdmin() {
+    const users = await UsersDL.getAll();
+    if(_.isEmpty(users)){
+        const admin = await PriviligesDL.getAdmin();
+        await UsersDL.create(adminID, Auth.encryptPassword(adminID), admin.id);
+    }
+    else if (users.length > 1 && users.some(u => u.username === adminID)) {
+        await UsersDL.deleteOne(adminID);
+    }
+}
+
+async function register(params) {
+    const {admin, newUser} = params;
+    const adminUser = await UsersDL.getOne(admin);
+    const isAdmin = adminUser && await PriviligesDL.isAdmin(adminUser);
+    if (!isAdmin || !Auth.isPasswordCorrect(admin.password, adminUser.password)) {
+        throw new UserIsNotAllowedError('User is wrong or not an admin');
     }
     else {
-        const user = await UsersDL.exist(username);
-        if (user !== null) {
-            res.status(400).json({error: 'username already exist!'});
+        if (newUser.username === adminID || await UsersDL.exist(newUser.username)) {
+            throw new UserAlreadyExistError('username already exist!');
         }
         else {
             try {
-                const crypted = Auth.encryptPassword(password);
-                const newUser = await UsersDL.create(username, crypted);
-                res.status(200).json({success: true});
+                const crypted = Auth.encryptPassword(newUser.password);
+                const privilige = await PriviligesDL.getSimpleUser();
+                await UsersDL.create(newUser.username, crypted, privilige.id);
+                await createOrDeleteAdmin();
+                return {success: true};
             }
             catch (e) {
-                res.status(500).json({error: 'Server error'});
                 console.error(e);
+                throw new ServerError('Server error at login');
             }
         }
     }
@@ -115,5 +134,5 @@ async function updateIPOFavorite(params) {
     return res
 }
 
-module.exports = {connect, registerUser, getUserAccounts, setUserAccounts,
+module.exports = {connect, register, getUserAccounts, setUserAccounts,
     getIntras, setIntras, getIPOs, setIPOs, getIPOFavorites, updateIPOFavorite};

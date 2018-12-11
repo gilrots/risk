@@ -187,11 +187,22 @@ function moveTo(parent, fromArr, toArr, item, deletedIndex) {
     return {[toArr]: to, [fromArr]: from};
 }
 
+function wait(interval, predicate, callback) {
+    setTimeout(() => {
+        if (predicate()) {
+            callback();
+        }
+        else {
+            wait(interval, predicate, callback);
+        }
+    }, interval);
+}
+
 module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
-    fetchJsonBackend, getPath, formatDate
+    fetchJsonBackend, getPath, formatDate, wait
 };
 
 

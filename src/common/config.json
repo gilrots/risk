@@ -5,6 +5,7 @@
       "allow": true,
       "interval": 200
     },
+    "priviliges":["ADMIN", "DEVELOPER", "TRADER"],
     "api": {
       "bankPost":"/gili",
       "login":"/api/login",
