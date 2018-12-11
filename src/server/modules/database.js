@@ -102,11 +102,11 @@ async function setUserAccounts(params) {
     return res
 }
 
-async function getIntras(params) {
+async function getUserIntras(params) {
     return await IntrasDL.getAll(params.user);
 }
 
-async function setIntras(params) {
+async function setUserIntras(params) {
     const {intras, user} = params;
 
     let res = true;
@@ -119,11 +119,11 @@ async function setIntras(params) {
     return res
 }
 
-async function getIPOs(params) {
+async function getUserIPOs(params) {
     return await IposDL.getAll(params.user);
 }
 
-async function setIPOs(params) {
+async function setUserIPOs(params) {
     const {ipos, user} = params;
     let res = true;
     try {
@@ -135,11 +135,11 @@ async function setIPOs(params) {
     return res
 }
 
-async function getIPOFavorites(params) {
+async function getUserIPOFavorites(params) {
     return await FavsDL.getAll(params.user);
 }
 
-async function updateIPOFavorite(params) {
+async function updateUserIPOFavorite(params) {
     const {favorite, user} = params;
     userify(favorite,user);
     let res = true;
@@ -159,4 +159,4 @@ async function updateIPOFavorite(params) {
 }
 
 module.exports = {connect, register, getUserAccounts, setUserAccounts,
-    getIntras, setIntras, getIPOs, setIPOs, getIPOFavorites, updateIPOFavorite};
+    getUserIntras, setUserIntras, getUserIPOs, setUserIPOs, getUserIPOFavorites, updateUserIPOFavorite};

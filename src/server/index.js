@@ -76,9 +76,9 @@ const routes = [
                 [api.createTable]:      Tables.createTable,
                 [api.setExcludeList]:   Tables.updateTableExcludes,
                 [api.setUserAccounts]:  DB.setUserAccounts,
-                [api.setIntras]:        DB.setIntras,
-                [api.setIPOs]:          DB.setIPOs,
-                [api.updateIPOFav]:     DB.updateIPOFavorite,
+                [api.setIntras]:        DB.setUserIntras,
+                [api.setIPOs]:          DB.setUserIPOs,
+                [api.updateIPOFav]:     DB.updateUserIPOFavorite,
             },
             get: {
                 [api.getData]:          Logic.getTable,
@@ -87,9 +87,9 @@ const routes = [
                 [api.getTableMakerData]:Logic.getTableMakerData,
                 [api.tableAction.url]:  Logic.tableAction,
                 [api.getUserAccounts]:  DB.getUserAccounts,
-                [api.getIntras]:        DB.getIntras,
-                [api.getIPOs]:          DB.getIPOs,
-                [api.getIPOFavs]:       DB.getIPOFavorites,
+                [api.getIntras]:        DB.getUserIntras,
+                [api.getIPOs]:          DB.getUserIPOs,
+                [api.getIPOFavs]:       DB.getUserIPOFavorites,
                 [api.searchAce]:        Ace.search,
             }
         }

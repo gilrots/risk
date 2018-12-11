@@ -31,8 +31,8 @@ async function getTable(params) {
         const aceLatency = { name: "Ace", error: false, message: '' };
         try {
             const { accounts } = await DB.getUserAccounts(params);
-            const { ipos } = await DB.getIntras(params);
-            const { intras } = await DB.getIPOs(params);
+            const { ipos } = await DB.getUserIntras(params);
+            const { intras } = await DB.getUserIPOs(params);
             Bank.filter(bankDB, table.excluded, accounts);
             const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
             let ids = bankDB.ids;
