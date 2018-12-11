@@ -9,7 +9,7 @@ const api = require('../../../common/config').server.api;
 
 class ExcludeList extends React.Component {
     static propTypes = {
-        tableId: PropTypes.string.isRequired,
+        tableId: PropTypes.number.isRequired,
     };
 
     constructor(props) {

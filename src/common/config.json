@@ -36,7 +36,7 @@
     }
   },
   "DB":{
-    "admin": "123",
+    "admin": "admin",
     "JWT":{
       "saltRounds": 2,
       "jwtSecret": "yo-its-a-secret",
@@ -65,7 +65,7 @@
     "searchLimit": 10,
     "defaultTable": {
       "name": "Position Report",
-      "id": "-999"
+      "id": -999
     }
   },
   "bank": {

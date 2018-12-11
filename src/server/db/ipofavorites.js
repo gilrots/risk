@@ -4,7 +4,7 @@ const IPOFavorties = require('./models').IPOFavorites;
 const _ = require('lodash');
 
 async function getAll() {
-    return IPOFavorties.findAll();
+    return IPOFavorties.findAll({raw:true});
 }
 
 async function setAll(favorites) {

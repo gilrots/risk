@@ -4,7 +4,7 @@ const Tables = require('./models').Tables;
 const _ = require('lodash');
 
 async function getAll() {
-    return Tables.findAll();
+    return Tables.findAll({raw:true});
 }
 
 async function getOne(id) {
@@ -33,6 +33,10 @@ async function setAll(tables) {
     }
 }
 
+async function createAll(tables) {
+    return Tables.bulkCreate(tables);
+}
+
 async function createOne(table) {
     return Tables.create(table);
 }
@@ -52,4 +56,4 @@ async function remove(id) {
     return Tables.destroy({where: {id}});
 }
 
-module.exports = { getAll, setAll, createOne, updateOne, getOne, duplicate, remove }
+module.exports = { getAll, setAll, createOne, createAll, updateOne, getOne, duplicate, remove }

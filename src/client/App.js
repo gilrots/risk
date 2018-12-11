@@ -61,7 +61,6 @@ export default class App extends Component {
     getData(callback) {
         const tableId = this.state.activeTable;
         console.log(tableId);
-
         Utils.fetchJson(api.getData, {tableId})
             .then((data) => {
                 console.log(data);
@@ -202,8 +201,8 @@ export default class App extends Component {
     render() {
         const {data, modal, tableMakerData, excludeMode, activeTable} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
-        const hasData = !_.isEmpty(data) && data && data.latency && !data.latency[0].error;
-        const hasLatency = data && data.latency;
+        const hasData = !_.isEmpty(data) && data.tables && data.short && data.long && data.risk;
+        const hasLatency = !_.isEmpty(data) && data.latency;
         const navItems = this.getNavMenuActions();
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">

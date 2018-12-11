@@ -17,18 +17,20 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
     aceDB.data[stockId] = Tables.formatAceData(stockId, aceDB, aceData, aceFields);
 }
 function getTable(params) {
-    const { tableId } = params;
+    const { user } = params;
+    const  tableId = parseInt(params.tableId);
+    console.log(params);
     return new Promise(resolve => {
         const table = Tables.getTable(tableId);
         const bankDB = Bank.getDBSnap();
         const aceDB = Ace.getAceDB();
-        if (table === undefined) {
+        if (_.isEmpty(table)) {
             console.log("No such table id:", { tableId });
-            resolve([]);
+            resolve(Tables.getResultFormat(user));
         }
         else if (table.calculated.aceFields.length === 0) {
             console.log("No ace fields", { name: table.name })
-            resolve([]);
+            resolve(Tables.getResultFormat(user));
         }
         else {
             DB.getUserAccounts(params).then(({accounts}) => {
@@ -50,10 +52,10 @@ function getTable(params) {
                             if (missingIds.length === 0 || counter.almost()) {
                                 const aceLatency = { name: "Ace", error: false, message: '' };
                                 try {
-                                    result = Tables.calculateTable(table, bankDB, aceDB);
+                                    result = Tables.calculateTable(table, bankDB, aceDB, user);
                                 }
                                 catch (e) {
-                                    result = Tables.getResultFormat();
+                                    result = Tables.getResultFormat(user);
                                     aceLatency.error = true;
                                     aceLatency.message = e.message;
                                     console.error(e);

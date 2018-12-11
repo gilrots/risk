@@ -6,20 +6,24 @@ const IntrasDL = require('../db/intras');
 const IposDL = require('../db/ipo');
 const FavsDL = require('../db/ipofavorites');
 const Auth = require('./auth');
+const Tables = require('./tables-logic');
 const {UserAlreadyExistError,UserIsNotAllowedError,ServerError} = require('./errors');
 
 const initModules = [PriviligesDL.init];
 const adminID = 'admin';
 
-async function connect() {
+async function connect(appModules) {
     try {
         await sequelize.authenticate();
         console.log("Connected to DB!");
         await sequelize.sync();
         console.log("Sequelize synced!");
         await Promise.all(initModules.map(promise => promise()));
-        await createOrDeleteAdmin();
         console.log("DL Modules initialized!");
+        const admin = await createOrDeleteAdmin();
+        console.log(`Default admin init: ${admin}`);
+        await Promise.all(appModules.map(promise => promise()));
+        console.log("App Modules initialized!");
     }
     catch (err) {
         console.error("Can't connect to DB: ", err);
@@ -28,13 +32,17 @@ async function connect() {
 
 async function createOrDeleteAdmin() {
     const users = await UsersDL.getAll();
+    let result = undefined;
     if(_.isEmpty(users)){
         const admin = await PriviligesDL.getAdmin();
         await UsersDL.create(adminID, Auth.encryptPassword(adminID), admin.id);
+        result = true;
     }
     else if (users.length > 1 && users.some(u => u.username === adminID)) {
         await UsersDL.deleteOne(adminID);
+        result = false;
     }
+    return result;
 }
 
 async function register(params) {
@@ -52,7 +60,8 @@ async function register(params) {
             try {
                 const crypted = Auth.encryptPassword(newUser.password);
                 const privilige = await PriviligesDL.getSimpleUser();
-                await UsersDL.create(newUser.username, crypted, privilige.id);
+                const createdUser = await UsersDL.create(newUser.username, crypted, privilige.id);
+                await Tables.createUserDefault(createdUser);
                 await createOrDeleteAdmin();
                 return {success: true};
             }

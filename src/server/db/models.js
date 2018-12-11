@@ -10,7 +10,7 @@ const Users = sequelize.define('Users', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     username:{type: Sequelize.STRING, unique: true},
     password:Sequelize.STRING,
-    accounts:Sequelize.ARRAY(Sequelize.STRING),
+    accounts:{type:Sequelize.ARRAY(Sequelize.STRING), defaultValue: []},
     type:Sequelize.INTEGER,
 });
 
@@ -18,10 +18,10 @@ const Tables = sequelize.define('Tables', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     name:Sequelize.STRING,
     user:Sequelize.INTEGER,
-    cols:Sequelize.ARRAY(Sequelize.JSON),
-    risk:Sequelize.ARRAY(Sequelize.JSON),
-    filter:Sequelize.JSON,
-    excluded:Sequelize.ARRAY(Sequelize.STRING),
+    cols:{type:Sequelize.ARRAY(Sequelize.JSON), defaultValue: []},
+    risk:{type:Sequelize.ARRAY(Sequelize.JSON), defaultValue: []},
+    filter:{type:Sequelize.JSON, defaultValue: {}},
+    excluded:{type:Sequelize.ARRAY(Sequelize.STRING), defaultValue: []},
 });
 
 const Intras = sequelize.define('Intras', {
@@ -35,7 +35,7 @@ const Intras = sequelize.define('Intras', {
 const IPO = sequelize.define('IPO', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     name: Sequelize.STRING,
-    data: Sequelize.ARRAY(Sequelize.JSON),
+    data: {type:Sequelize.ARRAY(Sequelize.JSON), defaultValue: []},
     user: Sequelize.INTEGER,
 });
 

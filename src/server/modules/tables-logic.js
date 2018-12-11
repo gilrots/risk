@@ -52,7 +52,6 @@ const defaultRisk = [`${DB.replaceToken} Total Value`,
 const defaultAce = config.ace.defaultTableFields;
 
 const defaultTable = {
-    id: config.app.defaultTable.id,
     name: config.app.defaultTable.name,
     cols: [
         {
@@ -258,18 +257,19 @@ function parseTable(table) {
     //console.log(table.calculated.aggregations);
 }
 
-function getResultFormat() {
+function getResultFormat(user) {
     return {
         short: { cols: [], data: [], dataKey: 'stock' },
         long: { cols: [], data: [], dataKey: 'stock' },
         risk: { cols: [], data: [] },
         aggs: [],
-        tables: _.map(DB.tables, table => ({ id: table.id, name: table.name })),
+        tables: _.chain(DB.tables).filter(t => t.user === user.id).map(t => ({id: t.id, name: t.name})).value(),
     };
 }
 
-function calculateTable(table, bankDB, aceDB) {
-    const result = getResultFormat();
+function calculateTable(table, bankDB, aceDB, user) {
+    console.log(bankDB);
+    const result = getResultFormat(user);
     //console.log(table.calculated.aggregations)
     result.aggs = Utils.copy(table.calculated.aggregations);
     _.forEach(DB.types, type => {
@@ -296,7 +296,6 @@ function calculateTable(table, bankDB, aceDB) {
             _.forEach(aggregationCols, col => res.stock[col.key] = undefined);
             result[type].data.push(res);
         });
-        console.log(aggregationCols.length)
 
         // after all stocks are set with basic data, its time to calculate aggregations
         _.forEach(aggregationCols, col => {
@@ -340,10 +339,8 @@ function calculateTable(table, bankDB, aceDB) {
 
         // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
-        console.log({ name: col.name, value });
         result.risk.data.push({ name: col.name, value });
     });
-    console.log(result.aggs);
     return result;
 }
 
@@ -376,10 +373,8 @@ function createTable(data) {
             id: update ? data.id : generateId(),
             cols:[],
             risk:[],
-            filter: {
-                excluded: [],
-                predicate: []
-            }
+            excluded: [],
+            filter: {}
         };
         try {
             let isRisk = false;
@@ -446,6 +441,7 @@ function createTable(data) {
 }
 
 function getTable(tableId) {
+    console.log(_.map(DB.tables, 'id'));
     return _.find(DB.tables, table => tableId === table.id);
 }
 
@@ -535,12 +531,20 @@ function tableToClient(table) {
     return result;
 }
 
+async function createUserDefault(user) {
+    const newTable =_.assign(Utils.copy(defaultTable),{user:user.id});
+    const createdTable = await TablesDL.createOne(newTable);
+    parseTable(createdTable);
+    DB.tables.push(createdTable);
+}
+
 async function init() {
     try{
         let allTables = await TablesDL.getAll();
         if(_.isEmpty(allTables)){
             const allUsers = await UsersDL.getAll();
-            await TablesDL.setAll(allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id})));
+            const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
+            await TablesDL.createAll(tables);
             allTables = await TablesDL.getAll();
         }
         DB.tables = allTables;
@@ -555,5 +559,5 @@ async function init() {
 module.exports = {
     init, getTable, calculateTable, formatAceData,
     getResultFormat, createTable, copyTable, removeTable,
-    tableToClient, updateTableExcludes
+    tableToClient, updateTableExcludes, createUserDefault
 };

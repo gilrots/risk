@@ -17,18 +17,10 @@ const api = config.server.api;
 const mock = config.server.mock;
 const port = config.server.port;
 
-DB.connect().then(() => {
-    Tables.init().then(() => {
-        console.log("Table module initialized");
-        runServer();
-    });
-})
+const modules = [Tables.init];
+DB.connect(modules).then(() => runServer());
 
 function runServer() {
-// Generate mock data
-if (mock.allow) {
-    setInterval(() => Bank.updateStocksData(_.sample(mockData)), mock.interval);
-}
 
 const app = express();
 app.use(express.static('dist'));
@@ -42,8 +34,7 @@ const methodParamsMap = {
     get: "query"
 };
 
-const {getPath} = Utils;
-const chainUser = (params,user) => _.isEmpty(user) ? _.assign(params,{user}) : params;
+const chainUser = (params,user) => _.isEmpty(user) ? params : _.assign(params,{user});
 const handleError = (error,res) => {
     console.error(error);
     let status = 400;
@@ -68,6 +59,7 @@ const answer = async (req,res,promise,prop) => {
 const routes = [
     {
         router: app,
+        path: path => path,
         api: {
             post: {
                 [api.bankPost]: Bank.updateStocksData,
@@ -78,6 +70,7 @@ const routes = [
     },
     {
         router: secured,
+        path: path => Utils.getPath(path),
         api: {
             post: {
                 [api.createTable]:      Tables.createTable,
@@ -102,10 +95,15 @@ const routes = [
         }
     }
 ]
-_.forEach(routes, route => _.forEach(_.keys(route.api), key => _.forEach(_.keys(route.api[key]), api => route.router[key](getPath(api), (req, res) => answer(req,res,route.api[key][api],methodParamsMap[key])))));
+_.forEach(routes, r => _.forKeys(r.api, key => _.forKeys(r.api[key], api => r.router[key](r.path(api), (req, res) => answer(req,res,r.api[key][api],methodParamsMap[key])))));
 
 
 app.listen(port, () => console.log(`Server is up on port: ${port}`));
+
+// Generate mock data
+if (mock.allow) {
+    setInterval(() => Utils.postJsonBackend(`http://localhost:${port}${api.bankPost}`,_.sample(mockData)), mock.interval);
+}
 
 //Redirect
 app.get('/*', (req, res) => 

@@ -2,7 +2,7 @@ const _ = require('lodash');
 const Users = require('./models').Users;
 
 async function getAll() {
-    return Users.all();
+    return Users.findAll({raw:true});
 }
 
 async function getOne(user) {

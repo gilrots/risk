@@ -58,8 +58,11 @@ function setMixins() {
           return result;
         },{});
       };
+    const forKeys = function(collection, iteratee) {
+        return _.forEach(_.keys(collection),(key, index, collection) => iteratee(key,index,collection));
+      };
 
-    _.mixin({limit, mapKeys});
+    _.mixin({limit, mapKeys, forKeys});
 }
 
 setMixins();
@@ -128,7 +131,6 @@ function getPath(fullPath) {
     return `/${_.last(fullPath.split('/'))}`;
 }
 
-
 function fetchJsonBackend(url, params) {
     let link = params ? setUrl(url, params) : url;
     return fetch(link).then(res => res.json());
@@ -138,6 +140,16 @@ function fetchJson(api, params, handler) {
     const headers = {...buildAuthHeader()};
     const url = params ? setUrl(api, params) : api;
     return fetch(url, {headers}).then(res => handleResponse(res, handler));
+}
+
+function postJsonBackend(url, object) {
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(object),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then(res => res.json());
 }
 
 function postJson(url, object, handler) {
@@ -202,7 +214,7 @@ module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, fetchJson, postJson, jsonError, moveTo, jsonResult,
-    fetchJsonBackend, getPath, formatDate, wait
+    fetchJsonBackend, postJsonBackend, getPath, formatDate, wait
 };
 
 

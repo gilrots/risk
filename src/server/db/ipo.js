@@ -5,7 +5,7 @@ const IPO = require('./models').IPO;
 const _ = require('lodash');
 
 async function getAll() {
-    return IPO.findAll();
+    return IPO.findAll({raw:true});
 }
 
 async function setAll(ipos) {
