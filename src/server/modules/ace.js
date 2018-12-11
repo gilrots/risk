@@ -10,11 +10,7 @@ const DB = {
 }
 
 const tempDB = {
-    errors:{
-        ace: false,
-        data: [],
-        fieldsMissing: {}
-    },
+    missing: {},
     data: {
     }
 }
@@ -42,10 +38,10 @@ function getFieldsDataQuery(fieldsArr) {
 function getFieldValue(stockId, aceDB, queryResult, index) {
     let val = queryResult.GetManyFieldsResult.Values[index];
     if(val === errorField) {
-        aceDB.errors.fieldsMissing[stockId] = true;
+        aceDB.missing[stockId] = true;
     }
-    const num = Number(val);
-    return Number.isNaN(num) ? val : num;
+    
+    return Utils.getNumber(val, val);
 }
 
 function setQueryId(id,query) {

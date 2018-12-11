@@ -230,7 +230,10 @@ function formatResult(bank, ace) {
 }
 
 function formatAceData(stockId, aceDB, aceData, aceFields) {
-    return _.reduce(aceFields, (res, field, index) => { res[field] = Ace.getFieldValue(stockId, aceDB, aceData, index); return res; }, {});
+    return _.reduce(aceFields, (res, field, index) => {
+        res[field] = Ace.getFieldValue(stockId, aceDB, aceData, index);
+        return res; 
+    }, {});
 }
 
 function parseTable(table) {
