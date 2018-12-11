@@ -31,17 +31,23 @@ async function getTable(params) {
         const aceLatency = { name: "Ace", error: false, message: '' };
         try {
             const { accounts } = await DB.getUserAccounts(params);
-            const { ipos } = await DB.getUserIntras(params);
-            const { intras } = await DB.getUserIPOs(params);
+            const intras = await DB.getUserIntras(params);
+            const ipos = await DB.getUserIPOs(params);
+            const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});
+            const ipoMapper = (ipo,errVal) => _.reduce(table.calculated.aceFields,(arr,field,i) => {
+                const dataField = _.find(ipo.data, df => df.field.id === field);
+                arr[i] = dataField.value ? dataField.value : errVal ;
+                return arr;
+            },[]);
+            Bank.addIntrasAndIPOs(bankDB, intras, ipos);
             Bank.filter(bankDB, table.excluded, accounts);
             const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
             let ids = bankDB.ids;
-
             const promises = _.map(ids, stockId =>
                 new Promise(resolve => 
                     Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
                         innerResolve => {
-                            Utils.getJson(Ace.setQueryId(stockId, aceQuery))
+                            Ace.getStockFields(stockId, aceQuery, iposMap[stockId], ipoMapper)
                             .then(aceData => {
                                 handleAceData(aceDB, stockId, aceData, table.calculated.aceFields);
                                 innerResolve(aceDB.missing[stockId] ? undefined : true);

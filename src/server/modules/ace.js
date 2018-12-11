@@ -48,6 +48,12 @@ function setQueryId(id,query) {
     return query.replace(idToken, Number(id))
 }
 
+function getStockFields(id,query,ipo, ipoMapper){
+    return ipo ?
+        Promise.resolve({GetManyFieldsResult:{Values:ipoMapper(ipo,errorField)}}) :
+        Utils.getJson(setQueryId(id, query))
+}
+
 function getAllSystemFields() {
     const queryResult = 'GetAllFieldsResult';
     return new Promise(resolve => {
@@ -129,4 +135,4 @@ function search(params){
     })
 }
 
-module.exports = { getAceDB, getFieldsQuery, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames, search };
+module.exports = { getAceDB, getFieldsQuery, getStockFields, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames, search };

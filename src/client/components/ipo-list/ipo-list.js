@@ -12,7 +12,7 @@ const debTime = config.app.searchDebounce;
 class IPOList extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { ipos: [], favs:[], selectedIndex: undefined, newIpo: '' };
+        this.state = { ipos: [], favs:[], selectedIndex: undefined, newIpo: '', newAmount:0 };
     }
 
     componentDidMount() {
@@ -53,8 +53,11 @@ class IPOList extends React.Component {
         this.setState(ps => ({
             ipos: [...ps.ipos, {
                 name: ps.newIpo,
-                data: ps.favs.length > 0 ? Utils.copy(ps.favs).map(fav => ({field:fav, value:''})) : [{ field: undefined, value: '' }],
+                amount: ps.newAmount,
+                data: ps.favs.length > 0 ? Utils.copy(ps.favs).map(fav => ({field:fav, value:fav.id === config.ace.nameField ? ps.newIpo : ''})) : [{ field: undefined, value: '' }],
             }],
+            newIpo: '',
+            newAmount: 0,
             selectedIndex: ps.ipos.length,
         }));
     };
@@ -86,7 +89,7 @@ class IPOList extends React.Component {
         const { ipos, selectedIndex } = this.state;
         if(ipos[selectedIndex].data.length > 1) {
             const selectedIpoData = [...ipos[selectedIndex].data];
-            selectedIpoData.data.splice(rowIndex, 1);
+            selectedIpoData.splice(rowIndex, 1);
             this.setState(ps => ({
                 ipos: ps.ipos.map((ipo, i) => i === selectedIndex ? Object.assign({}, ipo, { data: selectedIpoData }) : ipo)
             }));
@@ -95,9 +98,9 @@ class IPOList extends React.Component {
 
 
     render() {
-        const { ipos, newIpo, selectedIndex, favs } = this.state;
+        const { ipos, newIpo, newAmount, selectedIndex, favs } = this.state;
         const selectedIpo = ipos[selectedIndex];
-        const addDisabled = _.isEmpty(newIpo) || _.some(ipos, ipo => ipo.name === newIpo);
+        const addDisabled = _.isEmpty(newIpo) || newAmount === 0 || _.some(ipos, ipo => ipo.name === newIpo);
         return (<Container>
             <RiskLoader loading={!ipos}>
                 {ipos &&
@@ -112,6 +115,7 @@ class IPOList extends React.Component {
                                         <tr>
                                             <th>#</th>
                                             <th>Name</th>
+                                            <th>Amount</th>
                                             <th>Date</th>
                                             <th></th>
                                         </tr>
@@ -122,17 +126,20 @@ class IPOList extends React.Component {
                                                 onClick={(e) => {e.preventDefault(); this.setState({selectedIndex:index});}}>
                                                 <th scope="row">{index + 1}</th>
                                                 <td>{ipo.name}</td>
+                                                <td>{Math.floor(ipo.amount).toLocaleString('us')}</td>
                                                 <td>{ipo.createdAt ? Utils.formatDate(ipo.createdAt) : <Badge color='success'>NEW</Badge>}</td>
                                                 <td align="center" style={{verticalAlign: "center"}}>
                                                     <Badge className="pop-item" color="danger"
-                                                        onClick={(e) => {e.preventDefault(); this.deleteIPO(index);}}>
+                                                        onClick={(e) => {e.stopPropagation(); this.deleteIPO(index);}}>
                                                         <i className="fa fa-times" />
                                                     </Badge>
                                                 </td>
                                             </tr>)}
                                         <tr>
-                                            <td colSpan="3"><Input type="text" value={newIpo}
+                                            <td colSpan="2"><Input type="text" value={newIpo} placeholder="Name..."
                                                 onChange={e => this.setState({ newIpo: e.target.value })} /></td>
+                                            <td colSpan="2"><Input type="number" value={newAmount} placeholder="Amount..."
+                                                onChange={e => this.setState({ newAmount: e.target.value })} /></td>
                                             <td align="center">
                                                 <Button color="success" onClick={() => this.addIPO()} disabled={addDisabled}>Add</Button>
                                             </td>

@@ -17,6 +17,7 @@ const DB = {
     all:{},
     ids: undefined
 };
+const appAccnt = "System"
 
 const BankLatency = _.chain(banks).keys().mapKeys(rn).value();
 
@@ -39,51 +40,67 @@ function getId(stock) {
     return stock[idField];
 }
 
-function setId(stock) {
+function setId(stock, id) {
     stock[idField] = id;
 }
 
-function setOrigin(stock, origin) {
-    return stock[originField] = origin;
+function getAccount(stock) {
+    return stock[accntField];
 }
 
-function getStock(stockId) {
-    return DB.all[stockId];
+function setAccount(stock, account) {
+    stock[accntField] = account;
+}
+
+function getOrigin(stock) {
+    return stock[originField];
+}
+
+function setOrigin(stock, origin) {
+    stock[originField] = origin;
 }
 
 function getFields() {
     return _.map(config.bank.fields, field => ({id: field, name: field}));
 }
 
-function updateDB(stock, fromStocks, toStocks = undefined) {
+function updateDB(db, stock, fromStocks, toStocks = undefined) {
     const id = getId(stock);
     if(fromStocks[id]) {
         delete fromStocks[id];
-        delete DB.all[id];
+        delete db.all[id];
     }
     if(toStocks){
         toStocks[id] = stock;
-        DB.all[id] = stock;
+        db.all[id] = stock;
     }
 }
 
-async function updateStocksData(bankData) {
+async function updateStocksData(bankData, db = DB) {
     //console.log(getId(bankData));
-    updateBankLatency(bankData);
     const amount = getAmount(bankData);
-    setOrigin(bankData, origins.bank);
+    if(!getOrigin(bankData)){
+        updateBankLatency(bankData);
+        setOrigin(bankData, origins.bank);
+    }
 
     if (amount === 0) {
-        updateDB(bankData, DB.short);
-        updateDB(bankData, DB.long);
+        updateDB(db, bankData, db.short);
+        updateDB(db, bankData, db.long);
     }
     else if (amount > 0) {
-        updateDB(bankData, DB.short, DB.long);
+        updateDB(db, bankData, db.short, db.long);
     }
     else {
-        updateDB(bankData, DB.long, DB.short);
+        updateDB(db, bankData, db.long, db.short);
     }
     return true;
+}
+
+function addIntrasAndIPOs(bankSnap, intras, ipos){
+    _.forEach(intras, intra => updateStocksData(formatOuter(intra.stockId, intra.amount, origins.intra), bankSnap));
+    _.forEach(ipos, ipo => updateStocksData(formatOuter(ipo.id,ipo.amount, origins.ipo), bankSnap));
+    bankSnap.ids = _.keys(bankSnap.all);
 }
 
 function filter(bankSnap, ids, accounts){
@@ -93,9 +110,10 @@ function filter(bankSnap, ids, accounts){
         delete bankSnap.all[id];
     }
     const accntMap = _.chain(accounts).mapKeys(()=>true).value();
+    accntMap[appAccnt] = true;
     bankSnap.ids = _.chain(bankSnap.all)
                     .values()
-                    .filter(s => !accntMap[s[accntField]])
+                    .filter(s => !accntMap[getAccount(s)])
                     .map(idField)
                     .concat(ids)
                     .uniq()
@@ -127,12 +145,13 @@ function getBankLatency(){
     }],[]).value();
 }
 
-function formatOuter(id, amount, isIntra){
+function formatOuter(id, amount, origin){
     const stock = {}
     setId(stock, id);
     setAmount(stock, amount);
-    setOrigin(stock, isIntra ? origins.intra : origins.ipo);
+    setOrigin(stock, origin);
+    setAccount(stock, appAccnt);
     return stock;
 }
 
-module.exports = {updateStocksData, getDBSnap, getFields, filter, getBankLatency};
+module.exports = {updateStocksData, getDBSnap, getFields, filter, getBankLatency, addIntrasAndIPOs};
