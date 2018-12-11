@@ -268,7 +268,6 @@ function getResultFormat(user) {
 }
 
 function calculateTable(table, bankDB, aceDB, user) {
-    console.log(bankDB);
     const result = getResultFormat(user);
     //console.log(table.calculated.aggregations)
     result.aggs = Utils.copy(table.calculated.aggregations);
