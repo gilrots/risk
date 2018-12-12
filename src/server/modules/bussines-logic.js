@@ -13,6 +13,7 @@ function handleAceData(aceDB, stockId, aceData, aceFields) {
 }
 
 async function getTable(params) {
+    const t0 = new Date().getTime();
     const { user } = params;
     const tableId = parseInt(params.tableId);
     const table = Tables.getTable(tableId);
@@ -65,7 +66,8 @@ async function getTable(params) {
             console.error(e);
         }
         result.latency = [aceLatency, ...Bank.getBankLatency()];
-        
+        const t1 = new Date().getTime();
+        console.log(`Call to getTable took ${t1 - t0} milliseconds`);
         return result;
     }
 }

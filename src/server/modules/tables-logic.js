@@ -299,6 +299,7 @@ function calculateTable(table, bankDB, aceDB, user) {
             _.forEach(aggregationCols, col => res.stock[col.key] = undefined);
             result[type].data.push(res);
         });
+        _.forEach(result[type].data, d=>d.stock.origin = d.bank.Origin);
 
         // after all stocks are set with basic data, its time to calculate aggregations
         _.forEach(aggregationCols, col => {

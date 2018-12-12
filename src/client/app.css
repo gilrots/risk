@@ -17,6 +17,17 @@ html, body, #root {
     color: #9a0f07;
 }
 
+.INTRA-ROW .react-grid-Cell {
+    background-color: rgba(255, 255, 0, 0.5);
+}
+
+.IPO-ROW .react-grid-Cell{
+    background-color: rgba(0, 248, 0, 0.5);
+}
+
+.BANK-ROW {
+}
+
 #risk-modal-body, .table-responsive {
     overflow: visible !important;
 }
