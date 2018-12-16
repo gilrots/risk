@@ -4,7 +4,7 @@ import * as Utils from '../../../common/utils';
 import {Container, Button, Input, Table, Badge} from "reactstrap";
 import RiskLoader from "../loader/loader";
 import RemoteSearchDropdown from "../search-dropdown/remote-search-dropdown";
-import {get,post} from "../../helpers/client-utils"
+import {get,post, notify} from "../../helpers/client-utils"
 const config = require('../../../common/config');
 const api = config.server.api;
 const debTime = config.app.searchDebounce;
@@ -27,8 +27,9 @@ class IntraDaysList extends React.Component {
 
     updateIntras = () => {
         const {intras} = this.state;
-        post(api.setIntras, {intras}).then(response => {
-            if(response === true){
+        post(api.setIntras, {intras}).then(res => {
+            notify(this, res, "Update IntraDay");
+            if(res === true){
                 this.getIntras();
             }
         });

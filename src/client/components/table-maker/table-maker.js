@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Container, Row, Col, Input, InputGroup, InputGroupAddon, InputGroupText, ButtonGroup, Button, Badge } from "reactstrap";
 import PropTypes from "prop-types";
 import SearchDropdown from "../search-dropdown/search-dropdown";
-import {post} from "../../helpers/client-utils"
+import {post, notify} from "../../helpers/client-utils"
 const api = require('../../../common/config').server.api;
 
 const defaults = {
@@ -22,7 +22,7 @@ class TableMaker extends React.Component {
 
     constructor(props) {
         super(props);
-        const data = _.isEmpty(props.edited) ? { name: '', id: '', cols: [], risk: [] } : props.edited;
+        const data = _.isEmpty(props.edited) ? { name: '', id: undefined, cols: [], risk: [] } : props.edited;
         this.state = { ...data, riskMode: false, selectedColIndex: 0 };
         this.sources = ['ace', 'bank', 'stock'];
     }
@@ -88,7 +88,7 @@ class TableMaker extends React.Component {
     createTable = () => {
         const {id, name, cols, risk} = this.state
         post(api.createTable, {data:{id, name, cols, risk}}).
-            then(result => console.log('Success:', result));
+            then(res => notify(this, res, _.isEmpty(id) ? "Update Table" : "Create Table"));
     }
 
     save() {

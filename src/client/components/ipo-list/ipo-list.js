@@ -4,7 +4,7 @@ import * as Utils from '../../../common/utils';
 import { Container, Row, Col, Button, Input, Table, Badge } from "reactstrap";
 import RiskLoader from "../loader/loader";
 import RemoteSearchDropdown from "../search-dropdown/remote-search-dropdown";
-import {get,post} from "../../helpers/client-utils"
+import {get, post, notify} from "../../helpers/client-utils"
 const config = require('../../../common/config');
 const api = config.server.api;
 const debTime = config.app.searchDebounce;
@@ -34,8 +34,9 @@ class IPOList extends React.Component {
 
     updateIPOs = () => {
         const { ipos } = this.state;
-        post(api.setIPOs, { ipos }).then(response => {
-            if (response === true) {
+        post(api.setIPOs, { ipos }).then(res => {
+            notify(this, res, "Update IPO");
+            if (res === true) {
                 this.getIpos();
             }
         });

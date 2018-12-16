@@ -8,6 +8,7 @@ import {
     ModalHeader, NavItem, Nav, TabContent, TabPane, Alert, Badge,
     UncontrolledTooltip
 } from 'reactstrap';
+import SweetAlert from 'react-bootstrap-sweetalert';
 import TableMaker from "./components/table-maker/table-maker";
 import FilterMaker from "./components/filter-maker/filter-maker";
 import ExcludeList from "./components/exclude-list/exclude-list";
@@ -33,11 +34,17 @@ export default class App extends Component {
             excludeMode: false,
             modal: {
                 isOpen: false,
-                newTable: false
+                newTable: false,
             },
+            alert: {
+                type: undefined,
+                title: '',
+                message: ''
+            }
         };
         this.polling = true;
         this.toggleModal = this.toggleModal.bind(this);
+        this.toggleAlert = this.toggleAlert.bind(this);
         this.toggleTab = this.toggleTab.bind(this);
         this.tableAction = this.tableAction.bind(this);
         this.modalComponent = this.modalComponent.bind(this);
@@ -88,6 +95,14 @@ export default class App extends Component {
             });
     }
 
+    toggleAlert(alertData = {}){
+        const {message, title, type} = alertData;
+        this.setState(
+            _.isEmpty(message) ?
+                {alert: {message: '', title: '', type: undefined}} :
+                {alert: {message, title, type}});
+    }
+
     toggleTab(activeTable) {
         if (this.state.activeTable !== activeTable) {
             this.setState({activeTable}, () => this.getData());
@@ -121,25 +136,26 @@ export default class App extends Component {
             child: undefined,
             component: undefined
         };
+        const onAlert = this.toggleAlert;
         const ref = c => res.child = c;
         switch (component) {
             case 0:
-                res.component = <TableMaker id="table-maker" ref={ref} edited={editedTable} fields={tableMakerData}/>;
+                res.component = <TableMaker id="table-maker" ref={ref} edited={editedTable} fields={tableMakerData} onAlert={onAlert}/>;
                 break;
             case 1:
-                res.component = <FilterMaker id="filter-maker" ref={ref}/>;
+                res.component = <FilterMaker id="filter-maker" ref={ref} onAlert={onAlert}/>;
                 break;
             case 2:
-                res.component = <ExcludeList id="exclude-list" ref={ref} tableId={activeTable}/>;
+                res.component = <ExcludeList id="exclude-list" ref={ref} tableId={activeTable} onAlert={onAlert}/>;
                 break;
             case 3:
-                res.component = <IntraDaysList id="intradays" ref={ref} tableId={activeTable}/>;
+                res.component = <IntraDaysList id="intradays" ref={ref} tableId={activeTable} onAlert={onAlert}/>;
                 break;
             case 4:
-                res.component = <IPOList id="ipos" ref={ref} tableId={activeTable}/>;
+                res.component = <IPOList id="ipos" ref={ref} tableId={activeTable} onAlert={onAlert}/>;
                 break;
             case 5:
-                res.component = <RiskSettings id="risk-settings" ref={ref}/>;
+                res.component = <RiskSettings id="risk-settings" ref={ref} onAlert={onAlert}/>;
                 break;
             default:
                 res.component = <div>---</div>;
@@ -227,7 +243,7 @@ export default class App extends Component {
     };
 
     render() {
-        const {data, modal, tableMakerData, excludeMode, activeTable} = this.state;
+        const {data, modal, tableMakerData, excludeMode, activeTable, alert} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = !_.isEmpty(data) && data.tables && data.short && data.long && data.risk;
         const hasLatency = !_.isEmpty(data) && data.latency;
@@ -235,6 +251,10 @@ export default class App extends Component {
         const modalBody = this.modalComponent(modal.component);
         console.log(modalBody.child);
         return <Fragment>
+            {!_.isEmpty(alert.message) && 
+            <SweetAlert title={alert.title} type={alert.type} onConfirm={() => this.toggleAlert()} >
+                {alert.message}
+            </SweetAlert>}
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
                 <ModalBody id="risk-modal-body">

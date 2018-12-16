@@ -404,10 +404,12 @@ async function createTable(params) {
             throw new TableCouldNotBeParsedError(e.message);
         }
         try {
-            if (!_.isEmpty(data.id)) {
+            if (data.id) {
                 const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
                 if (updateIndex > -1) {
-                    const updatedTable = await TablesDL.updateOne(data);
+                    await TablesDL.updateOne(data);
+                    const updatedTable = await TablesDL.getOne(data.id);
+                    console.log("asdasdasd\n",updatedTable);
                     parseTable(updatedTable);
                     DB.tables[updateIndex] = updatedTable;
                     console.log("table updated");

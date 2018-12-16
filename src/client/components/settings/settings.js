@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {get,post} from "../../helpers/client-utils"
+import {get, post, notify} from "../../helpers/client-utils"
 import { Container, Button, Input, Table, Badge, Form, FormGroup, Label, InputGroup, InputGroupAddon } from "reactstrap";
 
 const config = require('../../../common/config');
@@ -24,8 +24,9 @@ class RiskSettings extends React.Component {
 
     updateSettings = () => {
         const { accounts } = this.state;
-        post(api.setUserAccounts, { accounts }).then(response => {
-            if (response === true) {
+        post(api.setUserAccounts, { accounts }).then(res => {
+            notify(this, res, "Update Settings");
+            if (res === true) {
                 this.getUser();
             }
         });

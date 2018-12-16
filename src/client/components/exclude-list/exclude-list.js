@@ -5,12 +5,13 @@ import {Container, Row, Col, Button} from "reactstrap";
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
 import {StockList} from "./stock-list";
-import {get,post} from "../../helpers/client-utils"
+import {get,post, notify} from "../../helpers/client-utils"
 const api = require('../../../common/config').server.api;
 
 class ExcludeList extends React.Component {
     static propTypes = {
         tableId: PropTypes.number.isRequired,
+        onAlert: PropTypes.func.isRequired,
     };
 
     constructor(props) {
@@ -40,9 +41,8 @@ class ExcludeList extends React.Component {
     updateExcludeTable() {
         const {tableId} = this.props;
         const exclude = _.map(this.state.excluded,'id');
-        post(api.setExcludeList, {tableId, exclude}).then(response => {
-            console.log(response);
-        });
+        post(api.setExcludeList, {tableId, exclude}).then(res =>
+            notify(this, res, 'Update Exclude List'));
     }
 
     save() {

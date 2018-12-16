@@ -1,6 +1,7 @@
  import { getJson, postJson } from "../../common/utils";
  import * as User from "./user";
- import * as history from "./history";
+ import history from "./history";
+ import _ from 'lodash';
 
 function buildAuthHeader() {
     // return authorization header with jwt token
@@ -30,4 +31,14 @@ export function get(api, params, handler) {
 export function post(url, object, handler) {
     const authHeader = buildAuthHeader();
     return postJson(url, object, authHeader, res => handleResponse(res,handler));
+}
+
+export function notify(component, response, title, message = "Action completed!") {
+    const onAlert = component.props.onAlert;
+    if(onAlert) {
+        const alert = response.error ? 
+        {title: `${title} - Error!`, message: response.error, type: 'danger'} :
+        {title, message, type: 'success'};
+        onAlert(alert);
+    }
 }
