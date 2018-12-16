@@ -2,6 +2,7 @@ import React, {Component, Fragment} from 'react';
 import _ from 'lodash';
 import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
+import {FormattersFuncs} from "./components/stock-viewer/formatters";
 import AppHeader from "./components/header/app-header";
 import {
     Container, Row, Col, Button, Modal, ModalBody, ModalFooter,
@@ -204,7 +205,7 @@ export default class App extends Component {
                     exportCSV(name,
                               [{name:'RISK', table:risk},
                                {name:'LONGS', table:long},
-                               {name:'SHORTS', table:short}]);
+                               {name:'SHORTS', table:short}], FormattersFuncs);
                 }
             },
         ];

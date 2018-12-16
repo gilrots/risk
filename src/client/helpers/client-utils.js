@@ -50,10 +50,9 @@ export function exportCSV(name, tables, formatters) {
         const totalRows = _.maxBy(tables,'table.data.length').table.data.length + 2;
         const result = Array(totalRows);
         for (let i = 0; i < result.length; i++) {
-            result[i] = Array(totalCols);
+            result[i] = _.fill(Array(totalCols),' ');
         }
     
-        //const tableNames = _.fill(Array(totalCols), ' ');
         let c = 0;
         _.forEach(tables, table => {
             result[0][c] = table.name;
@@ -61,9 +60,15 @@ export function exportCSV(name, tables, formatters) {
             _.forEach(cols, (col,i) => {
                 result[1][c + i] = col.name;
                 _.forEach(data, (row,j) => {
-                    result[2+j][c + i] = dataKey ? 
-                        row[dataKey][col.key] :
-                        row[col.key];
+                    let value = dataKey ? row[dataKey][col.key] : row[col.key];
+                    if(col.format) {
+                        value = formatters[col.format](value);
+                    }
+                    value = value !== undefined && value !== null ? value.toString() : '---';
+                    if(value.includes(',')){
+                        value = `"${value}"`
+                    }
+                    result[2 + j][c + i] = value;
                 });
             });
             c+=(cols.length + 1);
@@ -74,16 +79,13 @@ export function exportCSV(name, tables, formatters) {
             csv += row.join(',');
             csv += "\n";
         });
-    
-        var element = document.createElement('a');
+        console.log(csv);
+        let element = document.createElement('a');
         element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURI(csv));
         element.setAttribute('download', `${name}-${new Date().toLocaleString('us')}.csv`);
-    
         element.style.display = 'none';
         document.body.appendChild(element);
-    
         element.click();
-    
         document.body.removeChild(element);
         resolve();
    });
