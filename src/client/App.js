@@ -36,11 +36,7 @@ export default class App extends Component {
                 isOpen: false,
                 newTable: false,
             },
-            alert: {
-                type: undefined,
-                title: '',
-                message: ''
-            }
+            alert: {}
         };
         this.polling = true;
         this.toggleModal = this.toggleModal.bind(this);
@@ -95,12 +91,8 @@ export default class App extends Component {
             });
     }
 
-    toggleAlert(alertData = {}){
-        const {message, title, type} = alertData;
-        this.setState(
-            _.isEmpty(message) ?
-                {alert: {message: '', title: '', type: undefined}} :
-                {alert: {message, title, type}});
+    toggleAlert(alert = {}){
+        this.setState({alert});
     }
 
     toggleTab(activeTable) {
@@ -199,7 +191,9 @@ export default class App extends Component {
             {
                 name: 'Delete',
                 icon: 'times',
-                action: () => this.tableAction(ta.url, table.id, ta.actions.remove)
+                action: () => this.toggleAlert({ title: 'Delete table?',
+                    message: ' ', type: 'warning', showCancel: true,
+                    onConfirm: () => this.tableAction(ta.url, table.id, ta.actions.remove) })
             },
             {
                 name: 'Export',
@@ -252,7 +246,9 @@ export default class App extends Component {
         console.log(modalBody.child);
         return <Fragment>
             {!_.isEmpty(alert.message) && 
-            <SweetAlert title={alert.title} type={alert.type} onConfirm={() => this.toggleAlert()} >
+            <SweetAlert title={alert.title} type={alert.type} showCancel={alert.showCancel}
+            onConfirm={() => {_.invoke(alert, 'onConfirm'); this.toggleAlert();}} 
+            onCancel={this.toggleAlert}>
                 {alert.message}
             </SweetAlert>}
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
