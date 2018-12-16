@@ -42,3 +42,49 @@ export function notify(component, response, title, message = "Action completed!"
         onAlert(alert);
     }
 }
+
+
+export function exportCSV(name, tables, formatters) {
+   return new Promise(resolve => {
+        const totalCols = _.sumBy(tables,'table.cols.length') + tables.length;
+        const totalRows = _.maxBy(tables,'table.data.length').table.data.length + 2;
+        const result = Array(totalRows);
+        for (let i = 0; i < result.length; i++) {
+            result[i] = Array(totalCols);
+        }
+    
+        //const tableNames = _.fill(Array(totalCols), ' ');
+        let c = 0;
+        _.forEach(tables, table => {
+            result[0][c] = table.name;
+            const {cols,data,dataKey} =  table.table;
+            _.forEach(cols, (col,i) => {
+                result[1][c + i] = col.name;
+                _.forEach(data, (row,j) => {
+                    result[2+j][c + i] = dataKey ? 
+                        row[dataKey][col.key] :
+                        row[col.key];
+                });
+            });
+            c+=(cols.length + 1);
+        });
+    
+        let csv = '';
+        _.forEach(result, row => {
+            csv += row.join(',');
+            csv += "\n";
+        });
+    
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURI(csv));
+        element.setAttribute('download', `${name}-${new Date().toLocaleString('us')}.csv`);
+    
+        element.style.display = 'none';
+        document.body.appendChild(element);
+    
+        element.click();
+    
+        document.body.removeChild(element);
+        resolve();
+   });
+}

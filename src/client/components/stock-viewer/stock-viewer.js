@@ -4,8 +4,6 @@ const React = require('react');
 import _ from 'lodash';
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
-import * as Utils from '../../../common/utils';
-
 
 class StockViewer extends React.Component {
     static propTypes = {
