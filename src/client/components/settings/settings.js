@@ -22,7 +22,7 @@ class RiskSettings extends React.Component {
         })
     }
 
-    save = () => {
+    updateSettings = () => {
         const { accounts } = this.state;
         post(api.setUserAccounts, { accounts }).then(response => {
             if (response === true) {
@@ -45,6 +45,10 @@ class RiskSettings extends React.Component {
             return { accounts };
         });
     };
+
+    save() {
+        this.updateSettings();
+    }
 
     render() {
         const { accounts, newAccount, username } = this.state;
@@ -76,7 +80,6 @@ class RiskSettings extends React.Component {
                     </InputGroup>
                 </FormGroup>
             </Form>
-            <Button color="primary" onClick={this.save}>Save</Button>
         </Container>;
     }
 }

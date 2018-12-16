@@ -58,6 +58,10 @@ class FilterMaker extends React.Component {
         });
     }
 
+    save() {
+        
+    }
+
     render() {
         const {name, predicates} = this.state;
         const fields = this.fields;

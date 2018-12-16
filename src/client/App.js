@@ -117,22 +117,35 @@ export default class App extends Component {
 
     modalComponent(component) {
         const {tableMakerData, editedTable, activeTable} = this.state;
+        const res = {
+            child: undefined,
+            component: undefined
+        };
+        const ref = c => res.child = c;
         switch (component) {
             case 0:
-                return (<TableMaker id="table-maker" edited={editedTable} fields={tableMakerData}/>);
+                res.component = <TableMaker id="table-maker" ref={ref} edited={editedTable} fields={tableMakerData}/>;
+                break;
             case 1:
-                return (<FilterMaker id="filter-maker"/>);
+                res.component = <FilterMaker id="filter-maker" ref={ref}/>;
+                break;
             case 2:
-                return (<ExcludeList id="exclude-list" tableId={activeTable}/>);
+                res.component = <ExcludeList id="exclude-list" ref={ref} tableId={activeTable}/>;
+                break;
             case 3:
-                return (<IntraDaysList id="intradays" tableId={activeTable}/>);
+                res.component = <IntraDaysList id="intradays" ref={ref} tableId={activeTable}/>;
+                break;
             case 4:
-                return (<IPOList id="ipos" tableId={activeTable}/>);
+                res.component = <IPOList id="ipos" ref={ref} tableId={activeTable}/>;
+                break;
             case 5:
-                return (<RiskSettings id="risk-settings"/>);
+                res.component = <RiskSettings id="risk-settings" ref={ref}/>;
+                break;
             default:
-                return (<div>---</div>);
+                res.component = <div>---</div>;
         }
+
+        return res;
     }
 
     stockAction(stockId, action) {
@@ -219,14 +232,16 @@ export default class App extends Component {
         const hasData = !_.isEmpty(data) && data.tables && data.short && data.long && data.risk;
         const hasLatency = !_.isEmpty(data) && data.latency;
         const navItems = this.getNavMenuActions();
+        const modalBody = this.modalComponent(modal.component);
+        console.log(modalBody.child);
         return <Fragment>
             <Modal isOpen={modal.isOpen} toggle={this.toggleModal} className="max">
                 <ModalHeader toggle={this.toggleModal}>{modal.title}</ModalHeader>
                 <ModalBody id="risk-modal-body">
-                    {this.modalComponent(modal.component)}
+                    {modalBody.component}
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={this.toggleModal}>Do Something</Button>{' '}
+                    <Button color="primary" onClick={() => modalBody.child.save()}>Save</Button>{' '}
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>

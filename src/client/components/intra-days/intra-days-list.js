@@ -62,12 +62,16 @@ class IntraDaysList extends React.Component {
         });
     };
 
+    save() {
+        this.updateIntras();
+    }
+
     render() {
         const {intras, amount, selected} = this.state;
         const addDisabled = selected === undefined || amount === 0 || _.find(intras,intra => intra.stockId === selected.id) !== undefined;
-        return (<Container>
+        return <Container>
                 <RiskLoader loading={!intras}>
-                    {intras && <Fragment>
+                    {intras && 
                         <Table responsive striped>
                             <thead>
                             <tr>
@@ -105,12 +109,9 @@ class IntraDaysList extends React.Component {
                                 </td>
                             </tr>
                             </tbody>
-                        </Table>
-                        <Button color="primary" onClick={this.updateIntras}>Update</Button>
-                    </Fragment>}
+                        </Table>}
                 </RiskLoader>
-            </Container>
-        );
+            </Container>;
     }
 }
 

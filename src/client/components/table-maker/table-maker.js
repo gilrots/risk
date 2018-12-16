@@ -86,10 +86,14 @@ class TableMaker extends React.Component {
     }
 
     createTable = () => {
-        post(api.createTable, {id, name, cols, risk} = this.state).
+        const {id, name, cols, risk} = this.state
+        post(api.createTable, {data:{id, name, cols, risk}}).
             then(result => console.log('Success:', result));
     }
 
+    save() {
+       this.createTable();
+    }
 
     render() {
         const { name, selectedColIndex, riskMode } = this.state;
@@ -262,11 +266,6 @@ class TableMaker extends React.Component {
                                 </Col>
                             </Row>
                         </Container> : "Choose column to view or edit"}
-                    </Col>
-                </Row>
-                <Row className="my-3">
-                    <Col>
-                        <Button color="primary" onClick={this.createTable}>{tabAct}</Button>
                     </Col>
                 </Row>
             </Container>

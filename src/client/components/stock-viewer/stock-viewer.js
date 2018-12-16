@@ -123,10 +123,8 @@ class StockViewer extends React.Component {
         });
     };
 
-RowRenderer = ({ renderBaseRow, ...props }) => {
-    console.log(props.row.origin);
-    return <div className={`${props.row.origin}-ROW`}>{renderBaseRow(props)}</div>
-};
+    rowRenderer = ({ renderBaseRow, ...props }) => <div className={`${props.row.origin}-ROW`}>{renderBaseRow(props)}</div>;
+
 
     render() {
         const {cols,rows} = this.state;
@@ -139,7 +137,7 @@ RowRenderer = ({ renderBaseRow, ...props }) => {
                     rowGetter={this.rowGetter}
                     rowsCount={rows.length}
                     getCellActions={this.getCellActions}
-                    rowRenderer={this.RowRenderer}
+                    rowRenderer={this.rowRenderer}
                     minHeight={800}
                     rowHeight={20}
                     rowSelection={{

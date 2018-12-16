@@ -45,11 +45,15 @@ class ExcludeList extends React.Component {
         });
     }
 
+    save() {
+        this.updateExcludeTable();
+    }
+
     render() {
         const {excluded, included} = this.state;
         return (
             <RiskLoader loading={included.length === 0}>
-                <Container>
+                {included.length !== 0 && <Container>
                     <Row>
                         <Col>
                             <StockList title="Included" stocks={included} color="danger"
@@ -60,8 +64,7 @@ class ExcludeList extends React.Component {
                                        icon="fa fa-check" func={this.include}/>
                         </Col>
                     </Row>
-                </Container>
-                <Button color="primary" onClick={this.updateExcludeTable}>Apply</Button>
+                </Container>}
             </RiskLoader>
         );
     }

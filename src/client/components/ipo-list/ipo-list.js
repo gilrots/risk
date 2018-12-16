@@ -95,7 +95,10 @@ class IPOList extends React.Component {
             }));
         }
     };
-
+    
+    save() {
+        this.updateIPOs();
+    }
 
     render() {
         const { ipos, newIpo, newAmount, selectedIndex, favs } = this.state;
@@ -194,11 +197,6 @@ class IPOList extends React.Component {
                                         </tbody>
                                     </Table> : "Select IPO to view or edit fields"}
                                 </div>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <Button color="primary" onClick={this.updateIPOs}>Update IPOs</Button>
                             </Col>
                         </Row>
                     </Container>}
