@@ -1,13 +1,17 @@
 {
   "server": {
-    "port": 8080,
-    "mock": {
-      "allow": true,
-      "interval": 200
+    "bankService": {
+      "port": 80,
+      "api": "/gili",
+      "mock": {
+        "allow": true,
+        "interval": 200
+      }
     },
+    "port": 8080,
     "priviliges":["ADMIN", "DEVELOPER", "TRADER"],
     "api": {
-      "bankPost":"/gili",
+      "bankPost":"/bank",
       "login":"/api/login",
       "register":"/api/register",
       "getData":"/api/secured/getData",
