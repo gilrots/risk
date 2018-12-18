@@ -10,7 +10,8 @@
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "server": "nodemon src/server/index.js",
     "bank": "nodemon src/server/bank-service.js",
-    "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run bank\""
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev-bank": "concurrently \"npm run server\" \"npm run client\" \"npm run bank\""
   },
   "author": "Sandeep Raveesh",
   "license": "ISC",
