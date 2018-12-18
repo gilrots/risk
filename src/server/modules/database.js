@@ -111,7 +111,7 @@ async function setUserIntras(params) {
 
     let res = true;
     try {
-        await IntrasDL.setAll(userify(intras,user));
+        await IntrasDL.setAll(userify(intras,user), user);
     }
     catch (e) {
         res = e.message;

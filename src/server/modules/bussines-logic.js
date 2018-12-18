@@ -16,7 +16,7 @@ async function getTable(params) {
     const t0 = new Date().getTime();
     const { user } = params;
     const tableId = parseInt(params.tableId);
-    const table = Tables.getTable(tableId);
+    const table = await Tables.getUserTableOrDefault(user, tableId);
     const bankDB = Bank.getDBSnap();
     const aceDB = Ace.getAceDB();
     if (_.isEmpty(table)) {

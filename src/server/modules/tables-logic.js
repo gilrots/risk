@@ -322,12 +322,15 @@ function calculateTable(table, bankDB, aceDB, user) {
         });
         //console.log(result[type].data);
     });
-
     result.risk.cols = table.riskCols;
     _.forEach(table.calculated.cols.risk, col => {
         // after all stocks are set with basic data, its time to calculate aggregations
         // calculate the aggregations
         _.forEach(col.func.aggregations, agg => {
+            if(!col.type){
+                console.log(col);  
+            } 
+    
             if ((result.aggs[agg.key] === undefined || result.aggs[col.key] === undefined) && col.type !== DB.subTypes[0]) {
                 const stocks = result[col.type].data;
                 const aggResult = _.reduce(stocks, (acc, dat) => {
@@ -383,7 +386,7 @@ async function createTable(params) {
                     order: col.order,
                     type: col.name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0]
                 } : {};
-                isRisk = !isRisk;
+                
                 return {
                     name: col.name,
                     key: formatColKey(col.name),
@@ -397,7 +400,9 @@ async function createTable(params) {
                 };
             };
             data.cols = data.cols.map(parseCol);
+            isRisk = !isRisk;
             data.risk = data.risk.map(parseCol);
+            console.log(_.map(data.risk, 'type'));
         }
         catch (e) {
             console.error(e);
@@ -409,7 +414,6 @@ async function createTable(params) {
                 if (updateIndex > -1) {
                     await TablesDL.updateOne(data);
                     const updatedTable = await TablesDL.getOne(data.id);
-                    console.log("asdasdasd\n",updatedTable);
                     parseTable(updatedTable);
                     DB.tables[updateIndex] = updatedTable;
                     console.log("table updated");
@@ -432,6 +436,14 @@ async function createTable(params) {
 
 function getTable(tableId) {
     return _.find(DB.tables, table => tableId === table.id);
+}
+
+async function getUserTableOrDefault(user, tableId) {
+    let table = getTable(tableId);
+    if(!table && getUserTables(user).length === 0) {
+        table = await createUserDefault(user);
+    }
+    return table;
 }
 
 async function updateTableExcludes(params) {
@@ -473,7 +485,7 @@ async function copyTable(tableId) {
 async function removeTable(tableId) {
     const table = getTable(tableId);
     if (table) {
-        await TablesDL.remove(table.id);
+        await TablesDL.deleteOne(table.id);
         _.pull(DB.tables,table);
         return `Removed table with id: ${tableId}`;
     }
@@ -505,7 +517,7 @@ function tableToClient(table) {
             riskData = isRisk ? {
                 order: col.order
             } : {};
-            isRisk = !isRisk;
+            
             return {
                 name: col.name,
                 ...riskData,
@@ -516,6 +528,7 @@ function tableToClient(table) {
             };
         };
         result.cols = table.cols.map(deparseCol);
+        isRisk = !isRisk;
         result.risk = table.risk.map(deparseCol);
     }
     return result;
@@ -525,17 +538,22 @@ async function createUserDefault(user) {
     const newTable = _.assign(Utils.copy(defaultTable),{user:user.id});
     const createdTable = await TablesDL.createOne(newTable);
     parseTable(createdTable);
+    console.log(createdTable);
     DB.tables.push(createdTable);
+}
+
+function getUserTables(user) {
+    return _.filter(DB.tables, table => table.user === user.id);
 }
 
 async function init() {
     let allTables = await TablesDL.getAll();
-    if(_.isEmpty(allTables)){
-        const allUsers = await UsersDL.getAll();
-        const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
-        await TablesDL.createAll(tables);
-        allTables = await TablesDL.getAll();
-    }
+    // if(_.isEmpty(allTables)){
+    //     const allUsers = await UsersDL.getAll();
+    //     const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
+    //     await TablesDL.createAll(tables);
+    //     allTables = await TablesDL.getAll();
+    // }
     DB.tables = allTables;
     _.forEach(DB.tables, parseTable);
 }
@@ -543,5 +561,6 @@ async function init() {
 module.exports = {
     init, getTable, calculateTable, formatAceData,
     getResultFormat, createTable, copyTable, removeTable,
-    tableToClient, updateTableExcludes, createUserDefault
+    tableToClient, updateTableExcludes, createUserDefault,
+    getUserTableOrDefault, getUserTables
 };

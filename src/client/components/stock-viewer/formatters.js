@@ -33,8 +33,26 @@ class CommasFormatter extends React.Component {
         return commasFormatter(this.props.value);
     }
 }
+export const FormattersMap = [
+    {
+        id: 0,
+        name: '0.0%',
+        class: PercentFormatter,
+        func: percentFormatter
+    },{
+        id: 1,
+        name: '0.00%',
+        class: PercentFormatter100,
+        func: percentFormatter100
+    },{
+        id: 2,
+        name: '1,000,000',
+        class: CommasFormatter,
+        func: commasFormatter
+    }];
 
-export const Formatters = [PercentFormatter, PercentFormatter100, CommasFormatter];
-export const FormattersFuncs = [percentFormatter, percentFormatter100, commasFormatter];
+export const Formatters = _.map(FormattersMap,'class');
+export const FormattersFuncs = _.map(FormattersMap,'func');
+export const FormattersMenu = _.map(FormattersMap,x=> ({id:x.id, name:x.name}));
 
 

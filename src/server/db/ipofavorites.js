@@ -1,24 +1,22 @@
-const Sequelize = require('Sequelize');
-const Op = Sequelize.Op;
 const IPOFavorties = require('./models').IPOFavorites;
-const _ = require('lodash');
+const SeqUtils = require('./seq-utils');
 
 async function getAll(user) {
-    return IPOFavorties.findAll({where:{user:user.id}});
+    return SeqUtils.getAll(IPOFavorties, user);
 }
 
 async function exist(favorite) {
-    return !_.isEmpty(await IPOFavorties.findOne({where: ({id,user} = favorite)}));
+    const {id,user} = favorite
+    return SeqUtils.exist(IPOFavorties, {id,user})
 }
 
 async function createOne(favorite) {
-    return IPOFavorties.create(favorite);
+    return SeqUtils.create(IPOFavorties, favorite);
 }
 
 async function deleteOne(favorite) {
-    return IPOFavorties.destroy({
-        where: ({id,user} = favorite)
-    });
+    const {id,user} = favorite
+    return SeqUtils.deleteOne(IPOFavorties, {id,user})
 }
 
 module.exports = { getAll, createOne, deleteOne, exist }

@@ -1,9 +1,12 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import _ from 'lodash';
-import { Container, Row, Col, Input, InputGroup, InputGroupAddon, InputGroupText, ButtonGroup, Button, Badge } from "reactstrap";
+import { Container, Row, Col, Input, InputGroup, InputGroupAddon,
+    InputGroupText, ButtonGroup, Button, Badge,
+    DropdownToggle, DropdownMenu, DropdownItem, UncontrolledDropdown } from "reactstrap";
 import PropTypes from "prop-types";
 import SearchDropdown from "../search-dropdown/search-dropdown";
 import {post, notify} from "../../helpers/client-utils"
+import {FormattersMenu} from '../stock-viewer/formatters';
 const api = require('../../../common/config').server.api;
 
 const defaults = {
@@ -263,6 +266,19 @@ class TableMaker extends React.Component {
                                         </InputGroupAddon>
                                         <Input value={col.exp} placeholder="Expression..." onChange={e => this.setColData(index, 'exp', e.target.value)} />
                                     </InputGroup>
+                                </Col>
+                            </Row>
+                            <Row className="my-3">
+                                <Col>
+                                    Format
+                                    <UncontrolledDropdown color="primary">
+                                        <DropdownToggle caret>{col.format === undefined ? 'None' : FormattersMenu.find(f=>f.id === col.format).name}</DropdownToggle>
+                                        <DropdownMenu>
+                                            <DropdownItem onClick={e => this.setColData(index, 'format', undefined)}>None</DropdownItem>
+                                            {FormattersMenu.map(item => 
+                                            (<DropdownItem onClick={e => this.setColData(index, 'format', item.id)} key={item.id}>{item.name}</DropdownItem>))}
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
                                 </Col>
                             </Row>
                         </Container> : "Choose column to view or edit"}

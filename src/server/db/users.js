@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const Users = require('./models').Users;
+const SeqUtils = require('./seq-utils');
 
 async function getAll() {
     return Users.findAll();
@@ -10,7 +11,7 @@ async function getOne(user) {
 }
 
 async function create(username, password, type) {
-    return Users.create({username,password, type});
+    return SeqUtils.create(Users,{username,password, type});
 }
 
 async function deleteOne(username) {
