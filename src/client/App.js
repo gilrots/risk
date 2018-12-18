@@ -18,7 +18,7 @@ import IntraDaysList from "./components/intra-days/intra-days-list";
 import IPOList from "./components/ipo-list/ipo-list";
 import RiskSettings from './components/settings/settings';
 import { IconedMenu } from './components/func-components';
-import {get,post,exportCSV} from "./helpers/client-utils"
+import {get,post,exportCSV, setPolling} from "./helpers/client-utils"
 
 const config = require('../common/config');
 const api = config.server.api;
@@ -50,12 +50,14 @@ export default class App extends Component {
 
     componentDidMount() {
         this.getTableMakerData();
-        this.getData(() =>
-            setInterval(() => {
+        this.getData(() => {
+            const intId = setInterval(() => {
                 if (this.polling) {
                     this.getData();
                 }
-            }, config.app.updateInterval));
+            }, config.app.updateInterval);
+            setPolling(intId);
+        });
     }
 
     getTableMakerData = () => {

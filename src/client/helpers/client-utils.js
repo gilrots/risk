@@ -2,6 +2,7 @@
  import * as User from "./user";
  import history from "./history";
  import _ from 'lodash';
+ let polling = undefined;
 
 function buildAuthHeader() {
     // return authorization header with jwt token
@@ -12,6 +13,7 @@ function buildAuthHeader() {
 function handleResponse(response, handler){
     if(response.status === 401 || response.status === 403){
         User.remove();
+        stopPolling();
         history.push('/');
         return JSON.stringify(null);
     }
@@ -42,7 +44,6 @@ export function notify(component, response, title, message = "Action completed!"
         onAlert(alert);
     }
 }
-
 
 export function exportCSV(name, tables, formatters) {
    return new Promise(resolve => {
@@ -89,4 +90,16 @@ export function exportCSV(name, tables, formatters) {
         document.body.removeChild(element);
         resolve();
    });
+}
+
+export function setPolling(id) {
+    polling = id;
+}
+
+export function stopPolling() {
+    if(polling !== undefined);
+    {
+        clearInterval(polling);
+        polling = undefined;
+    }
 }
