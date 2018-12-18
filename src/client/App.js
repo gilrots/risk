@@ -251,7 +251,6 @@ export default class App extends Component {
         const hasLatency = !_.isEmpty(data) && data.latency;
         const navItems = this.getNavMenuActions();
         const modalBody = this.modalComponent(modal.component);
-        console.log(modalBody.child);
         return <Fragment>
             {!_.isEmpty(alert.message) && 
             <SweetAlert title={alert.title} type={alert.type} showCancel={alert.showCancel}

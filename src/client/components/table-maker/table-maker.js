@@ -16,7 +16,7 @@ const defaults = {
     risk: undefined
 };
 defaults.cols = { name: '', exp: '', params: [defaults.param], aggregations: [], format: undefined };
-defaults.risk = { ...defaults.cols, isGeneral: true, order: 0 };
+defaults.risk = { ...defaults.cols, order: 0 };
 
 class TableMaker extends React.Component {
     static propTypes = {
