@@ -127,7 +127,7 @@ async function setUserIPOs(params) {
     const {ipos, user} = params;
     let res = true;
     try {
-        await IposDL.setAll(userify(ipos,user));
+        await IposDL.setAll(userify(ipos,user), user);
     }
     catch (e) {
         res = e.message;

@@ -37,7 +37,7 @@ async function getTable(params) {
             const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});
             const ipoMapper = (ipo,errVal) => _.reduce(table.calculated.aceFields,(arr,field,i) => {
                 const dataField = _.find(ipo.data, df => df.field.id === field);
-                arr[i] = dataField.value ? dataField.value : errVal ;
+                arr[i] = dataField && dataField.value ? dataField.value : errVal ;
                 return arr;
             },[]);
             Bank.addIntrasAndIPOs(bankDB, intras, ipos);

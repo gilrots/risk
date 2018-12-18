@@ -15,8 +15,6 @@ async function setAll(model, data, user) {
     const parts = _.partition(data, 'id');
     const update = parts[0];
     const insert = parts[1];
-    console.log('update',update);
-    console.log('insert',insert);
     if(update.length !== 0){
         _.forEach(update,async updatedRow => await model.update(updatedRow, {where: {id: updatedRow.id}}));
         const updateIds = _.map(update,'id');
