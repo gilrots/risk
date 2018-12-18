@@ -4,7 +4,6 @@ const Ace = require('./ace');
 const {TableCouldNotBeParsedError,TableCouldNotBeUpdatedOrCreatedError} = require('./errors');
 const Utils = require('../../common/utils');
 const TablesDL = require('../db/tables'); 
-const UsersDL = require('../db/users'); 
 const DB = {
     types: ['long', 'short'],
     subTypes: ['risk'],
@@ -327,10 +326,6 @@ function calculateTable(table, bankDB, aceDB, user) {
         // after all stocks are set with basic data, its time to calculate aggregations
         // calculate the aggregations
         _.forEach(col.func.aggregations, agg => {
-            if(!col.type){
-                console.log(col);  
-            } 
-    
             if ((result.aggs[agg.key] === undefined || result.aggs[col.key] === undefined) && col.type !== DB.subTypes[0]) {
                 const stocks = result[col.type].data;
                 const aggResult = _.reduce(stocks, (acc, dat) => {
@@ -389,7 +384,7 @@ async function createTable(params) {
                 
                 return {
                     name: col.name,
-                    key: formatColKey(col.name),
+                    key: isRisk ? formatKey(col.name) : formatColKey(col.name),
                     ...riskData,
                     func: {
                         exp: parseExpression(col.exp, calc.argsMap),
@@ -402,7 +397,6 @@ async function createTable(params) {
             data.cols = data.cols.map(parseCol);
             isRisk = !isRisk;
             data.risk = data.risk.map(parseCol);
-            console.log(_.map(data.risk, 'type'));
         }
         catch (e) {
             console.error(e);
@@ -428,7 +422,7 @@ async function createTable(params) {
         }
         catch (e) {
             console.error(e);
-            throw new TableCouldNotBeParsedError(e.message);
+            throw new TableCouldNotBeUpdatedOrCreatedError(e.message);
         }
         
         return true;
@@ -538,7 +532,6 @@ async function createUserDefault(user) {
     const newTable = _.assign(Utils.copy(defaultTable),{user:user.id});
     const createdTable = await TablesDL.createOne(newTable);
     parseTable(createdTable);
-    console.log(createdTable);
     DB.tables.push(createdTable);
 }
 
@@ -548,12 +541,6 @@ function getUserTables(user) {
 
 async function init() {
     let allTables = await TablesDL.getAll();
-    // if(_.isEmpty(allTables)){
-    //     const allUsers = await UsersDL.getAll();
-    //     const tables = allUsers.map(user => _.assign(Utils.copy(defaultTable),{user:user.id}))
-    //     await TablesDL.createAll(tables);
-    //     allTables = await TablesDL.getAll();
-    // }
     DB.tables = allTables;
     _.forEach(DB.tables, parseTable);
 }
