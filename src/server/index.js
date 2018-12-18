@@ -10,12 +10,8 @@ const Ace = require('./modules/ace');
 const Logic = require('./modules/bussines-logic');
 const Auth = require('./modules/auth');
 const {ServerError} = require('./modules/errors');
-
 const config = require('../common/config.json');
-const mockData = _.values(require('../mocks/mock-table.json'));
-const api = config.server.api;
-const mock = config.server.mock;
-const port = config.server.port;
+const {api, port} = config.server;
 
 const modules = [Tables.init];
 DB.connect(modules).then(() => runServer());
@@ -99,11 +95,6 @@ _.forEach(routes, r => _.forKeys(r.api, key => _.forKeys(r.api[key], api => r.ro
 
 
 app.listen(port, () => console.log(`Server is up on port: ${port}`));
-
-// Generate mock data
-if (mock.allow) {
-    setInterval(() => Utils.postJson(`http://localhost:${port}${api.bankPost}`,_.sample(mockData)), mock.interval);
-}
 
 //Redirect
 app.get('/*', (req, res) => 
