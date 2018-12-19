@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "npm run build && node src/server/index.js",
+    "start-server": "node src/server/index.js",
     "start-bank": "node src/server/bank-service.js",
     "client": "webpack-dev-server --mode development --devtool inline-source-map --hot",
     "server": "nodemon src/server/index.js",
