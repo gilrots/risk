@@ -202,12 +202,14 @@ export default class App extends Component {
                 name: 'Export',
                 icon: 'file-excel',
                 action: () => { 
-                    const {risk,long,short,tables} = this.state.data;
-                    const name = tables.find(t=>t.id === this.state.activeTable).name
-                    exportCSV(name,
-                              [{name:'RISK', table:risk},
-                               {name:'LONGS', table:long},
-                               {name:'SHORTS', table:short}], FormattersFuncs);
+                    if(this.hasData(this.state.data)) {
+                        const {risk,long,short,tables} = this.state.data;
+                        const name = tables.find(t=>t.id === this.state.activeTable).name
+                        exportCSV(name,
+                                  [{name:'RISK', table:risk},
+                                   {name:'LONGS', table:long},
+                                   {name:'SHORTS', table:short}], FormattersFuncs);
+                    }
                 }
             },
         ];
@@ -246,10 +248,14 @@ export default class App extends Component {
         }
     };
 
+    hasData = (data) => {
+        return !_.isEmpty(data) && data.tables && data.short && data.long && data.risk;
+    };
+
     render() {
         const {data, modal, tableMakerData, excludeMode, activeTable, alert} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
-        const hasData = !_.isEmpty(data) && data.tables && data.short && data.long && data.risk;
+        const hasData = this.hasData(data);
         const hasLatency = !_.isEmpty(data) && data.latency;
         const navItems = this.getNavMenuActions();
         const modalBody = this.modalComponent(modal.component);
@@ -281,14 +287,14 @@ export default class App extends Component {
                         </NavItem>
                     )}
                 </Fragment>
-                <IconedMenu items={navItems} title="Menu"/>
+                <IconedMenu items={navItems} title="Menu" split={false}/>
             </AppHeader>
             <RiskLoader loading={!hasData}>
                 {hasData && <main className="my-5 py-5">
                     <Nav tabs>
                         {data.tables.map((table) =>
                         <IconedMenu key={table.id} items={this.getTableActions(table)} 
-                        title={table.name} active={table.id === activeTable}
+                        title={table.name} active={table.id === activeTable} split={true}
                         menuClick={() => {this.setState({activeTable:table.id});this.toggleTab(table.id)}} />)}
                         <NavItem>
                             <Button className="rounded-circle mx-2" outline color="primary"
