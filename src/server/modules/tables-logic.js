@@ -69,10 +69,10 @@ const defaultTable = {
         {
             ...defaultCols[1],
             func: {
-                exp: '{a:0}*({b:0}+{b:1})',
+                exp: '{a:0}*{b:0}',
                 arguments: {
                     stock: [],
-                    bank: [config.bank.fields[3], config.bank.fields[6]],
+                    bank: [config.bank.amountField],
                     ace: [defaultAce[1]]
                 },
                 aggregations: [],
@@ -95,10 +95,10 @@ const defaultTable = {
         {
             ...defaultCols[3],
             func: {
-                exp: '{b:0}+{b:1}',
+                exp: '{b:0}',
                 arguments: {
                     stock: [],
-                    bank: [config.bank.fields[3], config.bank.fields[6]],
+                    bank: [config.bank.amountField],
                     ace: []
                 },
                 aggregations: []

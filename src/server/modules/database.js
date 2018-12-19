@@ -87,7 +87,7 @@ function userify(data, user) {
 
 async function getUserAccounts(params) {
     const {username, accounts} = await UsersDL.getAccounts(params.user);
-    return {username, accounts};
+    return {username, accounts: accounts ? accounts : []};
 }
 
 async function setUserAccounts(params) {

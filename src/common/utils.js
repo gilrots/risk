@@ -51,7 +51,7 @@ function setMixins() {
           return result.length < limit;
         });
       };
-    const mapKeys = function(collection, getter) {
+    const keyMap = function(collection, getter) {
         return _.reduce(collection, function(result, curr) {
           result[curr] = getter(curr);
           return result;
@@ -61,7 +61,7 @@ function setMixins() {
         return _.forEach(_.keys(collection),(key, index, collection) => iteratee(key,index,collection));
       };
 
-    _.mixin({limit, mapKeys, forKeys});
+    _.mixin({limit, keyMap, forKeys});
 }
 
 setMixins();

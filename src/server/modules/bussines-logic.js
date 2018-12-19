@@ -17,59 +17,57 @@ async function getTable(params) {
     const { user } = params;
     const tableId = parseInt(params.tableId);
     const table = await Tables.getUserTableOrDefault(user, tableId);
-    const bankDB = Bank.getDBSnap();
-    const aceDB = Ace.getAceDB();
+    
     if (_.isEmpty(table)) {
         console.log("No such table id:", { tableId });
         return Tables.getResultFormat(user);
     }
-    else if (table.calculated.aceFields.length === 0) {
+    const {aceFields} = table.calculated;
+    if (aceFields.length === 0) {
         console.log("No ace fields", { name: table.name })
         return Tables.getResultFormat(user);
     }
-    else {
-        let result = undefined;
-        const aceLatency = { name: "Ace", error: false, message: '' };
-        try {
-            const { accounts } = await DB.getUserAccounts(params);
-            const intras = await DB.getUserIntras(params);
-            const ipos = await DB.getUserIPOs(params);
-            const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});
-            const ipoMapper = (ipo,errVal) => _.reduce(table.calculated.aceFields,(arr,field,i) => {
-                const dataField = _.find(ipo.data, df => df.field.id === field);
-                arr[i] = dataField && dataField.value ? dataField.value : errVal ;
-                return arr;
-            },[]);
-            Bank.addIntrasAndIPOs(bankDB, intras, ipos);
-            Bank.filter(bankDB, table.excluded, accounts);
-            const aceQuery = Ace.getFieldsQuery(table.calculated.aceFields);
-            let ids = bankDB.ids;
-            const promises = _.map(ids, stockId =>
-                new Promise(resolve => 
-                    Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
-                        innerResolve => {
-                            Ace.getStockFields(stockId, aceQuery, iposMap[stockId], ipoMapper)
-                            .then(aceData => {
-                                handleAceData(aceDB, stockId, aceData, table.calculated.aceFields);
-                                innerResolve(aceDB.missing[stockId] ? undefined : true);
-                            });
-                        })
-                ));
 
-            await Promise.all(promises);
-            result = Tables.calculateTable(table, bankDB, aceDB, user);
-        }
-        catch (e) {
-            result = Tables.getResultFormat(user);
-            aceLatency.error = true;
-            aceLatency.message = e.message;
-            console.error(e);
-        }
-        result.latency = [aceLatency, ...Bank.getBankLatency()];
-        const t1 = new Date().getTime();
-        console.log(`Call to getTable took ${t1 - t0} milliseconds`);
-        return result;
+    let result = undefined;
+    const aceLatency = { name: "Ace", error: false, message: '' };
+    try {
+        const { accounts } = await DB.getUserAccounts(params);
+        const intras = await DB.getUserIntras(params);
+        const ipos = await DB.getUserIPOs(params);
+        const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});
+        const ipoMapper = (ipo,errVal) => _.reduce(aceFields, (arr,field,i) => {
+            const dataField = _.find(ipo.data, df => df.field.id === field);
+            arr[i] = dataField && dataField.value ? dataField.value : errVal ;
+            return arr;
+        },[]);
+        const aceQuery = Ace.getFieldsQuery(aceFields);
+        const bankDB = Bank.getCustomDBSnap(table.excluded, accounts, intras, ipos);
+        const aceDB = Ace.getAceDB();
+        const promises = _.map(bankDB.ids, stockId =>
+            new Promise(resolve => 
+                Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
+                    innerResolve => {
+                        Ace.getStockFields(stockId, aceQuery, iposMap[stockId], ipoMapper)
+                        .then(aceData => {
+                            handleAceData(aceDB, stockId, aceData, aceFields);
+                            innerResolve(aceDB.missing[stockId] ? undefined : true);
+                        });
+                    })
+            ));
+
+        await Promise.all(promises);
+        result = Tables.calculateTable(table, bankDB, aceDB, user);
     }
+    catch (e) {
+        result = Tables.getResultFormat(user);
+        aceLatency.error = true;
+        aceLatency.message = e.message;
+        console.error(e);
+    }
+    result.latency = [aceLatency, ...Bank.getBankLatency()];
+    const t1 = new Date().getTime();
+    console.log(`Call to getTable took ${t1 - t0} milliseconds`);
+    return result;
 }
 
 async function getTableMakerData() {
@@ -122,7 +120,7 @@ async function getTableExcludeList(params) {
         throw new TableNotExistError(`No such table id ${tableId}`);
     }
 
-    const ids = Bank.getDBSnap().ids;
+    const ids = Bank.getLongShortIds();
     const excludes = table.excluded;
     const stocks = await Ace.getStocksNames(ids)
     const filtered = _.filter(stocks, stock => stock && stock.name);

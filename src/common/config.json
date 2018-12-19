@@ -78,6 +78,9 @@
   "bank": {
     "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"],
     "bankField": "Bank",
+    "amountField": "Amount",
+    "dataField": "Data",
+    "typeField": "Type",
     "timeout": 5000,
     "originField": "Origin",
     "origins": {

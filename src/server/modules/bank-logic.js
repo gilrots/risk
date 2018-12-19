@@ -1,125 +1,160 @@
-const config = require('../../common/config.json');
+const config = require('../../common/config.json').bank;
 const Utils = require('../../common/utils.js');
 const _ = require('lodash');
-const banks = config.bank.banks;
-const idField = config.bank.fields[1];
-const accntField = config.bank.fields[0];
-const sdqField = config.bank.fields[3];
-const fqField = config.bank.fields[6];
-const originField = config.bank.originField;
-const origins = config.bank.origins;
-const bankField = config.bank.bankField;
-const timeout = config.bank.timeout;
+const {banks, fields, originField, origins, bankField, amountField, timeout, dataField, typeField} = config;
+const idField = fields[1];
+const accntField = fields[0];
+const accntsField = `${accntField}s`;
+const sdqField = fields[3];
+const fqField = fields[6];
+const presentationFields = [
+    {id:idField,name:'מזהה נייר'},
+    {id:amountField,name:'כמות'},
+    {id:originField,name:'מקור'},
+];
 const rn = () => new Date().getTime(); // Right-now
+const sysAccount = "System"
+const bankTypes = _.keys(banks);
+const BankLatency = _.chain(banks).keys().keyMap(rn).value();
+const stockTypes = {
+    none:'none',
+    short:'short',
+    long:'long',
+}
 const DB = {
     long: {},
     short: {},
+    none: {},
     all:{},
-    ids: undefined
+    ids: []
 };
-const appAccnt = "System"
 
-const BankLatency = _.chain(banks).keys().mapKeys(rn).value();
-
-function getDBSnap(){
-    const snap = Utils.copy(DB);
-    snap.ids = _.keys(snap.all);
-    return snap;
+function calcAmount(bankData) {
+    return bankData[sdqField] + bankData[fqField];
 }
 
 function getAmount(stock) {
-    return stock[sdqField] + stock[fqField];;
+    return stock[amountField];
 }
 
-function setAmount(stock, amount) {
-    stock[sdqField] = amount;
-    stock[fqField] = 0;
+function getTotalAmount(stock) {
+    return _.sum(getAggregatedData(stock, amountField));
 }
 
 function getId(stock) {
     return stock[idField];
 }
 
-function setId(stock, id) {
-    stock[idField] = id;
+function getAccount(bankData) {
+    return bankData[accntField];
 }
 
-function getAccount(stock) {
-    return stock[accntField];
+function getAccounts(bankData) {
+    return bankData[accntsField];
 }
 
-function setAccount(stock, account) {
-    stock[accntField] = account;
+function getAggregatedData(stock, method) {
+    return _.chain(getData(stock)).values().map(method).value();
 }
 
 function getOrigin(stock) {
     return stock[originField];
 }
 
+function getBank(bankData) {
+    return bankData[bankField];
+}
+
+function getData(stock) {
+    return stock[dataField];
+}
+
+function setId(stock, id) {
+    stock[idField] = id;
+}
+
+function setAccount(stock, account) {
+    stock[accntField] = account;
+}
+
+function setAccounts(stock) {
+    return stock[accntsField] = getAggregatedData(stock,getAccount);
+}
+
 function setOrigin(stock, origin) {
     stock[originField] = origin;
 }
 
+function setInitialAmount(bankData, amount) {
+    bankData[sdqField] = amount;
+    bankData[fqField]= 0;
+}
+
+function setAmount(stock, amount) {
+    stock[amountField] = amount;
+}
+
+function setData(stock, bankData) {
+    setAmount(bankData, calcAmount(bankData));
+    stock[dataField][getBank(bankData)] = bankData;
+}
+
 function getFields() {
-    return _.map(config.bank.fields, field => ({id: field, name: field}));
+    return presentationFields;
 }
 
-function updateDB(db, stock, fromStocks, toStocks = undefined) {
-    const id = getId(stock);
-    if(fromStocks[id]) {
-        delete fromStocks[id];
-        delete db.all[id];
-    }
-    if(toStocks){
-        toStocks[id] = stock;
-        db.all[id] = stock;
-    }
-}
-
-async function updateStocksData(bankData, db = DB) {
-    //console.log(getId(bankData));
-    const amount = getAmount(bankData);
-    if(!getOrigin(bankData)){
-        updateBankLatency(bankData);
-        setOrigin(bankData, origins.bank);
-    }
-
-    if (amount === 0) {
-        updateDB(db, bankData, db.short);
-        updateDB(db, bankData, db.long);
-    }
-    else if (amount > 0) {
-        updateDB(db, bankData, db.short, db.long);
-    }
-    else {
-        updateDB(db, bankData, db.long, db.short);
-    }
+async function updateDB(bankData) {
+    updateBankLatency(bankData);
+    updateStocks(bankData, origins.bank , DB);
     return true;
 }
 
-function addIntrasAndIPOs(bankSnap, intras, ipos){
-    _.forEach(intras, intra => updateStocksData(formatOuter(intra.stockId, intra.amount, origins.intra), bankSnap));
-    _.forEach(ipos, ipo => updateStocksData(formatOuter(ipo.id,ipo.amount, origins.ipo), bankSnap));
-    bankSnap.ids = _.keys(bankSnap.all);
+function updateStocks(bankData, origin, db) {
+    const id = getId(bankData);
+    let stock = db.all[id];
+    if(stock === undefined) {
+        stock = newStock(id, origin);
+        db.all[id] = stock;
+    }
+    setData(stock, bankData);
+    setAmount(stock, getTotalAmount(stock));
+    setAccounts(stock);
 }
 
-function filter(bankSnap, ids, accounts){
-    const deleteId = id => {
-        delete bankSnap.long[id];
-        delete bankSnap.short[id];
-        delete bankSnap.all[id];
-    }
-    const accntMap = _.chain(accounts).mapKeys(()=>true).value();
-    accntMap[appAccnt] = true;
-    bankSnap.ids = _.chain(bankSnap.all)
-                    .values()
-                    .filter(s => !accntMap[getAccount(s)])
-                    .map(idField)
-                    .concat(ids)
-                    .uniq()
-                    .forEach(deleteId)
-                    .xor(bankSnap.ids)
-                    .value();
+function getLongShortIds(){
+    return _.partition(DB.all, stock => getAmount(stock) !== 0)[0];
+}
+
+function getCustomDBSnap(excludes, accounts, intras, ipos){
+    const snap = Utils.copy(DB);
+    addIntrasAndIPOs(snap, intras, ipos);
+    filter(snap, excludes, accounts);
+    return snap;
+}
+
+function getStockType(stock){
+    const amount = getAmount(stock);
+    return amount === 0 ? stockTypes.none : (amount > 0 ?  stockTypes.long : stockTypes.short);
+}
+
+function addIntrasAndIPOs(bankSnap, intras, ipos){
+    _.forEach(intras, intra => updateStocks(fakeStock(intra.stockId, intra.amount), origins.intra, bankSnap));
+    _.forEach(ipos, ipo => updateStocks(fakeStock(ipo.id,ipo.amount), origins.ipo, bankSnap));
+}
+
+function filter(bankSnap, excludes, accounts){
+    const excldMap = _.keyMap(excludes,() => true)
+    const accntMap = _.keyMap(accounts.concat(sysAccount),() => true);
+    const predicate = id => !excldMap[id] && getAccounts(bankSnap.all[id]).some(acct => accntMap[acct]);
+    const divider = id => {
+        const stock = bankSnap.all[id];
+        const type = getStockType(bankSnap.all[id]);
+        bankSnap[type][id] = stock;
+        if(type !== stockTypes.none){
+            bankSnap.ids.push(id);
+        }
+    };
+    _.chain(bankSnap.all).keys().filter(predicate).forEach(divider).value();
 }
 
 function updateBankLatency(bankData){
@@ -145,13 +180,25 @@ function getBankLatency(){
     }],[]).value();
 }
 
-function formatOuter(id, amount, origin){
-    const stock = {}
-    setId(stock, id);
-    setAmount(stock, amount);
-    setOrigin(stock, origin);
-    setAccount(stock, appAccnt);
-    return stock;
+function newStock(id, origin) {
+    const newData = {[dataField]:{}};
+    setId(newData, id);
+    setOrigin(newData, origin);
+    return newData;
 }
 
-module.exports = {updateStocksData, getDBSnap, getFields, filter, getBankLatency, addIntrasAndIPOs};
+function fakeStock(id, amount){
+    const fakeBankData = {};
+    setId(fakeBankData, id);
+    setInitialAmount(stock, amount);
+    setAccount(stock, sysAccount);
+    return fakeBankData;
+}
+
+module.exports = {
+    updateDB,
+    getCustomDBSnap,
+    getFields,
+    getBankLatency,
+    getLongShortIds
+};

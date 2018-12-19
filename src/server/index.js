@@ -58,7 +58,7 @@ const routes = [
         path: path => path,
         api: {
             post: {
-                [api.bankPost]: Bank.updateStocksData,
+                [api.bankPost]: Bank.updateDB,
                 [api.login]:    Auth.login,
                 [api.register]: DB.register,
             }
