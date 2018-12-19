@@ -95,10 +95,9 @@ _.forEach(routes, r => _.forKeys(r.api, key => _.forKeys(r.api[key], api => r.ro
 
 
 app.listen(port, () => console.log(`Server is up on port: ${port}`));
-
 //Redirect
 app.get('/*', (req, res) => 
-    res.sendFile(path.join(__dirname, 'dist/index.html'), err => {
+    res.sendFile(path.join(path.resolve('dist'),'index.html'), err => {
         if (err) {
             res.status(500).send(err);
         }
