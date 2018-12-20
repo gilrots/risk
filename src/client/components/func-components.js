@@ -9,9 +9,12 @@ export function IconedMenu(props) {
             menuClick();
         }
     } 
+    const labelClass = `${active ? 'font-weight-bold text-primary' : ''} p-1 mb-0`;
     return <UncontrolledDropdown className="d-flex align-items-center mr-2" direction="right" active={active} onClick={click} nav inNavbar>
-        <Label className="primary font-weight-bold p-1">{title}</Label>
-        <DropdownToggle id="drop-toggle" split={split} nav caret/>
+        {split && <Label className={labelClass}>{title}</Label>}
+        <DropdownToggle id="drop-toggle" split={split} nav caret>
+            {!split && <Label className={labelClass + ' font-weight-bold'}>{title}</Label>}
+        </DropdownToggle>
         <DropdownMenu right>
             {items.map(item =>
                 <DropdownItem key={item.name} onClick={item.action}>
