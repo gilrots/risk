@@ -1,5 +1,5 @@
 import React from 'react';
-import {Router, Route} from 'react-router-dom';
+import {Router, Route, Redirect} from 'react-router-dom';
 import {Jumbotron, Container, Alert} from "reactstrap";
 import history from "./helpers/history";
 import PrivateRoute from "./components/private-route/private-route";
@@ -35,6 +35,7 @@ class Risk extends React.Component {
                                 </Alert>
                                 <Route exact path="/login" render={() => <Login onAlert={this.childAlert}/>}/>
                                 <Route exact path="/register" render={() => <Register onAlert={this.childAlert}/>}/>
+                                <Redirect from="/*" to="/login" />
                             </div>
                         </Container>
                     </Jumbotron>}

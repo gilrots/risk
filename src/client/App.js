@@ -1,6 +1,5 @@
 import React, {Component, Fragment} from 'react';
 import _ from 'lodash';
-import './app.css';
 import StockViewer from './components/stock-viewer/stock-viewer';
 import {FormattersFuncs} from "./components/stock-viewer/formatters";
 import AppHeader from "./components/header/app-header";

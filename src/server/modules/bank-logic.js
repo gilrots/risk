@@ -190,8 +190,8 @@ function newStock(id, origin) {
 function fakeStock(id, amount){
     const fakeBankData = {};
     setId(fakeBankData, id);
-    setInitialAmount(stock, amount);
-    setAccount(stock, sysAccount);
+    setInitialAmount(fakeBankData, amount);
+    setAccount(fakeBankData, sysAccount);
     return fakeBankData;
 }
 
