@@ -4,6 +4,7 @@ import * as Utils from '../../../common/utils';
 import {Container, Button, Input, Table, Badge} from "reactstrap";
 import RiskLoader from "../loader/loader";
 import RemoteSearchDropdown from "../search-dropdown/remote-search-dropdown";
+import AmountInput from "../amount-input/amount-input";
 import {get,post, notify} from "../../helpers/client-utils"
 const config = require('../../../common/config');
 const api = config.server.api;
@@ -88,8 +89,9 @@ class IntraDaysList extends React.Component {
                                 <tr className="pop-box" key={intra.stockId}>
                                     <th scope="row">{index + 1}</th>
                                     <td>{intra.name}</td>
-                                    <td><Input type="number" value={intra.amount}
-                                               onChange={e => this.setAmount(index, e.target.value)}/></td>
+                                    <td>
+                                        <AmountInput value={intra.amount} onChange={val => this.setAmount(index,val)}/>
+                                    </td>
                                     <td align="center">{intra.createdAt ? Utils.formatDate(intra.createdAt) : <Badge color='success'>NEW</Badge>}</td>
                                     <td>
                                         <Button outline className="rounded-circle ml-2 pop-item" color="danger"

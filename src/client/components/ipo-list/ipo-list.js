@@ -1,9 +1,10 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import _ from 'lodash';
 import * as Utils from '../../../common/utils';
 import { Container, Row, Col, Button, Input, Table, Badge } from "reactstrap";
 import RiskLoader from "../loader/loader";
 import RemoteSearchDropdown from "../search-dropdown/remote-search-dropdown";
+import AmountInput from "../amount-input/amount-input";
 import {get, post, notify} from "../../helpers/client-utils"
 const config = require('../../../common/config');
 const api = config.server.api;
@@ -71,6 +72,12 @@ class IPOList extends React.Component {
         });
     };
 
+    updateIPOAmount = (index,amount) => {
+        this.setState(ps => ({
+            ipos: ps.ipos.map((ipo, i) => i === index ? Object.assign({}, ipo, { amount }) : ipo)
+        }));
+    };
+
     updateIPOData = (fieldIndex, field, value) => {
         const { ipos, selectedIndex } = this.state;
         const data = ipos[selectedIndex].data.map((dataRow, i) => i === fieldIndex ? Object.assign({}, dataRow, { [field]: value }) : dataRow);
@@ -127,10 +134,12 @@ class IPOList extends React.Component {
                                     <tbody>
                                         {ipos.map((ipo, index) =>
                                             <tr className={`pop-box ${selectedIndex === index ? 'active' : ''}`} key={ipo.name} 
-                                                onClick={(e) => {e.preventDefault(); this.setState({selectedIndex:index});}}>
+                                                onClick={() => this.setState({selectedIndex:index})}>
                                                 <th scope="row">{index + 1}</th>
                                                 <td>{ipo.name}</td>
-                                                <td>{Math.floor(ipo.amount).toLocaleString('us')}</td>
+                                                <td>
+                                                    <AmountInput value={ipo.amount} onChange={val => this.updateIPOAmount(index,val)}/>
+                                                </td>
                                                 <td>{ipo.createdAt ? Utils.formatDate(ipo.createdAt) : <Badge color='success'>NEW</Badge>}</td>
                                                 <td align="center" style={{verticalAlign: "center"}}>
                                                     <Badge className="pop-item" color="danger"

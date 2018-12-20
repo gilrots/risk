@@ -1,21 +1,18 @@
 const React = require('react');
-
-function percentFormatter(value){
-    const per = Number(value) * 100;
-    const percentComplete = per.toFixed(per < 1 ? 2 : 0) + '%';
-    return percentComplete;
+const err = '---';
+function formatNumber(value, func){
+    const num = Number(value);
+    return Number.isNaN(num) ? err : func(num);
 }
+
+export const percentFormatter = value => formatNumber(value, num => (num * 100).toFixed((num * 100) < 1 ? 2 : 0) + '%');
+export const percentFormatter100 = value => formatNumber(value, num => (num * 100).toFixed(2) + '%');
+export const commasFormatter = value => formatNumber(value, num => Math.floor(num).toLocaleString('us'));
 
 class PercentFormatter extends React.Component {
     render() {
         return percentFormatter(this.props.value);
     }
-}
-
-function percentFormatter100(value){
-    const val = Number(value);
-    const percentComplete = !Number.isNaN(val) ? ((val * 100).toFixed(2) + '%') : '---';
-    return percentComplete;
 }
 
 class PercentFormatter100 extends React.Component {
@@ -24,15 +21,12 @@ class PercentFormatter100 extends React.Component {
     }
 }
 
-function commasFormatter(value){
-    return Math.floor(Number(value)).toLocaleString('us');
-}
-
 class CommasFormatter extends React.Component {
     render() {
         return commasFormatter(this.props.value);
     }
 }
+
 export const FormattersMap = [
     {
         id: 0,
