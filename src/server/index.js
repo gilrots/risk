@@ -71,7 +71,7 @@ const routes = [
             post: {
                 [api.createTable]:      Tables.createTable,
                 [api.setExcludeList]:   Tables.updateTableExcludes,
-                [api.setUserAccounts]:  DB.setUserAccounts,
+                [api.setUserSettings]:  DB.setUserSettings,
                 [api.setIntras]:        DB.setUserIntras,
                 [api.setIPOs]:          DB.setUserIPOs,
                 [api.updateIPOFav]:     DB.updateUserIPOFavorite,
@@ -82,7 +82,7 @@ const routes = [
                 [api.searchAceFields]:  Logic.searchAceFields,
                 [api.getTableMakerData]:Logic.getTableMakerData,
                 [api.tableAction.url]:  Logic.tableAction,
-                [api.getUserAccounts]:  DB.getUserAccounts,
+                [api.getUserSettings]:  DB.getUserSettings,
                 [api.getIntras]:        DB.getUserIntras,
                 [api.getIPOs]:          DB.getUserIPOs,
                 [api.getIPOFavs]:       DB.getUserIPOFavorites,

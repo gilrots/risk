@@ -24,7 +24,8 @@ async function exist(username) {
 }
 
 async function getAccounts(user) {
-    return Users.findOne({where:{id: user.id}});
+    const {accounts} = await Users.findOne({where:{id: user.id}});
+    return accounts;
 }
 
 async function updateAccounts(user, accounts) {

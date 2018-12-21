@@ -31,7 +31,7 @@ async function getTable(params) {
     let result = undefined;
     const aceLatency = { name: "Ace", error: false, message: '' };
     try {
-        const { accounts } = await DB.getUserAccounts(params);
+        const accounts = await DB.getUserAccounts(params);
         const intras = await DB.getUserIntras(params);
         const ipos = await DB.getUserIPOs(params);
         const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});

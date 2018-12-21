@@ -7,6 +7,7 @@ const IposDL = require('../db/ipo');
 const FavsDL = require('../db/ipofavorites');
 const Auth = require('./auth');
 const Tables = require('./tables-logic');
+const config = require('../../common/config.json').DB;
 const {UserAlreadyExistError,UserIsNotAllowedError,ServerError} = require('./errors');
 
 const initModules = [PriviligesDL.init];
@@ -16,7 +17,7 @@ async function connect(appModules) {
     try {
         await sequelize.authenticate();
         console.log("Connected to DB!");
-        await sequelize.sync();
+        await sequelize.sync({force:config.forceSync});
         console.log("Sequelize synced!");
         await Promise.all(initModules.map(promise => promise()));
         console.log("DL Modules initialized!");
@@ -86,15 +87,29 @@ function userify(data, user) {
 }
 
 async function getUserAccounts(params) {
-    const {username, accounts} = await UsersDL.getAccounts(params.user);
-    return {username, accounts: accounts ? accounts : []};
+    const accounts = await UsersDL.getAccounts(params.user);
+    return accounts ? accounts : [];
 }
 
-async function setUserAccounts(params) {
-    const {user,accounts} = params;
+async function getUserSettings(params) {
+    const user = await UsersDL.getOne(params.user);
+    const {accounts} = user
+    let users = [user];
+    const isAdmin = await PriviligesDL.isAdmin(user);
+    if(isAdmin){
+        users = await UsersDL.getAll();
+    }
+
+    return {user, accounts, users, isAdmin};
+}
+
+async function setUserSettings(params) {
+    const {users} = params;
     let res = true;
     try {
-        await UsersDL.updateAccounts(user,accounts);
+        users.forEach(async user => {
+            await UsersDL.updateAccounts(user,user.accounts);
+        })
     }
     catch (e) {
         res = e.message;
@@ -158,5 +173,5 @@ async function updateUserIPOFavorite(params) {
     return res
 }
 
-module.exports = {connect, register, getUserAccounts, setUserAccounts,
+module.exports = {connect, register, getUserAccounts, getUserSettings, setUserSettings,
     getUserIntras, setUserIntras, getUserIPOs, setUserIPOs, getUserIPOFavorites, updateUserIPOFavorite};

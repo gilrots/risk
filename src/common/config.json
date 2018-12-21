@@ -21,8 +21,8 @@
       "createTable":"/api/secured/createTable",
       "searchAce":"/api/secured/searchAce",
       "searchAceFields":"/api/secured/searchAceFields",
-      "getUserAccounts":"/api/secured/getUserAccounts",
-      "setUserAccounts":"/api/secured/setUserAccounts",
+      "getUserSettings":"/api/secured/getUserSettings",
+      "setUserSettings":"/api/secured/setUserSettings",
       "getIntras":"/api/secured/getIntras",
       "setIntras":"/api/secured/setIntras",
       "getIPOFavs":"/api/secured/getIPOFavs",
@@ -47,6 +47,7 @@
       "tokenExpireTime": "3h"
     },
     "PG": {
+      "forceSync":false,
       "database":"Risk",
       "username":"postgres",
       "password":"carbit1",

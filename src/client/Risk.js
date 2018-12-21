@@ -35,7 +35,7 @@ class Risk extends React.Component {
                                 </Alert>
                                 <Route exact path="/login" render={() => <Login onAlert={this.childAlert}/>}/>
                                 <Route exact path="/register" render={() => <Register onAlert={this.childAlert}/>}/>
-                                <Redirect from="/*" to="/login" />
+                                <Redirect from="/*" to="/" />
                             </div>
                         </Container>
                     </Jumbotron>}

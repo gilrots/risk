@@ -10,11 +10,15 @@ function buildAuthHeader() {
     return token ? {'Authorization': 'Bearer ' + token} : {};
 }
 
+export function logout() {
+    stopPolling();
+    User.remove();
+    history.push('/');
+}
+
 function handleResponse(response, handler){
     if(response.status === 401 || response.status === 403){
-        User.remove();
-        stopPolling();
-        history.push('/');
+        logout();
         return JSON.stringify(null);
     }
     else if(response.status === 200 && response.headers.get("token")){
