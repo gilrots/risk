@@ -1,4 +1,4 @@
-import {Formatters} from "./formatters";
+import {Formatters,FormattersFuncs} from "./formatters";
 const ReactDataGrid = require('react-data-grid');
 const React = require('react');
 import _ from 'lodash';
@@ -10,7 +10,8 @@ class StockViewer extends React.Component {
         stocks: PropTypes.object.isRequired,
         excludeMode: PropTypes.bool,
         reverse: PropTypes.bool,
-        onRowActionClicked: PropTypes.func
+        formatsCells: PropTypes.bool,
+        onRowActionClicked: PropTypes.func,
     };
 
     constructor(props) {
@@ -57,10 +58,15 @@ class StockViewer extends React.Component {
         }
     }
 
+    formatRow = row => row.value = row.format !== undefined ? FormattersFuncs[row.format](row.value) : row.value;
+
     changeState(props){
         let originalRows = props.stocks.dataKey ?
             _.map(props.stocks.data, props.stocks.dataKey) :
             props.stocks.data;
+        if(this.props.formatsCells){
+            _.forEach(originalRows,this.formatRow);
+        }
         let rows = originalRows.slice(0);
         return { originalRows, rows };
     }

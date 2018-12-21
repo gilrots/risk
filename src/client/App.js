@@ -316,7 +316,7 @@ export default class App extends Component {
                                 <Row>
                                     <Col xs={{order: 1}} md={{size: 2}}
                                          className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                        {<StockViewer className="risk" 
+                                        {<StockViewer className="risk" formatsCells={true} 
                                          stocks={data.risk} id="risk"/>}
                                     </Col>
                                     <Col xs={{order: 2}} md={{size: 5}}

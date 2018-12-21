@@ -341,7 +341,7 @@ function calculateTable(table, bankDB, aceDB, user) {
 
         // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
-        result.risk.data.push({ name: col.name, value });
+        result.risk.data.push({ name: col.name, value, format:col.format });
     });
     return result;
 }
