@@ -1,7 +1,11 @@
 const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const {TableCouldNotBeParsedError,TableCouldNotBeUpdatedOrCreatedError} = require('./errors');
+const {
+    TableCouldNotBeParsedError, 
+    TableCouldNotBeUpdatedOrCreatedError,
+    FilterCouldNotBeParsedError
+} = require('./errors');
 const Utils = require('../../common/utils');
 const TablesDL = require('../db/tables'); 
 const DB = {
@@ -28,6 +32,10 @@ const DB = {
         },
         aceFields: [],
         aggregations: {
+        },
+        filter: {
+            active: false,
+            predicate:''
         }
     },
     generator: {
@@ -174,7 +182,7 @@ const defaultTable = {
             }
         }
     ],
-    filter: {},
+    filter: {isActive:false, predicates:[]},
     excluded: []
 }
 
@@ -240,7 +248,7 @@ function parseTable(table) {
     table.calculated = Utils.copy(DB.calculated);
     //Sums (optimize) all ace fields required for the table
     table.calculated.aceFields = _.uniq(_.reduce([...table.cols, ...table.risk], (sum, col) => sum.concat(...col.func.arguments.ace), []));
-
+    parseTableFilter(table);
     _.forEach(DB.types, type => {
         //TODO convert to foreach with risk sub type
         table.calculated.cols[type] = Utils.copy(table.cols);
@@ -348,6 +356,10 @@ function calculateTable(table, bankDB, aceDB, user) {
 
 function parseExpression(exp, argsMap) {
     return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
+}
+
+function parseTableFilter(table) {
+    table.calculated.filter = table.filter;
 }
 
 function formatKey(name){
@@ -461,7 +473,19 @@ async function setTableFilter(params) {
     const {filter} = params;
     const tableId = parseInt(params.tableId);
     const table = getTable(tableId);
-    
+    if (table) {
+        const oldFilter = table.filter;
+        table.filter = filter;
+        try {
+            parseTableFilter(table);
+        }
+        catch (e){
+            table.filter = oldFilter;
+            throw new FilterCouldNotBeParsedError(e.message);
+        }
+        await TablesDL.updateOne({id:table.id, filter});
+    }
+
     return table !== undefined;
 }
 

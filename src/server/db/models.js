@@ -46,6 +46,14 @@ const IPOFavorites = sequelize.define('IPOFavorites', {
     name: Sequelize.STRING,
 });
 
+const Funcs = sequelize.define('Funcs', {
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
+    name: Sequelize.STRING,
+    type: Sequelize.ENUM('operator', 'action', 'format'),
+    for: Sequelize.ENUM('number', 'string', 'date'),
+    func: Sequelize.TEXT,
+});
+
 Users.hasMany(Tables,{foreignKey:'user', sourceKey:'id'});
 Users.hasMany(Intras,{foreignKey:'user', sourceKey:'id'});
 Users.hasMany(IPO,{foreignKey:'user', sourceKey:'id'});
@@ -58,6 +66,7 @@ module.exports = {
     Tables,
     Intras,
     IPO,
-    IPOFavorites
+    IPOFavorites,
+    Funcs
 }
 

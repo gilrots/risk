@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, FormGroup, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu,DropdownItem, ButtonGroup, Button, Label } from "reactstrap";
+    DropdownMenu,DropdownItem, ButtonGroup, Button, Label, Badge } from "reactstrap";
 
 export function IconedMenu(props) {
     const { title, items, menuClick, active, split } = props;
@@ -61,4 +61,17 @@ export function SearchInput(props) {
                     <Input placeholder="Search for..." value={value} onChange={searchChanged}/>
                 </FormGroup>
             </Form>;
+}
+
+export function SymbolAmount(props) {
+    const { symbol,value, onChange, numeric } = props;
+    const text = numeric  || value < 2? symbol : _.chain(Array(value)).fill(symbol).join('').value();
+    return <Button color={value? "primary" : "secondary"} className="pop-box position-relative"
+            outline onClick={() => onChange(value+1)}>
+                <strong>{text}</strong>
+                {numeric && value !== 0 && <Badge color="secondary" pill>{value}</Badge>}
+                {value > 0 && <Badge pill className="pop-item position-absolute"
+                    color="danger" style={{left:-10,top:-10}}
+                    onClick={e =>{e.stopPropagation(); onChange(Math.max(value-1, 0));}}>-</Badge>}
+           </Button>;
 }

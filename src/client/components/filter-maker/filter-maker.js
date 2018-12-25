@@ -1,11 +1,12 @@
 import React from 'react';
 import _ from 'lodash';
-import {Container, Row, Col, Input, DropdownMenu, DropdownItem, DropdownToggle,UncontrolledDropdown, ButtonGroup,Button} from "reactstrap";
+import {Container,Table, Input, Button, Label} from "reactstrap";
+import ToggleButton from 'react-toggle-button'
 import {get, post, notify} from "../../helpers/client-utils"
 import {addElement, deleteElement, changeElement} from "../../helpers/state-utils"
 const api = require('../../../common/config').server.api;
 import PropTypes from "prop-types";
-import { ItemSelect } from '../func-components';
+import { ItemSelect, SymbolAmount } from '../func-components';
 const preds = 'predicates'; 
 class FilterMaker extends React.Component {
     static propTypes = {
@@ -51,7 +52,9 @@ class FilterMaker extends React.Component {
                 field: fields[0],
                 action: actions[0],
                 value: 0,
-                operator: operators[0]
+                operator: operators[0],
+                left:0,
+                right:0,
             });
         }
     }
@@ -60,38 +63,66 @@ class FilterMaker extends React.Component {
         deleteElement(this,preds,predicateIndex);
 
     save() {
-        
+        const {isActive, predicates} = this.state;
+        const {tableId} = this.props;
+        post(api.setTableFilter, {tableId, filter:{isActive, predicates}}).then(res =>
+            notify(this, res, 'Update Table Filter'));
     }
 
     render() {
-        const {predicates, fields, actions, operators} = this.state;
+        const { isActive, predicates, fields, actions, operators } = this.state;
+        const hasFilter = !_.isEmpty(predicates);
         return <Container>
-            {_.isEmpty(predicates) && operators.length > 1 && <Button color="success" onClick={()=> this.addPredicate(operators[1])}>New filter</Button>}
-            {predicates.map((predicate, index) => 
-                    <Row key={index}>
-                        <Col>
-                            Field
-                            <ItemSelect selected={predicate.field} items={fields}
-                                onSelect={field => this.setPredicateData(index,'field',field)}/>
-                        </Col>
-                        <Col>
-                            Action
-                            <ItemSelect selected={predicate.action} items={actions}
-                                onSelect={action => this.setPredicateData(index,'action',action)}/>
-                        </Col>
-                        <Col>
-                            Value
-                            <Input value={predicate.value} onChange={e => this.setPredicateData(index,'value',e.target.value)}/>
-                        </Col>
-                        <Col>
-                            <div>Operator</div>
-                            <ItemSelect selected={predicate.operator} items={operators} radios={3}
-                                onSelect={operator => {this.setPredicateData(index,'operator',operator); this.addPredicate(operator)}}/>
-                        </Col>
-                        <Col xs="auto" className="align-self-center">
-                            <Button close onClick={() => this.deletePredicate(index)}></Button>
-                        </Col>
-                    </Row>)}
+            {!hasFilter && operators.length > 1 && <Button color="success" onClick={() => this.addPredicate(operators[1])}>New filter</Button>}
+            {hasFilter &&
+                <Label>
+                    Filter
+                <ToggleButton value={isActive} onToggle={() => { this.setState({ isActive: !isActive }) }} />
+                </Label>}
+            {hasFilter && <Table responsive striped>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Field</th>
+                        <th>Action</th>
+                        <th>Value</th>
+                        <th></th>
+                        <th>Operator</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {predicates.map((predicate, index) =>
+                        <tr className="pop-box" key={index}>
+                            <td><SymbolAmount symbol="(" value={predicate.left} 
+                            onChange={left => this.setPredicateData(index, 'left', left)}/></td>
+                            <td>
+                                <ItemSelect selected={predicate.field} items={fields}
+                                    onSelect={field => this.setPredicateData(index, 'field', field)} />
+                            </td>
+                            <td>
+                                <ItemSelect selected={predicate.action} items={actions}
+                                    onSelect={action => this.setPredicateData(index, 'action', action)} />
+                            </td>
+                            <td>
+                                <Input value={predicate.value}
+                                    onChange={e => this.setPredicateData(index, 'value', e.target.value)} />
+                            </td>
+                            <td><SymbolAmount symbol=")" value={predicate.right} 
+                            onChange={right => this.setPredicateData(index, 'right', right)}/></td>
+                            <td>
+                                <ItemSelect selected={predicate.operator} items={operators} radios={3}
+                                    onSelect={operator => { this.setPredicateData(index, 'operator', operator); this.addPredicate(operator) }} />
+                            </td>
+                            <td>
+                                <Button outline className="rounded-circle ml-2 pop-item" color="danger"
+                                    onClick={() => this.deletePredicate(index)}>
+                                    <i className="fa fa-times" />
+                                </Button>
+                            </td>
+                        </tr>)}
+                </tbody>
+            </Table>}
         </Container>;
     }
 }

@@ -59,6 +59,13 @@ class DataRequestError extends Error {
     }
 }
 
+class FilterCouldNotBeParsedError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, FilterCouldNotBeParsedError);
+    }
+}
+
 module.exports = {
     UserIsNotAllowedError,
     UserAlreadyExistError,
@@ -67,6 +74,7 @@ module.exports = {
     TableNotExistError,
     TableCouldNotBeParsedError,
     TableCouldNotBeUpdatedOrCreatedError,
+    FilterCouldNotBeParsedError,
     DataRequestError,
     AceError
 };

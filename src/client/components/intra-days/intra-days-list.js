@@ -1,4 +1,4 @@
-import React, {Fragment} from 'react';
+import React from 'react';
 import _ from 'lodash';
 import * as Utils from '../../../common/utils';
 import {Container, Button, Input, Table, Badge} from "reactstrap";

@@ -70,7 +70,7 @@ const routes = [
         api: {
             post: {
                 [api.createTable]:          Tables.createTable,
-                [api.setTableFilter]:            Tables.setTableFilter,
+                [api.setTableFilter]:       Tables.setTableFilter,
                 [api.setExcludeList]:       Tables.updateTableExcludes,
                 [api.setUserSettings]:      DB.setUserSettings,
                 [api.setIntras]:            DB.setUserIntras,
@@ -79,7 +79,7 @@ const routes = [
             },
             get: {
                 [api.getData]:              Logic.getTable,
-                [api.getTableFilter]:            Logic.getTableFilter,
+                [api.getTableFilter]:       Logic.getTableFilter,
                 [api.getExcludeList]:       Logic.getTableExcludeList,
                 [api.searchAceFields]:      Logic.searchAceFields,
                 [api.getTableMakerData]:    Logic.getTableMakerData,
