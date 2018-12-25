@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, FormGroup, Input, UncontrolledDropdown, DropdownToggle,
-    DropdownMenu,DropdownItem, ListGroup, ListGroupItem, Button, Label } from "reactstrap";
+    DropdownMenu,DropdownItem, ButtonGroup, Button, Label } from "reactstrap";
 
 export function IconedMenu(props) {
     const { title, items, menuClick, active, split } = props;
@@ -20,6 +20,28 @@ export function IconedMenu(props) {
                 <DropdownItem key={item.name} onClick={item.action}>
                     <i className={`fa fa-${item.icon} mr-2`} />{item.name}
                 </DropdownItem>
+            )}
+        </DropdownMenu>
+    </UncontrolledDropdown>;
+}
+
+export function ItemSelect(props) {
+    const { selected, items, onSelect, radios} = props;
+    if(radios !== undefined && items.length <= radios) {
+        return <ButtonGroup>
+            {items.map(item => 
+                <Button color="primary" key={item} active={item === selected}
+                onClick={() => onSelect(item)}>{item}</Button>
+            )}
+        </ButtonGroup>;
+    }
+    return <UncontrolledDropdown color="primary">
+        <DropdownToggle caret>
+            {selected}
+        </DropdownToggle>
+        <DropdownMenu>
+            {items.map(item =>
+                <DropdownItem key={item} onClick={() => onSelect(item)}>{item}</DropdownItem>
             )}
         </DropdownMenu>
     </UncontrolledDropdown>;

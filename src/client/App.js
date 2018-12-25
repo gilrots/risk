@@ -137,7 +137,7 @@ export default class App extends Component {
                 res.component = <TableMaker id="table-maker" ref={ref} edited={editedTable} fields={tableMakerData} onAlert={onAlert}/>;
                 break;
             case 1:
-                res.component = <FilterMaker id="filter-maker" ref={ref} onAlert={onAlert}/>;
+                res.component = <FilterMaker id="filter-maker" ref={ref} tableId={activeTable} onAlert={onAlert}/>;
                 break;
             case 2:
                 res.component = <ExcludeList id="exclude-list" ref={ref} tableId={activeTable} onAlert={onAlert}/>;

@@ -457,6 +457,14 @@ async function updateTableExcludes(params) {
     return table !== undefined;
 }
 
+async function setTableFilter(params) {
+    const {filter} = params;
+    const tableId = parseInt(params.tableId);
+    const table = getTable(tableId);
+    
+    return table !== undefined;
+}
+
 async function copyTable(tableId) {
     const table = getTable(tableId);
     let res;
@@ -546,8 +554,18 @@ async function init() {
 }
 
 module.exports = {
-    init, getTable, calculateTable, formatAceData,
-    getResultFormat, createTable, copyTable, removeTable,
-    tableToClient, updateTableExcludes, createUserDefault,
-    getUserTableOrDefault, getUserTables
+    init,
+    getTable,
+    calculateTable,
+    formatAceData,
+    getResultFormat,
+    createTable,
+    copyTable,
+    removeTable,
+    tableToClient,
+    updateTableExcludes,
+    createUserDefault,
+    getUserTableOrDefault,
+    getUserTables,
+    setTableFilter
 };

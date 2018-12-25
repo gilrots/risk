@@ -45,6 +45,20 @@ class TableCouldNotBeParsedError extends Error {
     }
 }
 
+class AceError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, AceError);
+    }
+}
+
+class DataRequestError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, DataRequestError);
+    }
+}
+
 module.exports = {
     UserIsNotAllowedError,
     UserAlreadyExistError,
@@ -52,5 +66,7 @@ module.exports = {
     LoginError,
     TableNotExistError,
     TableCouldNotBeParsedError,
-    TableCouldNotBeUpdatedOrCreatedError
+    TableCouldNotBeUpdatedOrCreatedError,
+    DataRequestError,
+    AceError
 };

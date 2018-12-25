@@ -4,7 +4,7 @@ const Tables = require('./tables-logic');
 const Ace = require('./ace');
 const DB = require('./database');
 const Utils = require('../../common/utils.js');
-const {TableNotExistError} = require('./errors');
+const {TableNotExistError, DataRequestError} = require('./errors');
 
 const _ = require('lodash');
 
@@ -86,6 +86,19 @@ async function getTableMakerData() {
     return result;
 }
 
+async function getFilterMakerData() {
+    let result = {fields:['bb','ff'],actions:['bigger','smaller'],operators:["None","Or","And"], defaultOperator:"None"};
+
+    try {
+    }
+    catch(e){
+        console.error("getFilterMakerData error: ", e);
+        throw new DataRequestError(e.message);
+    }
+
+    return result;
+}
+
 async function searchAceFields(params) {
     const { search } = params;
     const fields = await getTableMakerData();
@@ -128,4 +141,22 @@ async function getTableExcludeList(params) {
     return { included: parts[0], excluded: parts[1] };
 }
 
-module.exports = { getTable, getTableMakerData, tableAction, getTableExcludeList, searchAceFields };
+async function getTableFilter(params) {
+    const tableId = parseInt(params.tableId);
+    const table = Tables.getTable(tableId);
+    if (_.isEmpty(table)) {
+        throw new TableNotExistError(`No such table id ${tableId}`);
+    }
+
+    return table.filter;
+}
+
+module.exports = {
+    getTable,
+    getTableMakerData,
+    tableAction,
+    getTableExcludeList,
+    getTableFilter,
+    getFilterMakerData,
+    searchAceFields 
+};
