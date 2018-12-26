@@ -7,7 +7,9 @@ import {addElement, deleteElement, changeElement} from "../../helpers/state-util
 const api = require('../../../common/config').server.api;
 import PropTypes from "prop-types";
 import { ItemSelect, SymbolAmount } from '../func-components';
+import Predicate from '../../../common/models/predicate';
 const preds = 'predicates'; 
+
 class FilterMaker extends React.Component {
     static propTypes = {
         tableId: PropTypes.number.isRequired
@@ -46,17 +48,9 @@ class FilterMaker extends React.Component {
         changeElement(this,preds,predicateIndex,predicateField,value);
 
     addPredicate = operator => {
-        const {fields, actions, operators, defaultOperator} = this.state;
+        const {fields, actions, defaultOperator} = this.state;
         if(operator !== defaultOperator) {
-            addElement(this,preds, {
-                field: fields[0].id,
-                action: actions[0].id,
-                value: 0,
-                operator: operators[0].id,
-                not: false,
-                left:0,
-                right:0,
-            });
+            addElement(this, preds, new Predicate(fields[0].id,actions[0].id,defaultOperator, 0));
         }
     }
 

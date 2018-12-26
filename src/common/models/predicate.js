@@ -14,3 +14,5 @@ class Predicate {
         this.value = value;
     }
 }
+
+module.exports = Predicate;
