@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
-import {Container,Table, Input, Button, Label} from "reactstrap";
+import {Container,Table, Input, Button,ButtonGroup, Label} from "reactstrap";
 import ToggleButton from 'react-toggle-button'
 import {get, post, notify} from "../../helpers/client-utils"
 import {addElement, deleteElement, changeElement} from "../../helpers/state-utils"
@@ -53,6 +53,7 @@ class FilterMaker extends React.Component {
                 action: actions[0].id,
                 value: 0,
                 operator: operators[0].id,
+                not: false,
                 left:0,
                 right:0,
             });
@@ -101,8 +102,14 @@ class FilterMaker extends React.Component {
                                     onSelect={field => this.setPredicateData(index, 'field', field.id)} />
                             </td>
                             <td>
-                                <ItemSelect selectedId={predicate.action} items={actions}
+                                <ButtonGroup>
+                                <Button color={predicate.not ? "danger":"secondary"}
+                                    className="rounded mr-2"
+                                    outline={!predicate.not}
+                                    onClick={() => this.setPredicateData(index, 'not', !predicate.not)}>Not</Button>
+                                <ItemSelect selectedId={predicate.action} items={actions} 
                                     onSelect={action => this.setPredicateData(index, 'action', action.id)} />
+                                </ButtonGroup>
                             </td>
                             <td>
                                 <Input value={predicate.value}
