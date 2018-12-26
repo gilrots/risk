@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const {toItem,toItems} = require('../../common/utils.js');
 const FuncsDL = require('../db/funcs');
 const {funcTypes} = FuncsDL;
 const p = '@';//param
@@ -22,17 +23,18 @@ const defaultFuncs = [
 const DB = {
     operators: [],
     actions: [],
-    defaultOperator: defaultOp
+    defaultOperator: undefined
 }
 
 async function init() {
     DB.actions = await FuncsDL.getAllActions();
     DB.operators = await FuncsDL.getAllOperators();
-    if(_.isEmpty(DB.actions) || _.isEmpty(DB.actions)) {
+    if(_.isEmpty(DB.operators) || _.isEmpty(DB.actions)) {
         await FuncsDL.createAll(defaultFuncs);
         DB.actions = await FuncsDL.getAllActions();
         DB.operators = await FuncsDL.getAllOperators();
     }
+    DB.defaultOperator = await FuncsDL.getOneByName(defaultOp.name);
 }
 
 function getDefaultFilter() {
@@ -47,9 +49,9 @@ function parseFilter(filter) {
 
 function getFilterMetadata() {
     return {
-        actions: _.map(DB.actions, 'name'),
-        operators: _.map(DB.operators, 'name'),
-        defaultOperator: DB.defaultOperator.name
+        actions: toItems(DB.actions),
+        operators: toItems(DB.operators),
+        defaultOperator: DB.defaultOperator.id
     };
 }
 

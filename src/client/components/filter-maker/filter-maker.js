@@ -49,10 +49,10 @@ class FilterMaker extends React.Component {
         const {fields, actions, operators, defaultOperator} = this.state;
         if(operator !== defaultOperator) {
             addElement(this,preds, {
-                field: fields[0],
-                action: actions[0],
+                field: fields[0].id,
+                action: actions[0].id,
                 value: 0,
-                operator: operators[0],
+                operator: operators[0].id,
                 left:0,
                 right:0,
             });
@@ -97,12 +97,12 @@ class FilterMaker extends React.Component {
                             <td><SymbolAmount symbol="(" value={predicate.left} 
                             onChange={left => this.setPredicateData(index, 'left', left)}/></td>
                             <td>
-                                <ItemSelect selected={predicate.field} items={fields}
-                                    onSelect={field => this.setPredicateData(index, 'field', field)} />
+                                <ItemSelect selectedId={predicate.field} items={fields}
+                                    onSelect={field => this.setPredicateData(index, 'field', field.id)} />
                             </td>
                             <td>
-                                <ItemSelect selected={predicate.action} items={actions}
-                                    onSelect={action => this.setPredicateData(index, 'action', action)} />
+                                <ItemSelect selectedId={predicate.action} items={actions}
+                                    onSelect={action => this.setPredicateData(index, 'action', action.id)} />
                             </td>
                             <td>
                                 <Input value={predicate.value}
@@ -111,8 +111,8 @@ class FilterMaker extends React.Component {
                             <td><SymbolAmount symbol=")" value={predicate.right} 
                             onChange={right => this.setPredicateData(index, 'right', right)}/></td>
                             <td>
-                                <ItemSelect selected={predicate.operator} items={operators} radios={3}
-                                    onSelect={operator => { this.setPredicateData(index, 'operator', operator); this.addPredicate(operator) }} />
+                                <ItemSelect selectedId={predicate.operator} items={operators} radios={3}
+                                    onSelect={operator => { this.setPredicateData(index, 'operator', operator.id); this.addPredicate(operator) }} />
                             </td>
                             <td>
                                 <Button outline className="rounded-circle ml-2 pop-item" color="danger"

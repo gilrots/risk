@@ -21,6 +21,10 @@ async function getOne(id) {
     return Funcs.findOne({where: {id}});
 }
 
+async function getOneByName(name) {
+    return Funcs.findOne({where: {name}});
+}
+
 async function createAll(tables) {
     return Funcs.bulkCreate(tables);
 }
@@ -46,6 +50,7 @@ module.exports = {
     createAll,
     updateOne,
     getOne,
+    getOneByName,
     deleteOne,
     funcTypes,
     funcArgsTypes 

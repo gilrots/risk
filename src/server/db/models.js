@@ -51,7 +51,8 @@ const funcTypes = {operator:'operator',action:'action', format:'format'};
 const funcArgsTypes = {number:'number',string:'string', date:'date'};
 
 const Funcs = sequelize.define('Funcs', {
-    name: {type:Sequelize.STRING, unique:true, primaryKey:true},
+    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
+    name: {type:Sequelize.STRING, unique:true},
     type: Sequelize.ENUM(_.values(funcTypes)),
     for: Sequelize.ENUM(_.values(funcArgsTypes)),
     func: Sequelize.TEXT,

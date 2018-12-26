@@ -139,7 +139,7 @@ async function getTableFilter(params) {
     if (_.isEmpty(table)) {
         throw new TableNotExistError(`No such table id ${tableId}`);
     }
-    const fields = _.map(Tables.getTableRegularCols(table),'name');
+    const fields = Utils.toItems(Tables.getTableRegularCols(table), 'key');
 
     return {...table.filter, fields};
 }

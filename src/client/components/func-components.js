@@ -26,23 +26,24 @@ export function IconedMenu(props) {
 }
 
 export function ItemSelect(props) {
-    const { selected, items, onSelect, radios} = props;
+    const { selectedId, items, onSelect, radios} = props;
     if(radios !== undefined && items.length <= radios) {
         return <ButtonGroup>
             {items.map(item => 
-                <Button color="primary" key={item} active={item === selected}
-                onClick={() => onSelect(item)}>{item}</Button>
+                <Button color="primary" key={item.id} active={item.id === selectedId}
+                onClick={() => onSelect(item)}>{item.name}</Button>
             )}
         </ButtonGroup>;
     }
+    const selectedItem = _.find(items,item=> item.id === selectedId) || {name:"---"};
     return <UncontrolledDropdown >
             <ButtonGroup>
-                <Button color="primary">{selected}</Button>
+                <Button color="primary">{selectedItem.name}</Button>
                 <DropdownToggle color="primary" caret split />
             </ButtonGroup>
             <DropdownMenu>
                 {items.map(item =>
-                    <DropdownItem key={item} onClick={() => onSelect(item)}>{item}</DropdownItem>
+                    <DropdownItem key={item.id} onClick={() => onSelect(item)}>{item.name}</DropdownItem>
                 )}
             </DropdownMenu>
     </UncontrolledDropdown>;
