@@ -35,15 +35,16 @@ export function ItemSelect(props) {
             )}
         </ButtonGroup>;
     }
-    return <UncontrolledDropdown color="primary">
-        <DropdownToggle caret>
-            {selected}
-        </DropdownToggle>
-        <DropdownMenu>
-            {items.map(item =>
-                <DropdownItem key={item} onClick={() => onSelect(item)}>{item}</DropdownItem>
-            )}
-        </DropdownMenu>
+    return <UncontrolledDropdown >
+            <ButtonGroup>
+                <Button color="primary">{selected}</Button>
+                <DropdownToggle color="primary" caret split />
+            </ButtonGroup>
+            <DropdownMenu>
+                {items.map(item =>
+                    <DropdownItem key={item} onClick={() => onSelect(item)}>{item}</DropdownItem>
+                )}
+            </DropdownMenu>
     </UncontrolledDropdown>;
 }
 

@@ -278,6 +278,11 @@ function getResultFormat(user) {
     };
 }
 
+// regular cols are ones that their value can be calculted only by ace & bank data
+function isRegularCol(col) {
+   return _.isEmpty(col.func.aggregations) && _.isEmpty(col.func.arguments.stock)
+};
+
 function calculateTable(table, bankDB, aceDB, user) {
     const result = getResultFormat(user);
     //console.log(table.calculated.aggregations)
@@ -285,9 +290,6 @@ function calculateTable(table, bankDB, aceDB, user) {
     _.forEach(DB.types, type => {
         // set presentation columns
         result[type].cols = [...table.calculated.cols[type]];
-
-        // regular cols are ones that their value can be calculted only by ace & bank data
-        const isRegularCol = col => _.isEmpty(col.func.aggregations) && _.isEmpty(col.func.arguments.stock);
         const partition = _.partition(table.calculated.cols[type], isRegularCol);
         const regularCols = partition[0];
         const aggregationCols = partition[1];
@@ -444,6 +446,10 @@ function getTable(tableId) {
     return _.find(DB.tables, table => tableId === table.id);
 }
 
+function getTableRegularCols(table) {
+    return _.filter(table.cols, isRegularCol);
+}
+
 async function getUserTableOrDefault(user, tableId) {
     let table = getTable(tableId);
     if(!table && getUserTables(user).length === 0) {
@@ -591,5 +597,6 @@ module.exports = {
     createUserDefault,
     getUserTableOrDefault,
     getUserTables,
-    setTableFilter
+    setTableFilter,
+    getTableRegularCols
 };

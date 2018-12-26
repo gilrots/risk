@@ -2,6 +2,7 @@ const config = require('../../common/config.json');
 const Bank = require('./bank-logic');
 const Tables = require('./tables-logic');
 const Ace = require('./ace');
+const Filters = require('./filter');
 const DB = require('./database');
 const Utils = require('../../common/utils.js');
 const {TableNotExistError, DataRequestError} = require('./errors');
@@ -87,16 +88,7 @@ async function getTableMakerData() {
 }
 
 async function getFilterMakerData() {
-    let result = {fields:['bb','ff'],actions:['bigger','smaller'],operators:["None","Or","And"], defaultOperator:"None"};
-
-    try {
-    }
-    catch(e){
-        console.error("getFilterMakerData error: ", e);
-        throw new DataRequestError(e.message);
-    }
-
-    return result;
+    return Filters.getFilterMetadata();
 }
 
 async function searchAceFields(params) {
@@ -147,8 +139,9 @@ async function getTableFilter(params) {
     if (_.isEmpty(table)) {
         throw new TableNotExistError(`No such table id ${tableId}`);
     }
+    const fields = _.map(Tables.getTableRegularCols(table),'name');
 
-    return table.filter;
+    return {...table.filter, fields};
 }
 
 module.exports = {

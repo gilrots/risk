@@ -1,5 +1,6 @@
 const sequelize = require("./db");
 const Sequelize = require('Sequelize');
+const _ = require('lodash');
 
 const Priviliges = sequelize.define('Priviliges', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
@@ -46,11 +47,13 @@ const IPOFavorites = sequelize.define('IPOFavorites', {
     name: Sequelize.STRING,
 });
 
+const funcTypes = {operator:'operator',action:'action', format:'format'};
+const funcArgsTypes = {number:'number',string:'string', date:'date'};
+
 const Funcs = sequelize.define('Funcs', {
-    id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
-    name: Sequelize.STRING,
-    type: Sequelize.ENUM('operator', 'action', 'format'),
-    for: Sequelize.ENUM('number', 'string', 'date'),
+    name: {type:Sequelize.STRING, unique:true, primaryKey:true},
+    type: Sequelize.ENUM(_.values(funcTypes)),
+    for: Sequelize.ENUM(_.values(funcArgsTypes)),
     func: Sequelize.TEXT,
 });
 
@@ -67,6 +70,8 @@ module.exports = {
     Intras,
     IPO,
     IPOFavorites,
-    Funcs
+    Funcs,
+    funcTypes,
+    funcArgsTypes
 }
 

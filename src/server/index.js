@@ -9,12 +9,12 @@ const Bank = require('./modules/bank-logic');
 const Ace = require('./modules/ace');
 const Logic = require('./modules/bussines-logic');
 const Auth = require('./modules/auth');
+const Filters = require('./modules/filter');
 const {ServerError} = require('./modules/errors');
 const config = require('../common/config.json');
 const {api, port} = config.server;
 
-const modules = [Tables.init];
-DB.connect(modules).then(() => runServer());
+DB.connect([Tables.init,Filters.init]).then(runServer);
 
 function runServer() {
 

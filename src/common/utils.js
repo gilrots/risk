@@ -128,6 +128,14 @@ function getJson(api, params, headers, handler) {
     return utilsFetch(url, headers ? {headers} : undefined, handler);
 }
 
+function toItem(item, idField='id', nameField='name') {
+    return {id:item[idField],name:item[nameField]};
+}
+
+function toItems(array, idField='id', nameField='name') {
+    return _.map(array, item => toItem(item,idField,nameField));
+}
+
 function postJson(url, object, headers = {}, handler) {
     return utilsFetch(url, {
         method: 'POST',
@@ -175,7 +183,7 @@ module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, getJson, postJson, moveTo,
-    getPath, formatDate, wait
+    getPath, formatDate, wait, toItem, toItems
 };
 
 
