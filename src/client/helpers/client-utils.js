@@ -44,7 +44,7 @@ export function notify(component, response, title, message = "Action completed!"
     if(onAlert) {
         const alert = response.error ? 
         {title: `${title} - Error!`, message: response.error, type: 'danger'} :
-        {title, message, type: 'success'};
+        {title, message, type: 'success', closeModal:true};
         onAlert(alert);
     }
 }

@@ -266,7 +266,13 @@ export default class App extends Component {
         return <Fragment>
             {!_.isEmpty(alert.message) && 
             <SweetAlert title={alert.title} type={alert.type} showCancel={alert.showCancel}
-            onConfirm={() => {_.invoke(alert, 'onConfirm'); this.toggleAlert();}} 
+            onConfirm={() => {
+                _.invoke(alert, 'onConfirm');
+                this.toggleAlert();
+                if(alert.closeModal){
+                    this.toggleModal();
+                }
+            }} 
             onCancel={this.toggleAlert}>
                 {alert.message}
             </SweetAlert>}
