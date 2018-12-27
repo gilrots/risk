@@ -428,6 +428,7 @@ async function createTable(params) {
             if (data.id) {
                 const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
                 if (updateIndex > -1) {
+                    data.filter = {};
                     await TablesDL.updateOne(data);
                     const updatedTable = await TablesDL.getOne(data.id);
                     parseTable(updatedTable);
