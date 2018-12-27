@@ -55,7 +55,8 @@ class FilterMaker extends React.Component {
     }
 
     deletePredicate = predicateIndex => 
-        deleteElement(this,preds,predicateIndex);
+        deleteElement(this,preds,predicateIndex,
+            ()=>this.setPredicateData(this.state.predicates.length - 1, 'operator', this.state.defaultOperator));
 
     save() {
         const {isActive, predicates} = this.state;
@@ -68,11 +69,12 @@ class FilterMaker extends React.Component {
         const { isActive, predicates, fields, actions, operators } = this.state;
         const hasFilter = !_.isEmpty(predicates);
         return <Container>
-            {!hasFilter && operators.length > 1 && <Button color="success" onClick={() => this.addPredicate(operators[1])}>New filter</Button>}
+            {!hasFilter && operators.length > 1 && <Button color="success"
+                onClick={() => {this.addPredicate(operators[1]);this.setState({isActive:true})}}>New filter</Button>}
             {hasFilter &&
                 <Label>
                     Filter
-                <ToggleButton value={isActive} onToggle={() => { this.setState({ isActive: !isActive }) }} />
+                <ToggleButton value={isActive} onToggle={() => this.setState({isActive:!isActive})} />
                 </Label>}
             {hasFilter && <Table responsive striped>
                 <thead>

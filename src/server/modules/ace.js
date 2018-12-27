@@ -48,9 +48,9 @@ function setQueryId(id,query) {
     return query.replace(idToken, Number(id))
 }
 
-function getStockFields(id,query,ipo, ipoMapper){
+async function getStockFields(id,query,ipo, ipoMapper){
     return ipo ?
-        Promise.resolve({GetManyFieldsResult:{Values:ipoMapper(ipo,errorField)}}) :
+        {GetManyFieldsResult:{Values:ipoMapper(ipo,errorField)}} :
         Utils.getJson(setQueryId(id, query))
 }
 

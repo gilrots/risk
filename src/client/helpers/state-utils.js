@@ -9,12 +9,12 @@ export function changeElement(component, property, index, field, value) {
     }));
 }
 
-export function deleteElement(component, property, index) {
+export function deleteElement(component, property, index, callback) {
     component.setState(ps => {
         let deleted = [...ps[property]];
         deleted.splice(index,1);
         return {[property]:deleted};
-    });
+    }, callback);
 }
 
 export function addElement(component, property, element) {

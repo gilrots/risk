@@ -23,7 +23,6 @@ function treeForEach(obj, key, func, args) {
     }
 }
 
-
 function performance(func, name) {
     const t0 = new Date().getTime();
     func();
@@ -32,7 +31,7 @@ function performance(func, name) {
 }
 
 function getNumber(val, fallback) {
-    const num = Number(val);
+    const num = typeof val === 'number' ? val : Number(val);
     return Number.isNaN(num) ? fallback : num;
 }
 
@@ -42,6 +41,12 @@ function tryCounter(maxTries, fallback = undefined) {
     counter.done = () => counter.tries > counter.maxTries;
     counter.almost = () => counter.tries === counter.maxTries;
     return counter;
+}
+
+async function runProdceduresSync(tasks) {
+    await tasks.reduce((chain, task) => 
+        chain.then(() => task().then())
+        , Promise.resolve([]));
 }
 
 function setMixins() {
@@ -183,7 +188,8 @@ module.exports = {
     copy, treeForEach, performance, getNumber,
     tryAtleast, tryCounter, divideUrl, replaceAll,
     setUrl, getJson, postJson, moveTo,
-    getPath, formatDate, wait, toItem, toItems
+    getPath, formatDate, wait, toItem, toItems,
+    runProdceduresSync
 };
 
 

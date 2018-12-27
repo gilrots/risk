@@ -1,6 +1,7 @@
 const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
+const {parseFilter} = require('./filter');
 const {
     TableCouldNotBeParsedError, 
     TableCouldNotBeUpdatedOrCreatedError,
@@ -33,10 +34,7 @@ const DB = {
         aceFields: [],
         aggregations: {
         },
-        filter: {
-            active: false,
-            predicate:''
-        }
+        filter: {}
     },
     generator: {
         actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
@@ -293,7 +291,17 @@ function calculateTable(table, bankDB, aceDB, user) {
         const partition = _.partition(table.calculated.cols[type], isRegularCol);
         const regularCols = partition[0];
         const aggregationCols = partition[1];
-    
+
+        //addes stock only if filter allows it
+        const {active,predicate} = table.calculated.filter;
+        const push = active ? 
+        calculatedStock => {
+            if(predicate(calculatedStock.stock)) {
+                result[type].data.push(calculatedStock)
+            }
+        } :
+        calculatedStock => result[type].data.push(calculatedStock);
+
         //set stock values than can be computed from band data or ace
         _.forEach(bankDB[type], bankStock => {
             const res = formatResult(bankStock, aceDB.data);
@@ -306,9 +314,9 @@ function calculateTable(table, bankDB, aceDB, user) {
                 
             });
             _.forEach(aggregationCols, col => res.stock[col.key] = undefined);
-            result[type].data.push(res);
+            res.stock.origin = res.bank.Origin
+            push(res);
         });
-        _.forEach(result[type].data, d=>d.stock.origin = d.bank.Origin);
 
         // after all stocks are set with basic data, its time to calculate aggregations
         _.forEach(aggregationCols, col => {
@@ -361,7 +369,7 @@ function parseExpression(exp, argsMap) {
 }
 
 function parseTableFilter(table) {
-    table.calculated.filter = table.filter;
+    table.calculated.filter = parseFilter(table.filter);
 }
 
 function formatKey(name){

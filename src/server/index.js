@@ -14,7 +14,7 @@ const {ServerError} = require('./modules/errors');
 const config = require('../common/config.json');
 const {api, port} = config.server;
 
-DB.connect([Tables.init,Filters.init]).then(runServer);
+DB.connect([Filters.init,Tables.init]).then(runServer);
 
 function runServer() {
 

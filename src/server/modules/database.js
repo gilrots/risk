@@ -8,6 +8,7 @@ const FavsDL = require('../db/ipofavorites');
 const Auth = require('./auth');
 const Tables = require('./tables-logic');
 const config = require('../../common/config.json').DB;
+const {runProdceduresSync} = require('../../common/utils');
 const {UserAlreadyExistError,UserIsNotAllowedError,ServerError} = require('./errors');
 
 const initModules = [PriviligesDL.init];
@@ -19,11 +20,12 @@ async function connect(appModules) {
         console.log("Connected to DB!");
         await sequelize.sync({force:config.forceSync});
         console.log("Sequelize synced!");
-        await Promise.all(initModules.map(promise => promise()));
+        await runProdceduresSync(initModules);
         console.log("DL Modules initialized!");
         const admin = await createOrDeleteAdmin();
         console.log(`Default admin init: ${admin}`);
-        await Promise.all(appModules.map(promise => promise()));
+        await runProdceduresSync(appModules);
+        appModules.forEach(async promise => (await promise()));
         console.log("App Modules initialized!");
     }
     catch (err) {

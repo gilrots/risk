@@ -5,7 +5,7 @@ const Ace = require('./ace');
 const Filters = require('./filter');
 const DB = require('./database');
 const Utils = require('../../common/utils.js');
-const {TableNotExistError, DataRequestError} = require('./errors');
+const {TableNotExistError, AceError} = require('./errors');
 
 const _ = require('lodash');
 
@@ -44,19 +44,27 @@ async function getTable(params) {
         const aceQuery = Ace.getFieldsQuery(aceFields);
         const bankDB = Bank.getCustomDBSnap(table.excluded, accounts, intras, ipos);
         const aceDB = Ace.getAceDB();
+        let aceConnectionError = '';
         const promises = _.map(bankDB.ids, stockId =>
             new Promise(resolve => 
                 Utils.tryAtleast(resolve, Utils.tryCounter(config.ace.tries, []),
-                    innerResolve => {
-                        Ace.getStockFields(stockId, aceQuery, iposMap[stockId], ipoMapper)
-                        .then(aceData => {
+                    async innerResolve => {
+                        try {
+                            const aceData = await Ace.getStockFields(stockId, aceQuery, iposMap[stockId], ipoMapper)
                             handleAceData(aceDB, stockId, aceData, aceFields);
                             innerResolve(aceDB.missing[stockId] ? undefined : true);
-                        });
+                        }
+                        catch (e) {
+                            aceConnectionError = e.message;
+                            innerResolve(undefined);
+                        }
                     })
             ));
-
+       
         await Promise.all(promises);
+        if(!_.isEmpty(aceConnectionError)){
+            throw new AceError("Ace server is down.");
+        }
         result = Tables.calculateTable(table, bankDB, aceDB, user);
     }
     catch (e) {
