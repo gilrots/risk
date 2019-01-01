@@ -134,7 +134,8 @@ const defaultTable = {
                     ace: []
                 },
                 aggregations: [{ key: `${DB.replaceToken}_total_value`, exp: `${DB.sum} + {s:0}` }]
-            }
+            },
+            format: 2,
         },
         {
             ...defaultRisk[1],
@@ -163,7 +164,8 @@ const defaultTable = {
                 aggregations: [
                     { key: `${DB.replaceToken}_total_duration`, exp: `${DB.sum} + {a:0}` },
                     { key: `${DB.replaceToken}_total_duration_per`, exp: `${DB.sum} + ({s:0} * {a:0})` }],
-            }
+            },
+            format: 1,
         },
         {
             ...defaultRisk[3],

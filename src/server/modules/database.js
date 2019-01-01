@@ -90,7 +90,7 @@ function userify(data, user) {
 
 async function getUserAccounts(params) {
     const accounts = await UsersDL.getAccounts(params.user);
-    return accounts ? _.map(_.filter(accounts,'active'),'number') : [];
+    return accounts ? _.map(_.filter(accounts,'active'),'id') : [];
 }
 
 async function getUserSettings(params) {
