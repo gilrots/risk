@@ -1,9 +1,10 @@
 const _ = require('lodash');
-const {toItems, getNumber} = require('../../common/utils.js');
+const {toItems, getNumber,replaceAll} = require('../../common/utils.js');
 const FuncsDL = require('../db/funcs');
 const {FilterCouldNotBeParsedError} = require('./errors');
 const {funcTypes, funcArgsTypes} = FuncsDL;
 const Predicate = require('../../common/models/predicate');
+const {errorField} = require('./ace');
 const p = '@';//param
 const v = '#';//value
 const e = '~';//epsilon
@@ -18,9 +19,10 @@ const defaultFuncs = [
     {name: '>=', type:funcTypes.action, func:`Math.gte(${p},${v},${e})`, for:funcArgsTypes.number},
     {name: '<', type:funcTypes.action, func:`${p} < ${v}`, for:funcArgsTypes.number},
     {name: '<=', type:funcTypes.action, func:`Math.lte(${p},${v},${e})`, for:funcArgsTypes.number},
-    {name: 'Contains', type:funcTypes.action, func:`${p}.includes(${v})`, for:funcArgsTypes.string},
-    {name: 'Starts With', type:funcTypes.action, func:`${p}.startsWith(${v})`, for:funcArgsTypes.string},
-    {name: 'Ends With', type:funcTypes.action, func:`${p}.endsWith(${v})`, for:funcArgsTypes.string},
+    {name: 'Empty', type:funcTypes.action, func:`Math.empty(${p})`},
+    {name: 'Contains', type:funcTypes.action, func:`${p}.toString().includes(${v})`, for:funcArgsTypes.string},
+    {name: 'Starts With', type:funcTypes.action, func:`${p}.toString().startsWith(${v})`, for:funcArgsTypes.string},
+    {name: 'Ends With', type:funcTypes.action, func:`${p}.toString().endsWith(${v})`, for:funcArgsTypes.string},
 ];
 
 const DB = {
@@ -44,6 +46,9 @@ function setMathFuncs() {
     };
     Math.lte = function lte(v1, v2,epsilon) {
         return Math.apx(v1,v2,epsilon) || v1 < v2;
+    };
+    Math.empty = function empty(value) {
+        return _.isNaN(value) || _.isNil(value) || value === "" || value === errorField;
     };
 }
 

@@ -135,4 +135,14 @@ function search(params){
     })
 }
 
-module.exports = { getAceDB, getFieldsQuery, getStockFields, setQueryId, getFieldValue, getAllSystemFields, getFieldName, getStocksNames, search };
+module.exports = {
+    errorField,
+    getAceDB,
+    getFieldsQuery,
+    getStockFields,
+    setQueryId,
+    getFieldValue,
+    getAllSystemFields,
+    getFieldName,
+    getStocksNames,
+    search };
