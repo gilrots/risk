@@ -19,10 +19,12 @@ const DB = {
         {
             name: 'Name',
             key: 'name',
+            visible: true
         },
         {
             name: 'Value',
             key: 'value',
+            visible: true
         },
     ],
     calculated: {
@@ -35,10 +37,6 @@ const DB = {
         aggregations: {
         },
         filter: {}
-    },
-    generator: {
-        actions: ['Bigger Than', 'Contains', 'Smaller Than', 'Starts With', 'Ends With'],
-        operators: ['None', 'And', 'Or']
     }
 };
 
@@ -46,7 +44,11 @@ const defaultCols = ["Name",
                     `${DB.replaceToken} Value`,
                     `${DB.replaceToken} Value %`,
                     "Amount",
-                    "Syn Diff"].map(name => ({name, key:formatColKey(name)}));
+                    "Syn Diff"].map((name,i) => ({
+                        name, 
+                        key:formatColKey(name),
+                        visible:true,
+                        order: i}));
 const defaultRisk = [`${DB.replaceToken} Total Value`,
                     `${DB.replaceToken} Total Risk`,
                     `${DB.replaceToken} Duration`,
@@ -54,6 +56,7 @@ const defaultRisk = [`${DB.replaceToken} Total Value`,
                         name,
                         key:formatKey(name),
                         type: name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0],
+                        visible:true,
                         order: i}));
 const defaultAce = config.ace.defaultTableFields;
 
@@ -389,7 +392,7 @@ async function createTable(params) {
         data.user = user.id;
         try {
             let isRisk = false;
-            const parseCol = col => {
+            const parseCol = (col,colIndex) => {
                 const calc = _.reduce(col.params, (acc, param, index) => {
                     if (param.source === 'stock') {
                         param.item.id = formatColKey(param.item.id);
@@ -404,7 +407,7 @@ async function createTable(params) {
                     calc.aggregations.push({ key: formatKey(agg.key), exp: `${DB.sum} ${parseExpression(agg.exp, calc.argsMap)}` })
                 });
                 riskData = isRisk ? {
-                    order: col.order,
+                    
                     type: col.name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0]
                 } : {};
                 
@@ -412,6 +415,8 @@ async function createTable(params) {
                     name: col.name,
                     key: isRisk ? formatKey(col.name) : formatColKey(col.name),
                     ...riskData,
+                    order: colIndex,
+                    visible: col.visible,
                     func: {
                         exp: parseExpression(col.exp, calc.argsMap),
                         arguments: calc.arguments,
@@ -543,8 +548,7 @@ function tableToClient(table) {
         result.name = table.name;
         result.id = table.id;
         const colNameToKey = _.reduce(table.cols, (acc, col) => ({...acc,[col.key]:col.name}),{});
-        let isRisk = false;
-        const deparseCol = col => {
+        const deparseCol = (col,colIndex) => {
             const calc = _.reduce(_.keys(col.func.arguments), (acc, source) => {
                 _.forEach(col.func.arguments[source], (id, index) => {
                     let paramId = source === 'stock' ? colNameToKey[id] : id;
@@ -559,13 +563,11 @@ function tableToClient(table) {
                 calc.argsMap[`{t:${revInd}}`] = `Y${revInd}`;
                 calc.aggregations.push({ key: Utils.replaceAll(agg.key, '_', ' '), exp: parseExpression(agg.exp, calc.argsMap).replace(DB.sum,'') });
             });
-            riskData = isRisk ? {
-                order: col.order
-            } : {};
             
             return {
                 name: col.name,
-                ...riskData,
+                order: colIndex,
+                visible: col.visible,
                 exp: parseExpression(col.func.exp, calc.argsMap),
                 params: calc.params,
                 aggregations: calc.aggregations.reverse(),
@@ -573,7 +575,6 @@ function tableToClient(table) {
             };
         };
         result.cols = table.cols.map(deparseCol);
-        isRisk = !isRisk;
         result.risk = table.risk.map(deparseCol);
     }
     return result;

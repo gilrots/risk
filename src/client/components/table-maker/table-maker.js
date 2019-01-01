@@ -45,6 +45,19 @@ class TableMaker extends React.Component {
     }
 
     whichCols = () => this.state.riskMode ? "risk" : "cols";
+    moveCol = (currIndex,newIndex) => {
+        if(currIndex !== newIndex){
+            const cols = this.whichCols();
+            this.setState(ps => {
+                const arr = [...ps[cols]];
+                const temp = arr[currIndex];
+                arr[currIndex] = arr[newIndex]
+                arr[newIndex] = temp;
+                return {[cols]:arr};
+            });
+        }
+    }
+        
 
     setColData = (colIndex, colField, value, secIndex, secField) => {
         let assignVal = value;
@@ -54,8 +67,8 @@ class TableMaker extends React.Component {
             assignVal = arr.map((val, index) => (index === secIndex ? (secField !== undefined ? Object.assign({}, val, { [secField]: value }) : value) : val));
         }
 
-        this.setState(pervState => ({
-            [cols]: pervState[cols].map((col, index) => (index === colIndex ? Object.assign({}, col, { [colField]: assignVal }) : col))
+        this.setState(ps => ({
+            [cols]: ps[cols].map((col, index) => (index === colIndex ? Object.assign({}, col, { [colField]: assignVal }) : col))
         }));
     }
 
@@ -100,7 +113,6 @@ class TableMaker extends React.Component {
 
     render() {
         const { name, selectedColIndex, riskMode } = this.state;
-        const tabAct = _.isEmpty(this.state.id) ? 'Create Table' : 'Update Table';
         const cols = this.state[this.whichCols()];
         let col = _.get(cols, selectedColIndex.toString(), undefined);
         let index = selectedColIndex;
@@ -147,9 +159,13 @@ class TableMaker extends React.Component {
                             <Row className="my-2">
                                 <Col>
                                     {cols.map((col, colIndex) =>
-                                        <Button key={colIndex} className="mr-2 pop-box" color="primary" active={colIndex === index}
-                                            onClick={() => this.setState({ selectedColIndex: colIndex })}>{col.name ? col.name : `Col ${colIndex}`}
+                                        <Button key={colIndex} className="mr-2 pop-box" color={col.visible ? 'primary' : 'secondary'} active={colIndex === index}
+                                            onClick={() => this.setState({ selectedColIndex: colIndex })}>
+                                            <i className="mr-2 pop-item fa fa-caret-left" onClick={() => this.moveCol(colIndex, Math.max(0,colIndex-1))}/>
+                                            {col.name ? col.name : `Col ${colIndex}`}
+                                            {!riskMode && <i className={`ml-2 fa fa-${col.visible ? 'eye' : 'eye-slash'}`} onClick={() => this.setColData(colIndex, 'visible', !col.visible)}/>}
                                             <Badge className="ml-2 pop-item" color="danger" onClick={(e) => this.deleteCol(e, colIndex)} disabled={cols.length < 2}><i className="fa fa-times" /></Badge>
+                                            <i className="ml-2 pop-item fa fa-caret-right" onClick={() => this.moveCol(colIndex, Math.min(cols.length - 1,colIndex+1))}/>
                                         </Button>)}
                                 </Col>
                                 <Col xs="auto">
@@ -172,17 +188,6 @@ class TableMaker extends React.Component {
                                         <Input value={col.name} placeholder="New Column..." onChange={e => this.setColData(index, 'name', e.target.value)} />
                                     </InputGroup>
                                 </Col>
-                                {riskMode &&
-                                    <Col xs="auto">
-                                        <InputGroup>
-                                            <InputGroupAddon addonType="prepend">
-                                                <InputGroupText>Order</InputGroupText>
-                                            </InputGroupAddon>
-                                            <Input value={col.order} type="number"
-                                             onChange={e => this.setColData(index, 'order', e.target.value)} />
-                                        </InputGroup>
-                                    </Col>
-                                }
                             </Row>
                             <Row className="my-1">
                                 <Col>

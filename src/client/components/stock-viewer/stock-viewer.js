@@ -72,7 +72,7 @@ class StockViewer extends React.Component {
     }
 
     createColumns(props) {
-        let res =  props.stocks.cols.map(col => ({
+        let res =  _.filter(props.stocks.cols,'visible').map(col => ({
             key: col.key,
             name: col.name,
             sortable: true,
