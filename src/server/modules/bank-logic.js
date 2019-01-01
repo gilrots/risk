@@ -37,8 +37,8 @@ function getAmount(stock) {
     return stock[amountField];
 }
 
-function getTotalAmount(stock) {
-    return _.sum(getAggregatedData(stock, amountField));
+function getTotalAmount(stock, filter) {
+    return _.sum(getAggregatedData(stock, amountField, filter));
 }
 
 function getId(stock) {
@@ -53,8 +53,8 @@ function getAccounts(bankData) {
     return bankData[accntsField];
 }
 
-function getAggregatedData(stock, method) {
-    return _.chain(getData(stock)).values().map(method).value();
+function getAggregatedData(stock, method, filter) {
+    return _.map(_.filter(getData(stock), filter), method);
 }
 
 function getOrigin(stock) {
@@ -66,7 +66,7 @@ function getBank(bankData) {
 }
 
 function getData(stock) {
-    return stock[dataField];
+    return _.flatMap(stock[dataField],_.values);
 }
 
 function setId(stock, id) {
@@ -96,7 +96,7 @@ function setAmount(stock, amount) {
 
 function setData(stock, bankData) {
     setAmount(bankData, calcAmount(bankData));
-    stock[dataField][getBank(bankData)] = bankData;
+    _.setWith(stock,[dataField,getBank(bankData),getAccount(bankData)],bankData,Object);
 }
 
 function getFields() {
@@ -148,7 +148,8 @@ function filter(bankSnap, excludes, accounts){
     const predicate = id => !excldMap[id] && getAccounts(bankSnap.all[id]).some(acct => accntMap[acct]);
     const divider = id => {
         const stock = bankSnap.all[id];
-        const type = getStockType(bankSnap.all[id]);
+        setAmount(stock, getTotalAmount(stock,s => accntMap[getAccount(s)]));
+        const type = getStockType(stock);
         bankSnap[type][id] = stock;
         if(type !== stockTypes.none){
             bankSnap.ids.push(id);
