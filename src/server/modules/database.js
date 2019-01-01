@@ -88,6 +88,12 @@ function userify(data, user) {
     return data;
 }
 
+async function getRole(params) {
+    const user = await UsersDL.get(params.user);
+    const role  = await PriviligesDL.getRole(user);
+    return {role};
+}
+
 async function getUserAccounts(params) {
     const accounts = await UsersDL.getAccounts(params.user);
     return accounts ? _.map(_.filter(accounts,'active'),'id') : [];
@@ -175,5 +181,5 @@ async function updateUserIPOFavorite(params) {
     return res
 }
 
-module.exports = {connect, register, getUserAccounts, getUserSettings, setUserSettings,
+module.exports = {connect, register, getUserAccounts, getRole, getUserSettings, setUserSettings,
     getUserIntras, setUserIntras, getUserIPOs, setUserIPOs, getUserIPOFavorites, updateUserIPOFavorite};

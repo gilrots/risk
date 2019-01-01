@@ -6,6 +6,10 @@ async function getAll() {
     return Users.findAll();
 }
 
+async function get(user) {
+    return Users.findOne({where:{id: user.id}});
+}
+
 async function getOne(user) {
     return Users.findOne({where:{username: user.username}});
 }
@@ -32,4 +36,4 @@ async function updateAccounts(user, accounts) {
     return Users.update({accounts},{where:{id: user.id}});
 }
 
-module.exports = { create, exist, getAccounts, updateAccounts, getAll, getOne, deleteOne }
+module.exports = { create, exist,get, getAccounts, updateAccounts, getAll, getOne, deleteOne }

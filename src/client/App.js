@@ -30,6 +30,7 @@ export default class App extends Component {
             data: {},
             activeTable: undefined,
             tableMakerData: {},
+            role: ' ',
             editedTable: {},
             excludeMode: false,
             modal: {
@@ -48,6 +49,7 @@ export default class App extends Component {
     }
 
     componentDidMount() {
+        this.getUserRole();
         this.getTableMakerData();
         this.getData(() => {
             const intId = setInterval(() => {
@@ -61,6 +63,10 @@ export default class App extends Component {
 
     getTableMakerData = () => {
         get(api.getTableMakerData).then(tableMakerData => this.setState({tableMakerData}));
+    };
+
+    getUserRole = () => {
+        get(api.getRole).then(({role}) => this.setState({role}));
     };
 
     getData(callback) {
@@ -257,7 +263,7 @@ export default class App extends Component {
     };
 
     render() {
-        const {data, modal, tableMakerData, excludeMode, activeTable, alert} = this.state;
+        const {data, modal, tableMakerData, excludeMode, activeTable, alert, role} = this.state;
         const hasTableData = !_.isEmpty(tableMakerData);
         const hasData = this.hasData(data);
         const hasLatency = !_.isEmpty(data) && data.latency;
@@ -286,7 +292,7 @@ export default class App extends Component {
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>
-        <AppHeader>
+        <AppHeader role={role}>
                 <Fragment>
                     {hasLatency && data.latency.map(badge =>
                         <NavItem key={badge.name} className="d-flex align-items-center mr-1">

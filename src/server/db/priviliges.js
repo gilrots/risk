@@ -26,4 +26,9 @@ async function getAll() {
     return Priviliges.findAll();
 }
 
-module.exports = { init, isAdmin, getSimpleUser, getAdmin, getAll }
+async function getRole(user) {
+    const priv = await Priviliges.findOne({where:{id:user.type}});
+    return priv.type;
+}
+
+module.exports = { init, isAdmin, getSimpleUser, getAdmin, getAll, getRole }

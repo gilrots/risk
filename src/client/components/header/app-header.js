@@ -3,13 +3,12 @@ const logo = require('../../assests/logo.jpg');
 
 import {
     Container, Row, Col, Navbar, Nav,
-    NavbarBrand, NavLink, NavItem, 
+    NavbarBrand, NavLink, NavItem, Button
 } from 'reactstrap';
-
-const AVATAR = 'https://www.gravatar.com/avatar/429e504af19fc3e1cfa5c4326ef3394c?s=240&d=mm&r=pg';
 
 class AppHeader extends React.Component {
     render() {
+        console.log(this.props.role);
         return (
             <header>
                 <Navbar fixed="top" color="light" light expand="xs" className="border-bottom border-gray bg-white"
@@ -20,8 +19,9 @@ class AppHeader extends React.Component {
                                 <Nav className="mrx-auto" navbar>
                                     <NavItem className="d-flex align-items-center">
                                         <NavLink className="font-weight-bold" href="/">
-                                            <img src={AVATAR} alt="avatar" className="img-fluid rounded-circle"
-                                                 style={{width: 36}}/>
+                                            <Button className="rounded-circle font-weight-bold" disabled color="primary" title={this.props.role}>
+                                                {this.props.role[0]}
+                                            </Button>
                                         </NavLink>
                                     </NavItem>
                                     {this.props.children.slice(1)}

@@ -14,6 +14,7 @@
       "bankPost":"/bank",
       "login":"/api/login",
       "register":"/api/register",
+      "getRole":"/api/secured/getRole",
       "getData":"/api/secured/getData",
       "getTableMakerData":"/api/secured/getTBMD",
       "getFilterMakerData":"/api/secured/getFMD",

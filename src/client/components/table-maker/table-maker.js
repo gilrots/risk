@@ -139,7 +139,7 @@ class TableMaker extends React.Component {
                                 <Col>
                                     <h6 className="mr-3 align-self-center">Type:</h6>
                                     <ButtonGroup>
-                                        <Button color="success" active={!riskMode} onClick={() => this.setState({ riskMode: false })}>Table</Button>
+                                        <Button color="success" active={!riskMode} onClick={() => this.setState({ riskMode: false })}>Long\Short</Button>
                                         <Button color="success" active={riskMode} onClick={() => this.setState({ riskMode: true })}>Risk</Button>
                                     </ButtonGroup>
                                 </Col>

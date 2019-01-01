@@ -108,7 +108,8 @@ const defaultTable = {
                     ace: []
                 },
                 aggregations: []
-            }
+            },
+            format: 2
         },
         {
             ...defaultCols[4],
@@ -150,7 +151,8 @@ const defaultTable = {
                     { key: `${DB.replaceToken}_total_duration`, exp: `${DB.sum} + {a:0}` },
                     { key: `${DB.replaceToken}_total_duration_per`, exp: `${DB.sum} + ({s:0} * {a:0})` },
                     { key: `${DB.replaceToken}_total_value`, exp: `${DB.sum} + {s:1}` }],
-            }
+            },
+            format: 2,
         },
         {
             ...defaultRisk[2],
