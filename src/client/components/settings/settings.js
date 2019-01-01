@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {get, post, notify} from "../../helpers/client-utils"
 import { Container, Button, Input, Badge, Form, FormGroup, Label, InputGroup, InputGroupAddon } from "reactstrap";
 import SearchDropdown from "../search-dropdown/search-dropdown";
+import ToggleButton from 'react-toggle-button'
 
 const config = require('../../../common/config');
 const {getUserSettings, setUserSettings} = config.server.api;
@@ -55,7 +56,9 @@ class RiskSettings extends React.Component {
         }});
     };
 
-    addAccount = () => this.updateAccount((selectedUser,newAccount) => [...selectedUser.accounts, newAccount]);
+    addAccount = () => this.updateAccount((selectedUser,newAccount) => [...selectedUser.accounts, {id:newAccount,active:true}]);
+
+    toggleAccount = acc => this.updateAccount(selectedUser => selectedUser.accounts.map(accnt => accnt.id === acc.id ?  {id:acc.id, active:!acc.active}: accnt));
 
     deleteAccount = index => 
         this.updateAccount(selectedUser => {
@@ -76,8 +79,9 @@ class RiskSettings extends React.Component {
             <Label for="add-acc">Accounts</Label>
             <br />
             {!_.isEmpty(selectedUser.accounts) ? selectedUser.accounts.map((acnt, index) =>
-                <Button key={acnt} className="pop-box mr-2" color="primary">
-                    <span className="mr-2">{acnt}</span>
+                <Button key={acnt.id} className="pop-box mr-2" color={acnt.active ? "primary" : "secondary"}>
+                    <span className="mr-2">{acnt.id}</span>
+                    <ToggleButton className="mr-2" value={acnt.active} onToggle={() => this.toggleAccount(acnt)} />
                     {isAdmin && <Badge color="danger" className="pop-item"
                         onClick={() => this.deleteAccount(index)}>
                         <i className="fa fa-times" />

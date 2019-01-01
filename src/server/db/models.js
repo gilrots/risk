@@ -11,7 +11,7 @@ const Users = sequelize.define('Users', {
     id:{type:Sequelize.INTEGER, autoIncrement: true, primaryKey:true},
     username:{type: Sequelize.STRING, unique: true},
     password:Sequelize.STRING,
-    accounts:{type:Sequelize.ARRAY(Sequelize.STRING), defaultValue: []},
+    accounts:{type:Sequelize.ARRAY(Sequelize.JSON), defaultValue: []},
     type:Sequelize.INTEGER,
 });
 
