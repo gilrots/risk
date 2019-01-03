@@ -15,8 +15,8 @@ const defaults = {
     cols: undefined,
     risk: undefined
 };
-defaults.cols = { name: '', exp: '', params: [defaults.param], aggregations: [], format: undefined };
-defaults.risk = { ...defaults.cols, order: 0 };
+defaults.cols = { name: '', exp: '',visible:true, params: [defaults.param], aggregations: [], format: undefined };
+defaults.risk = { ...defaults.cols};
 
 class TableMaker extends React.Component {
     static propTypes = {
@@ -157,7 +157,7 @@ class TableMaker extends React.Component {
                             <Row className="my-2">
                                 <Col>
                                     {cols.map((col, colIndex) =>
-                                        <Button key={colIndex} className="mr-2 pop-box" color={col.visible ? 'primary' : 'secondary'} active={colIndex === index}
+                                        <Button key={colIndex} className="mr-2 mb-2 pop-box" color={col.visible ? 'primary' : 'secondary'} active={colIndex === index}
                                             onClick={() => this.setState({ selectedColIndex: colIndex })}>
                                             <i className="mr-2 pop-item fa fa-caret-left" onClick={() => this.moveCol(colIndex, Math.max(0,colIndex-1))}/>
                                             {col.name ? col.name : `Col ${colIndex}`}

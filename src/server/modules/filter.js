@@ -1,7 +1,8 @@
 const _ = require('lodash');
 const {toItems, getNumber,replaceAll} = require('../../common/utils.js');
 const FuncsDL = require('../db/funcs');
-const {FilterCouldNotBeParsedError} = require('./errors');
+const {FilterCouldNotBeParsedError,
+        FilterFieldsNotIntersectingError} = require('./errors');
 const {funcTypes, funcArgsTypes} = FuncsDL;
 const Predicate = require('../../common/models/predicate');
 const {errorField} = require('./ace');
@@ -93,7 +94,10 @@ function replaceFuncTokens(action, param, value) {
     return func
 }
 
-function validateFilter(preds){
+function validateFilter(preds, allowedFields){
+    if(preds.some(pred=> !_.includes(allowedFields,pred.field))){
+        throw new FilterFieldsNotIntersectingError('Filter contains fields that are not in the table');
+    }
     const none = DB.defaultOperator.id;
     let error = undefined
     if(_.sumBy(preds,'right') !== _.sumBy(preds,'left')){
@@ -111,12 +115,12 @@ function validateFilter(preds){
     return true;
 }
 
-function parseFilter(filter) {
+function parseFilter(filter, allowedFields) {
     const arg = 'functionTokenThatIsReallySpecial';
     const fm = DB.funcsMap;
     let predicate = () => true;
     const {predicates} = filter;
-    if(!_.isEmpty(predicates) && validateFilter(predicates)) {
+    if(!_.isEmpty(predicates) && validateFilter(predicates, allowedFields)) {
         const func = _.reduce(predicates, (acc,curr) => {
             const pred = Predicate.create(curr,val => changeValue(val,fm[curr.action].for));
             return acc + pred.expression(arg,(id, all) => all ? fm[id] : fm[id].func,replaceFuncTokens);

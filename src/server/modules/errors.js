@@ -66,6 +66,13 @@ class FilterCouldNotBeParsedError extends Error {
     }
 }
 
+class FilterFieldsNotIntersectingError extends Error {
+    constructor(...args) {
+        super(...args);
+        Error.captureStackTrace(this, FilterFieldsNotIntersectingError);
+    }
+}
+
 module.exports = {
     UserIsNotAllowedError,
     UserAlreadyExistError,
@@ -75,6 +82,7 @@ module.exports = {
     TableCouldNotBeParsedError,
     TableCouldNotBeUpdatedOrCreatedError,
     FilterCouldNotBeParsedError,
+    FilterFieldsNotIntersectingError,
     DataRequestError,
     AceError
 };

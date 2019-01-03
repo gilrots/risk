@@ -1,11 +1,12 @@
 const config = require('../../common/config.json');
 const _ = require('lodash');
 const Ace = require('./ace');
-const {parseFilter} = require('./filter');
+const {parseFilter, getDefaultFilter} = require('./filter');
 const {
     TableCouldNotBeParsedError, 
     TableCouldNotBeUpdatedOrCreatedError,
-    FilterCouldNotBeParsedError
+    FilterCouldNotBeParsedError,
+    FilterFieldsNotIntersectingError
 } = require('./errors');
 const Utils = require('../../common/utils');
 const TablesDL = require('../db/tables'); 
@@ -187,7 +188,7 @@ const defaultTable = {
             }
         }
     ],
-    filter: {isActive:false, predicates:[]},
+    filter: getDefaultFilter(),
     excluded: []
 }
 
@@ -377,8 +378,22 @@ function parseExpression(exp, argsMap) {
     return _.reduce(_.keys(argsMap), (acc, key) => Utils.replaceAll(acc, key, argsMap[key]), exp);
 }
 
-function parseTableFilter(table) {
-    table.calculated.filter = parseFilter(table.filter);
+function parseTableFilter(table, filter) {
+    try {
+        const toParse = filter || table.filter;
+        const parsedFilter = parseFilter(toParse, table.calculated.aceFields);
+        table.filter = toParse;
+        table.calculated.filter = parsedFilter;
+    }
+    catch (e){
+        if (e instanceof FilterFieldsNotIntersectingError) {
+            table.filter = getDefaultFilter();
+            table.calculated.filter = {};
+        } 
+        else if (e instanceof FilterCouldNotBeParsedError) {
+            throw new FilterCouldNotBeParsedError(e.message);
+        } 
+    }
 }
 
 function formatKey(name){
@@ -438,7 +453,6 @@ async function createTable(params) {
             if (data.id) {
                 const updateIndex = _.findIndex(DB.tables, tab => tab.id === data.id);
                 if (updateIndex > -1) {
-                    data.filter = {};
                     await TablesDL.updateOne(data);
                     const updatedTable = await TablesDL.getOne(data.id);
                     parseTable(updatedTable);
@@ -499,15 +513,7 @@ async function setTableFilter(params) {
     const tableId = parseInt(params.tableId);
     const table = getTable(tableId);
     if (table) {
-        const oldFilter = table.filter;
-        table.filter = filter;
-        try {
-            parseTableFilter(table);
-        }
-        catch (e){
-            table.filter = oldFilter;
-            throw new FilterCouldNotBeParsedError(e.message);
-        }
+        parseTableFilter(table, filter);
         await TablesDL.updateOne({id:table.id, filter});
     }
 

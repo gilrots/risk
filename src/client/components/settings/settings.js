@@ -78,7 +78,7 @@ class RiskSettings extends React.Component {
             <Label for="add-acc">Accounts</Label>
             <br />
             {!_.isEmpty(selectedUser.accounts) ? selectedUser.accounts.map((acnt, index) =>
-                <Button key={acnt.id} className="pop-box mr-2" color={acnt.active ? "primary" : "secondary"}>
+                <Button key={acnt.id} className="pop-box mr-2 mb-2" color={acnt.active ? "primary" : "secondary"}>
                     <span className="mr-2">{acnt.id}</span>
                     <i className={`mr-2 fa fa-${acnt.active ? 'eye' : 'eye-slash'}`} onClick={() => this.toggleAccount(acnt)}/>
                     {isAdmin && <Badge color="danger" className="pop-item"
