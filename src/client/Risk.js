@@ -24,7 +24,7 @@ class Risk extends React.Component {
         const loggedIn = User.exist();
         return (
             <Router history={history}>
-                <div>
+                <Container fluid className="d-flex flex-fill flex-column">
                     <PrivateRoute exact path="/" component={App}/>
                     {!loggedIn && <Jumbotron>
                         <Container>
@@ -39,7 +39,7 @@ class Risk extends React.Component {
                             </div>
                         </Container>
                     </Jumbotron>}
-                </div>
+                </Container>
             </Router>
         );
     }

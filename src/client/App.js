@@ -292,7 +292,7 @@ export default class App extends Component {
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>
-        <AppHeader role={role}>
+            <AppHeader role={role}>
                 <Fragment>
                     {hasLatency && data.latency.map(badge =>
                         <NavItem key={badge.name} className="d-flex align-items-center mr-1">
@@ -304,51 +304,46 @@ export default class App extends Component {
                     )}
                 </Fragment>
                 <IconedMenu items={navItems} title="Menu" split={false}/>
+                <Alert color="warning" className="m-2" isOpen={excludeMode}>Exclude Mode On</Alert>
             </AppHeader>
             <RiskLoader loading={!hasData}>
-                {hasData && <main className="my-5 py-5">
-                    <Nav tabs>
-                        {data.tables.map((table) =>
-                        <IconedMenu key={table.id} items={this.getTableActions(table)} 
-                        title={table.name} active={table.id === activeTable} split={true}
-                        menuClick={() => {this.setState({activeTable:table.id});this.toggleTab(table.id)}} />)}
-                        <NavItem>
-                            <Button className="rounded-circle mx-2" outline color="primary"
+                {hasData && 
+                <Container fluid className="mt-5 pt-5 d-flex flex-column flex-fill">
+                    <Row>
+                        <Nav tabs>
+                            {data.tables.map((table) =>
+                                <IconedMenu key={table.id} items={this.getTableActions(table)}
+                                    title={table.name} active={table.id === activeTable} split={true}
+                                    menuClick={() => { this.setState({ activeTable: table.id }); this.toggleTab(table.id) }} />)}
+                            <NavItem>
+                                <Button className="rounded-circle mx-2" outline color="primary"
                                     onClick={() => this.openTableMaker(hasTableData)}>
-                                <i className={`fa fa-${hasTableData ? 'plus' : 'sync-alt'}`}/>
-                            </Button>
-                        </NavItem>
-                    </Nav>
-                    <TabContent activeTab={'0'} className="jumbo">
-                        <TabPane tabId={'0'}>
-                            <Container className="max">
-                                <Row className="justify-content-center">
-                                    <Alert color="warning" className="m-2" isOpen={excludeMode}>Exclude Mode On</Alert>
-                                </Row>
-                                <Row>
-                                    <Col xs={{order: 1}} md={{size: 2}}
-                                         className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                        {<StockViewer className="risk" formatsCells={true} 
-                                         stocks={data.risk} id="risk"/>}
-                                    </Col>
-                                    <Col xs={{order: 2}} md={{size: 5}}
-                                         className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
-                                        {<StockViewer id="longs" className="longs"
-                                                      stocks={data.long}
-                                                      excludeMode={excludeMode} 
-                                                      onRowActionClicked={this.stockAction} reverse/>}
-                                    </Col>
-                                    <Col xs={{order: 3}} md={{size: 5}} className="shorts py-5 mb-5 py-md-0 mb-md-0">
-                                        {<StockViewer id="shorts" className="shorts"
-                                                      stocks={data.short}
-                                                      excludeMode={excludeMode} 
-                                                      onRowActionClicked={this.stockAction}/>}
-                                    </Col>
-                                </Row>
-                            </Container>
-                        </TabPane>
-                    </TabContent>
-                </main>}
+                                    <i className={`fa fa-${hasTableData ? 'plus' : 'sync-alt'}`} />
+                                </Button>
+                            </NavItem>
+                        </Nav>
+                    </Row>
+                    <Row className="jumbo flex-fill">
+                        <Col xs={{order: 1}} md={{size: 2}}
+                                className="pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                            {<StockViewer className="risk" formatsCells={true} 
+                                stocks={data.risk} id="risk"/>}
+                        </Col>
+                        <Col xs={{order: 2}} md={{size: 5}}
+                                className="longs pb-5 mb-5 pb-md-0 mb-md-0 mx-auto mx-md-0">
+                            {<StockViewer id="longs" className="longs"
+                                            stocks={data.long}
+                                            excludeMode={excludeMode} 
+                                            onRowActionClicked={this.stockAction} reverse/>}
+                        </Col>
+                        <Col xs={{order: 3}} md={{size: 5}} className="shorts py-5 mb-5 py-md-0 mb-md-0">
+                            {<StockViewer id="shorts" className="shorts"
+                                            stocks={data.short}
+                                            excludeMode={excludeMode} 
+                                            onRowActionClicked={this.stockAction}/>}
+                        </Col>
+                    </Row>
+                </Container>}
             </RiskLoader>
         </Fragment>;
     }

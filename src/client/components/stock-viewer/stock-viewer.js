@@ -61,13 +61,13 @@ class StockViewer extends React.Component {
     formatRow = row => row.value = row.format !== undefined ? FormattersFuncs[row.format](row.value) : row.value;
 
     changeState(props){
-        let originalRows = props.stocks.dataKey ?
+        const originalRows = props.stocks.dataKey ?
             _.map(props.stocks.data, props.stocks.dataKey) :
             props.stocks.data;
         if(this.props.formatsCells){
             _.forEach(originalRows,this.formatRow);
         }
-        let rows = originalRows.slice(0);
+        const rows = originalRows.slice(0);
         return { originalRows, rows };
     }
 
@@ -110,25 +110,7 @@ class StockViewer extends React.Component {
     //TODO: make this efficient
     getCellActions = (col,row) => this.changeCallback(this.cellActions[col.key],{col,row});
 
-    onRowsSelected = rows => {
-        this.setState({
-            selectedIndexes: this.state.selectedIndexes.concat(
-                rows.map(r => r.rowIdx)
-            )
-        });
-    };
-
-    onRowsDeselected = rows => {
-        let rowIndexes = rows.map(r => r.rowIdx);
-        this.setState({
-            selectedIndexes: this.state.selectedIndexes.filter(
-                i => rowIndexes.indexOf(i) === -1
-            )
-        });
-    };
-
     rowRenderer = ({ renderBaseRow, ...props }) => <div className={`${props.row.origin}-ROW`}>{renderBaseRow(props)}</div>;
-
 
     render() {
         const {cols,rows} = this.state;
@@ -142,19 +124,10 @@ class StockViewer extends React.Component {
                     rowsCount={rows.length}
                     getCellActions={this.getCellActions}
                     rowRenderer={this.rowRenderer}
-                    minHeight={800}
-                    rowHeight={20}
-                    rowSelection={{
-                        showCheckbox: false,
-                        enableShiftSelect: true,
-                        onRowsSelected: this.onRowsSelected,
-                        onRowsDeselected: this.onRowsDeselected,
-                        selectBy: {
-                            indexes: this.state.selectedIndexes
-                        }
-                    }}/>
+                    rowHeight={20}/>
               </RiskLoader>;
     }
 }
+//minHeight={800}
 
 export default StockViewer;
