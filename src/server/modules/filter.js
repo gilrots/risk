@@ -73,7 +73,7 @@ function changeValue(value, type) {
         case funcArgsTypes.number:
             return getNumber(value,Number.NaN);
         case funcArgsTypes.string:
-            if(value === undefined || value === null){
+            if(_.isNil(value)){
                 throw new FilterCouldNotBeParsedError("value must be textual!");
             }
             return `"${value}"`;
@@ -86,8 +86,8 @@ function replaceFuncTokens(action, param, value) {
     let func =  action.func.replace(p,param).replace(v,value);
     if(action.func.includes(e)){
         let epsilon = 1;
-        if (value < 1) {
-          epsilon = Math.pow(10,-1*(value.toString().split(".")[1].length));
+        if (value < 1 && value.toString.includes('.')) {
+          epsilon = Math.pow(10,-1*(value.toString().split('.')[1].length));
         }
         func = func.replace(e,epsilon);
     }
@@ -95,6 +95,7 @@ function replaceFuncTokens(action, param, value) {
 }
 
 function validateFilter(preds, allowedFields){
+    console.log(_.map(preds,'field'));
     if(preds.some(pred=> !_.includes(allowedFields,pred.field))){
         throw new FilterFieldsNotIntersectingError('Filter contains fields that are not in the table');
     }

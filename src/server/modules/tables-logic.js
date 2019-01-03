@@ -381,7 +381,7 @@ function parseExpression(exp, argsMap) {
 function parseTableFilter(table, filter) {
     try {
         const toParse = filter || table.filter;
-        const parsedFilter = parseFilter(toParse, table.calculated.aceFields);
+        const parsedFilter = parseFilter(toParse, _.map(table.cols,'key'));
         table.filter = toParse;
         table.calculated.filter = parsedFilter;
     }
