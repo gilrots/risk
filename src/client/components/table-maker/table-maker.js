@@ -72,11 +72,9 @@ class TableMaker extends React.Component {
         }));
     }
 
-    deleteElement = (arr, index, keepOne = true) => {
+    deleteElement = (arr, index) => {
         let deleted = [...arr];
-        if (deleted.length > 1 || !keepOne) {
-            deleted.splice(index, 1);
-        }
+        deleted.splice(index, 1);
         return deleted;
     }
 
@@ -163,7 +161,7 @@ class TableMaker extends React.Component {
                                             onClick={() => this.setState({ selectedColIndex: colIndex })}>
                                             <i className="mr-2 pop-item fa fa-caret-left" onClick={() => this.moveCol(colIndex, Math.max(0,colIndex-1))}/>
                                             {col.name ? col.name : `Col ${colIndex}`}
-                                            {!riskMode && <i className={`ml-2 fa fa-${col.visible ? 'eye' : 'eye-slash'}`} onClick={() => this.setColData(colIndex, 'visible', !col.visible)}/>}
+                                            <i className={`ml-2 fa fa-${col.visible ? 'eye' : 'eye-slash'}`} onClick={() => this.setColData(colIndex, 'visible', !col.visible)}/>
                                             <Badge className="ml-2 pop-item" color="danger" onClick={(e) => this.deleteCol(e, colIndex)} disabled={cols.length < 2}><i className="fa fa-times" /></Badge>
                                             <i className="ml-2 pop-item fa fa-caret-right" onClick={() => this.moveCol(colIndex, Math.min(cols.length - 1,colIndex+1))}/>
                                         </Button>)}
@@ -220,7 +218,7 @@ class TableMaker extends React.Component {
                                             onSelected={item => this.setColData(index, 'params', item, parIndex, 'item')} />
                                     </Col>
                                     <Col xs="auto" className="align-self-center">
-                                        <Button color="danger" className="hover-item rounded-circle" outline disabled={col.params.length < 2}
+                                        <Button color="danger" className="hover-item rounded-circle" outline
                                             onClick={() => this.setColData(index, 'params', this.deleteElement(col.params, parIndex))} >
                                             <i className="fa fa-times" />
                                         </Button>
@@ -257,7 +255,7 @@ class TableMaker extends React.Component {
                                     </Col>
                                     <Col xs="auto" className="align-self-center">
                                         <Button className="hover-item rounded-circle" color="danger" outline
-                                            onClick={() => this.setColData(index, 'aggregations', this.deleteElement(col.aggregations, aggIndex, false))}>
+                                            onClick={() => this.setColData(index, 'aggregations', this.deleteElement(col.aggregations, aggIndex))}>
                                             <i className="fa fa-times" />
                                         </Button>
                                     </Col>

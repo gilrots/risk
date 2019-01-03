@@ -366,7 +366,9 @@ function calculateTable(table, bankDB, aceDB, user) {
 
         // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
-        result.risk.data.push({ name: col.name, value, format:col.format });
+        if(col.visible){
+            result.risk.data.push({ name: col.name, value, format:col.format });
+        }
     });
     return result;
 }
@@ -407,7 +409,6 @@ async function createTable(params) {
                     calc.aggregations.push({ key: formatKey(agg.key), exp: `${DB.sum} ${parseExpression(agg.exp, calc.argsMap)}` })
                 });
                 riskData = isRisk ? {
-                    
                     type: col.name.includes(DB.replaceToken) ? DB.replaceToken : DB.subTypes[0]
                 } : {};
                 
