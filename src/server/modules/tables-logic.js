@@ -351,22 +351,24 @@ function calculateTable(table, bankDB, aceDB, user) {
     _.forEach(table.calculated.cols.risk, col => {
         // after all stocks are set with basic data, its time to calculate aggregations
         // calculate the aggregations
-        _.forEach(col.func.aggregations, agg => {
-            if ((result.aggs[agg.key] === undefined || result.aggs[col.key] === undefined) && col.type !== DB.subTypes[0]) {
-                const stocks = result[col.type].data;
-                const aggResult = _.reduce(stocks, (acc, dat) => {
-                    // these values may seem redundant but the eval func needs them
-                    const { stock, ace, bank } = dat;
-                    const val = eval(agg.exp);
-                    return Utils.getNumber(val, acc);
-                }, 0);
-                result.aggs[col.key] = aggResult;
-                result.aggs[agg.key] = aggResult;
-            }
-        });
+        if(col.type !== DB.subTypes[0]){
+            _.forEach(col.func.aggregations, agg => {
+                if (_.isNil(result.aggs[agg.key])) {
+                    const stocks = result[col.type].data;
+                    const aggResult = _.reduce(stocks, (acc, dat) => {
+                        // these values may seem redundant but the eval func needs them
+                        const { stock, ace, bank } = dat;
+                        const val = eval(agg.exp);
+                        return Utils.getNumber(val, acc);
+                    }, 0);
+                    result.aggs[agg.key] = aggResult;
+                }
+            });
+        }
 
         // now that aggregations values are computed, recalculate risk values that needed them
         const value = eval(col.func.exp);
+        result.aggs[col.key] = value;
         if(col.visible){
             result.risk.data.push({ name: col.name, value, format:col.format });
         }
