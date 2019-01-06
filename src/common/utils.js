@@ -23,7 +23,7 @@ function treeForEach(obj, key, func, args) {
     }
 }
 
-function performance(func, name) {
+function performance(func, name = func.name) {
     const t0 = new Date().getTime();
     func();
     const t1 = new Date().getTime();

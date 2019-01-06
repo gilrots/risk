@@ -4,7 +4,13 @@ const React = require('react');
 import _ from 'lodash';
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
+import {performance} from "../../../common/utils";
 
+const sd = {
+    none: "NONE",
+    asc: "ASC",
+    desc: "DESC",
+}
 class StockViewer extends React.Component {
     static propTypes = {
         stocks: PropTypes.object.isRequired,
@@ -16,12 +22,11 @@ class StockViewer extends React.Component {
 
     constructor(props) {
         super(props);
-        this.sortRef = React.createRef();
         this.getCellActions = props.onRowActionClicked ? this.getCellActions : undefined;
-        this.state = this.changeState(props);
-        this.state.cols = this.createColumns(props);
-        this.state.selectedIndexes = [];
-        this.lastSort = {};
+        this.state = {
+            cols: this.createColumns(props),
+            ...this.changeState(props)
+        };
         this.rowActions = [
             {
                 icon: <span className="fa fa-times" />,
@@ -33,6 +38,7 @@ class StockViewer extends React.Component {
                 }
             }
         ];
+        this.lastSort = undefined;
     }
 
     changeCallback(rowActions,args) {
@@ -42,20 +48,25 @@ class StockViewer extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        // You don't have to do this check first, but it can help prevent an unneeded render
-        if (nextProps.stocks.data !== this.props.stocks.data) {
-            this.setState(this.changeState(nextProps));
-            if(this.sortRef.current && !_.isEmpty(this.lastSort))
-            {
-                this.sortRef.current.setState({sortColumn:this.lastSort.sortColumn, sortDirection:this.lastSort.sortDirection})
-                //TODO: check if even needs sorting
-                this.sortRef.current.handleSort(this.lastSort.sortColumn, this.lastSort.sortDirection);
-            }
-        }
-        if(nextProps.stocks.cols !== this.props.stocks.cols || 
-           nextProps.excludeMode !== this.props.excludeMode) {
+        if(!_.isEqual(nextProps.stocks.cols, this.props.stocks.cols)) {
             this.setState({cols: this.createColumns(nextProps)});
         }
+        if (!_.isEqual(nextProps.stocks.data, this.props.stocks.data)) {
+            this.setState(this.changeState(nextProps), () => {     
+                    if(!_.isNil(this.lastSort) ){
+                        const {sortColumn,sortDirection} = this.lastSort;
+                        this.handleGridSort(sortColumn, sortDirection);
+                    }
+                }
+            );
+        }
+        if(nextProps.excludeMode !== this.props.excludeMode) {
+            this.setState({
+                cols: this.createColumns(nextProps),
+                ...this.changeState(nextProps)
+            });
+        }
+
     }
 
     formatRow = row => row.value = row.format !== undefined ? FormattersFuncs[row.format](row.value) : row.value;
@@ -77,32 +88,22 @@ class StockViewer extends React.Component {
             name: col.name,
             sortable: true,
             resizable: true,
-            formatter: col.format != undefined ? Formatters[col.format] : undefined
+            formatter: !_.isNil(col.format) ? Formatters[col.format] : undefined
         }));
-        this.cellActions = props.excludeMode ? {
+        this.cellActions = props.excludeMode && res.length > 0 ? {
             [res[0].key]: this.rowActions
         } : {};
         return props.reverse ? res.reverse() : res;
     }
 
     handleGridSort = (sortColumn, sortDirection) => {
-        if(sortColumn && sortDirection) {
-            this.lastSort = {sortColumn, sortDirection};
-        }
-
-        const comparer = (a, b) => {
-            if (sortDirection === 'ASC') {
-                return (a[sortColumn] > b[sortColumn]) ? 1 : -1;
-            } else if (sortDirection === 'DESC') {
-                return (a[sortColumn] < b[sortColumn]) ? 1 : -1;
-            }
-        };
-
-        //TODO: function clled when sort = none
-        const rows = sortDirection === 'NONE' ? this.state.originalRows.slice(0) : this.state.originalRows.sort(comparer);
-        console.log('im sorting!',{sortColumn, sortDirection});
-        //TODO: SORT this out - hihi
-        this.setState({rows },()=>{window.dispatchEvent(new Event('resize'))});
+        const shouldSort = sortDirection === sd.none;
+        this.lastSort = shouldSort ? undefined : {sortColumn, sortDirection};
+        const {originalRows} = this.state;
+        const rows = shouldSort ? 
+            originalRows.slice(0) :
+            _.orderBy(originalRows, sortColumn, sortDirection.toLowerCase());
+        this.setState({rows});
     };
 
     rowGetter = rowIdx => this.state.rows[rowIdx];
@@ -117,7 +118,6 @@ class StockViewer extends React.Component {
         const can = _.isEmpty(cols);
         return <RiskLoader loading={can}>
                     <ReactDataGrid
-                    ref={this.sortRef}
                     columns={cols}
                     onGridSort={this.handleGridSort}
                     rowGetter={this.rowGetter}
