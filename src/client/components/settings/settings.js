@@ -5,6 +5,7 @@ import { Container, Button, Input, Badge, Form, FormGroup, Label, InputGroup, In
 import SearchDropdown from "../search-dropdown/search-dropdown";
 
 const config = require('../../../common/config');
+const accSplit = '-';
 const {getUserSettings, setUserSettings} = config.server.api;
 
 class RiskSettings extends React.Component {
@@ -55,7 +56,13 @@ class RiskSettings extends React.Component {
         }});
     };
 
-    addAccount = () => this.updateAccount((selectedUser,newAccount) => [...selectedUser.accounts, {id:newAccount,active:true}]);
+    createAccounts(newAccount) {
+            return newAccount.includes(accSplit) ?
+            _.map(_.filter(newAccount.split(accSplit),_.negate(_.isEmpty)), nacc => ({id:nacc,active:true})) :
+            [{id:newAccount,active:true}];
+    }
+
+    addAccount = () => this.updateAccount((selectedUser,newAccount) => _.uniqBy([...selectedUser.accounts, ...this.createAccounts(newAccount)],'id'));
 
     toggleAccount = acc => this.updateAccount(selectedUser => selectedUser.accounts.map(accnt => accnt.id === acc.id ?  {id:acc.id, active:!acc.active}: accnt));
 
@@ -72,7 +79,7 @@ class RiskSettings extends React.Component {
 
     render() {
         const { selectedUser,isAdmin,newAccount } = this.state;
-        const addDisabled = _.isEmpty(newAccount) || selectedUser.accounts.includes(newAccount);
+        const addDisabled = _.isEmpty(newAccount) || _.some(selectedUser.accounts,['id',newAccount]);
         return selectedUser ? <Container>
             <h4>{selectedUser.username}</h4>
             <Label for="add-acc">Accounts</Label>
@@ -97,7 +104,7 @@ class RiskSettings extends React.Component {
                             onSelected={item => this.setState(this.getSelected(Number(item.id)))} />
                     </div>
                     <InputGroup>
-                        <Input type="number" id="add-acc" name="settings" value={newAccount}
+                        <Input type="text" id="add-acc" name="settings" value={newAccount}
                             placeholder="Add account"
                             onChange={e => this.setState({ newAccount: e.target.value })} />
                         <InputGroupAddon addonType="append">

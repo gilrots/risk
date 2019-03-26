@@ -33,6 +33,9 @@ async function getTable(params) {
     const aceLatency = { name: "Ace", error: false, message: '' };
     try {
         const accounts = await DB.getUserAccounts(params);
+        if(_.isEmpty(accounts)){
+            throw new AceError("No accounts are registered to this user");
+        }
         const intras = await DB.getUserIntras(params);
         const ipos = await DB.getUserIPOs(params);
         const iposMap = _.reduce(ipos,(acc,ipo) => _.assign(acc,{[ipo.id]:ipo}),{});
