@@ -4,7 +4,6 @@ const React = require('react');
 import _ from 'lodash';
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
-import {performance} from "../../../common/utils";
 
 const sd = {
     none: "NONE",
@@ -48,25 +47,30 @@ class StockViewer extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if(!_.isEqual(nextProps.stocks.cols, this.props.stocks.cols)) {
-            this.setState({cols: this.createColumns(nextProps)});
+        const state = {};
+        let callback = undefined;
+        const exclude = nextProps.excludeMode !== this.props.excludeMode;
+        if(!_.isEqual(nextProps.stocks.cols, this.props.stocks.cols) || exclude) {
+           state.cols = this.createColumns(nextProps);
         }
-        if (!_.isEqual(nextProps.stocks.data, this.props.stocks.data)) {
-            this.setState(this.changeState(nextProps), () => {     
-                    if(!_.isNil(this.lastSort) ){
-                        const {sortColumn,sortDirection} = this.lastSort;
-                        this.handleGridSort(sortColumn, sortDirection);
-                    }
-                }
-            );
-        }
-        if(nextProps.excludeMode !== this.props.excludeMode) {
-            this.setState({
-                cols: this.createColumns(nextProps),
-                ...this.changeState(nextProps)
-            });
-        }
+        if (!_.isEqual(nextProps.stocks.data, this.props.stocks.data) || exclude) {
+            Object.assign(state,this.changeState(nextProps));
+            if(!_.isNil(this.lastSort) ){
+                callback = () => {     
+                    const {sortColumn,sortDirection} = this.lastSort;
+                    this.handleGridSort(sortColumn, sortDirection);
+                };
+            }
 
+        }
+        if(!_.isEmpty(state)) {
+            if(state.cols && state.rows) {
+                 this.setState({cols:state.cols},() => this.setState({rows:state.rows, originalRows: state.originalRows},callback));
+            }
+            else {
+                this.setState(state,callback);
+            }
+        }
     }
 
     formatRow = row => row.value = row.format !== undefined ? FormattersFuncs[row.format](row.value) : row.value;
