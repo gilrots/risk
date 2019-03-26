@@ -4,4 +4,3 @@ dist
 *.log
 yarn.lock
 .idea/
-src/common/config.json

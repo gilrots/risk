@@ -97,6 +97,11 @@
       "poalim": "פועלים",
       "ubank": "U-Bank",
       "igud": "איגוד"
+    },
+    "colors": {
+      "poalim": "danger",
+      "ubank": "warning",
+      "igud": "info"
     }
   },
   "ace": {

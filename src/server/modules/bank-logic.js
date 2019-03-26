@@ -5,12 +5,15 @@ const {banks, fields, originField, origins, bankField, amountField, timeout, dat
 const idField = fields[1];
 const accntField = fields[0];
 const accntsField = `${accntField}s`;
+const banksField = `${bankField}s`;
 const sdqField = fields[3];
 const fqField = fields[6];
 const presentationFields = [
     {id:idField,name:'מזהה נייר'},
     {id:amountField,name:'כמות'},
     {id:originField,name:'מקור'},
+    {id:banksField,name:'בנקים'},
+    {id:accntsField,name:'חשבונות'},
 ];
 const rn = () => new Date().getTime(); // Right-now
 const sysAccount = "System"
@@ -65,6 +68,10 @@ function getBank(bankData) {
     return bankData[bankField];
 }
 
+function getBanks(bankData) {
+    return bankData[banksField];
+}
+
 function getData(stock) {
     return _.flatMap(stock[dataField],_.values);
 }
@@ -79,6 +86,10 @@ function setAccount(stock, account) {
 
 function setAccounts(stock) {
     return stock[accntsField] = getAggregatedData(stock,getAccount);
+}
+
+function setBanks(stock) {
+    return stock[banksField] = _.keyMap(_.keys(stock[dataField]),k => _.keys(stock[dataField][k]));
 }
 
 function setOrigin(stock, origin) {
@@ -119,6 +130,7 @@ function updateStocks(bankData, origin, db) {
     setData(stock, bankData);
     setAmount(stock, getTotalAmount(stock));
     setAccounts(stock);
+    setBanks(stock);
 }
 
 function getLongShortIds(){
