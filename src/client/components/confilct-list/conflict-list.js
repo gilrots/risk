@@ -22,11 +22,7 @@ class ConflictList extends React.Component {
             this.setState({conflicts});
         })
     }
-
-    save() {
-        
-    }
-
+    
     render() {
         const {conflicts} = this.state;
         return <Container>

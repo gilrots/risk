@@ -15,6 +15,8 @@ import ExcludeList from "./components/exclude-list/exclude-list";
 import RiskLoader from "./components/loader/loader";
 import IntraDaysList from "./components/intra-days/intra-days-list";
 import IPOList from "./components/ipo-list/ipo-list";
+import ConflictsList from "./components/confilct-list/conflict-list";
+import LoansList from "./components/loans-list/loans-list";
 import RiskSettings from './components/settings/settings';
 import { IconedMenu } from './components/func-components';
 import {get,post,exportCSV, setPolling, logout} from "./helpers/client-utils"
@@ -157,6 +159,12 @@ export default class App extends Component {
             case 5:
                 res.component = <RiskSettings id="risk-settings" ref={ref} onAlert={onAlert}/>;
                 break;
+            case 6:
+                res.component = <ConflictsList id="conflicts-list" ref={ref} onAlert={onAlert}/>;
+                break;
+            case 7:
+                res.component = <LoansList id="loans-list" ref={ref} onAlert={onAlert}/>;
+                break;
             default:
                 res.component = <div>---</div>;
         }
@@ -237,6 +245,16 @@ export default class App extends Component {
                 action: () => this.setState(ps => ({excludeMode:!ps.excludeMode}))
             },
             {
+                name: 'Conflicts',
+                icon: 'exchange-alt',
+                action: () => this.toggleModal("Conflicts", 6)
+            },
+            {
+                name: 'Loans',
+                icon: 'coins',
+                action: () => this.toggleModal("Loans", 7)
+            },
+            {
                 name: 'User Settings',
                 icon: 'user-cog',
                 action: () => this.toggleModal("Settings", 5)
@@ -269,6 +287,7 @@ export default class App extends Component {
         const hasLatency = !_.isEmpty(data) && data.latency;
         const navItems = this.getNavMenuActions();
         const modalBody = this.modalComponent(modal.component);
+        const onSave =  () => modalBody.child.save ? modalBody.child.save() : this.toggleModal();
         return <Fragment>
             {!_.isEmpty(alert.message) && 
             <SweetAlert title={alert.title} type={alert.type} showCancel={alert.showCancel}
@@ -288,7 +307,7 @@ export default class App extends Component {
                     {modalBody.component}
                 </ModalBody>
                 <ModalFooter>
-                    <Button color="primary" onClick={() => modalBody.child.save()}>Save</Button>{' '}
+                    <Button color="primary" onClick={onSave}>{_.get(modalBody, 'child.save') ? "Save" : "Ok"}</Button>{' '}
                     <Button color="secondary" onClick={this.toggleModal}>Cancel</Button>
                 </ModalFooter>
             </Modal>

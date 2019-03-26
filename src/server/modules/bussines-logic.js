@@ -102,6 +102,20 @@ async function getFilterMakerData() {
     return Filters.getFilterMetadata();
 }
 
+async function getConflicts() {
+    return [{
+        id:'3234',
+        name:'2323',
+        short:'3234',
+        long:'3234',
+        accounts:'3234',
+    }];
+}
+
+async function getLoans() {
+    return [];
+}
+
 async function searchAceFields(params) {
     const { search } = params;
     const fields = await getTableMakerData();
@@ -162,5 +176,7 @@ module.exports = {
     getTableExcludeList,
     getTableFilter,
     getFilterMakerData,
-    searchAceFields 
+    searchAceFields,
+    getConflicts,
+    getLoans
 };

@@ -85,6 +85,8 @@ const routes = [
                 [api.getTableMakerData]:    Logic.getTableMakerData,
                 [api.getFilterMakerData]:   Logic.getFilterMakerData,
                 [api.tableAction.url]:      Logic.tableAction,
+                [api.getConflicts]:         Logic.getConflicts,
+                [api.getLoans]:             Logic.getLoans,
                 [api.getRole]:              DB.getRole,
                 [api.getUserSettings]:      DB.getUserSettings,
                 [api.getIntras]:            DB.getUserIntras,

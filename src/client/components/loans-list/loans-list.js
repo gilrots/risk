@@ -23,10 +23,6 @@ class LoansList extends React.Component {
         })
     }
 
-    save() {
-        
-    }
-
     render() {
         const {loans} = this.state;
         return <Container>
