@@ -4,60 +4,64 @@
       "port": 80,
       "api": "/gili",
       "mock": {
-        "allow": false,
+        "allow": true,
         "interval": 200
       }
     },
     "port": 8080,
-    "priviliges":["ADMIN", "DEVELOPER", "TRADER"],
+    "priviliges": [
+      "ADMIN",
+      "DEVELOPER",
+      "TRADER"
+    ],
     "api": {
-      "bankPost":"/bank",
-      "login":"/api/login",
-      "register":"/api/register",
-      "getRole":"/api/secured/getRole",
-      "getData":"/api/secured/getData",
-      "getTableMakerData":"/api/secured/getTBMD",
-      "getFilterMakerData":"/api/secured/getFMD",
-      "getTableFilter":"/api/secured/getFilter",
-      "setTableFilter":"/api/secured/setFilter",
-      "getExcludeList":"/api/secured/getExclude",
-      "setExcludeList":"/api/secured/setExclude",
-      "createTable":"/api/secured/createTable",
-      "searchAce":"/api/secured/searchAce",
-      "searchAceFields":"/api/secured/searchAceFields",
-      "getUserSettings":"/api/secured/getUserSettings",
-      "setUserSettings":"/api/secured/setUserSettings",
-      "getIntras":"/api/secured/getIntras",
-      "setIntras":"/api/secured/setIntras",
-      "getIPOFavs":"/api/secured/getIPOFavs",
-      "getConflicts":"/api/secured/getConflicts",
-      "getLoans":"/api/secured/getLoans",
-      "updateIPOFav":"/api/secured/updateIPOFav",
-      "getIPOs":"/api/secured/getIPOs",
-      "setIPOs":"/api/secured/setIPOs",
-      "tableAction":{
+      "bankPost": "/bank",
+      "login": "/api/login",
+      "register": "/api/register",
+      "getRole": "/api/secured/getRole",
+      "getData": "/api/secured/getData",
+      "getTableMakerData": "/api/secured/getTBMD",
+      "getFilterMakerData": "/api/secured/getFMD",
+      "getTableFilter": "/api/secured/getFilter",
+      "setTableFilter": "/api/secured/setFilter",
+      "getExcludeList": "/api/secured/getExclude",
+      "setExcludeList": "/api/secured/setExclude",
+      "createTable": "/api/secured/createTable",
+      "searchAce": "/api/secured/searchAce",
+      "searchAceFields": "/api/secured/searchAceFields",
+      "getUserSettings": "/api/secured/getUserSettings",
+      "setUserSettings": "/api/secured/setUserSettings",
+      "getIntras": "/api/secured/getIntras",
+      "setIntras": "/api/secured/setIntras",
+      "getIPOFavs": "/api/secured/getIPOFavs",
+      "getConflicts": "/api/secured/getConflicts",
+      "getLoans": "/api/secured/getLoans",
+      "updateIPOFav": "/api/secured/updateIPOFav",
+      "getIPOs": "/api/secured/getIPOs",
+      "setIPOs": "/api/secured/setIPOs",
+      "tableAction": {
         "url": "/api/secured/tableAction",
-        "actions":{
-          "copy":"copy",
-          "get":"get",
-          "remove":"remove"
+        "actions": {
+          "copy": "copy",
+          "get": "get",
+          "remove": "remove"
         }
       }
     }
   },
-  "DB":{
+  "DB": {
     "admin": "admin",
-    "JWT":{
+    "JWT": {
       "saltRounds": 2,
       "jwtSecret": "yo-its-a-secret",
       "tokenExpireTime": "3h"
     },
     "PG": {
-      "forceSync":false,
-      "database":"Risk",
-      "username":"postgres",
-      "password":"carbit1",
-      "settings":{
+      "forceSync": false,
+      "database": "Risk",
+      "username": "postgres",
+      "password": "carbit1",
+      "settings": {
         "host": "localhost",
         "dialect": "postgres",
         "operatorsAliases": false,
@@ -67,8 +71,8 @@
           "acquire": 30000,
           "idle": 10000
         },
-        "query":{
-          "raw":true
+        "query": {
+          "raw": true
         }
       }
     }
@@ -83,7 +87,20 @@
     }
   },
   "bank": {
-    "fields": ["AcntNo", "securityID", "currency", "StartDayQty", "BuyOrderQty", "SellOrderQty", "FillQty", "CostPrice", "UpdateTime", "TotalWorth", "TradeSum"],
+    "fields": [
+      "AcntNo",
+      "securityID",
+      "currency",
+      "StartDayQty",
+      "BuyOrderQty",
+      "SellOrderQty",
+      "FillQty",
+      "CostPrice",
+      "UpdateTime",
+      "TotalWorth",
+      "TradeSum",
+      "LentQty"
+    ],
     "bankField": "Bank",
     "amountField": "Amount",
     "dataField": "Data",
@@ -111,8 +128,13 @@
     "error": "!error!",
     "tries": 3,
     "nameField": "name",
-    "defaultTableFields": ["name", "last", "syn_diff", "duration_bruto"],
-    "queries" :{
+    "defaultTableFields": [
+      "name",
+      "last",
+      "syn_diff",
+      "duration_bruto"
+    ],
+    "queries": {
       "stockField": "http://localhost:4071/aoc/core/AocRT/getdata?s=XXX&f=",
       "stockFields": "http://localhost:4071/aoc/core/AocRT/getmanyfields?s=XXX&f=",
       "aceFields": "http://localhost:4071/Aoc/Core/AocRT/getallfields?",

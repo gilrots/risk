@@ -102,18 +102,28 @@ async function getFilterMakerData() {
     return Filters.getFilterMetadata();
 }
 
-async function getConflicts() {
-    return [{
-        id:'3234',
-        name:'2323',
-        short:'3234',
-        long:'3234',
-        accounts:'3234',
-    }];
+async function getConflicts(params) {
+    const accounts = await DB.getUserAccounts(params);
+    if(_.isEmpty(accounts)){
+        throw new AceError("No accounts are registered to this user");
+    }
+    const conflicts = Bank.getConflicts(accounts);
+    let names = await Ace.getStocksNames(_.map(conflicts,'id'));
+    names  = _.keyBy(names,'id');
+    const response = _.map(conflicts, conf => _.assign(conf,names[conf.id]));
+    console.log(response);
+    return response;
 }
 
-async function getLoans() {
-    return [];
+async function getLoans(params) {
+    const accounts = await DB.getUserAccounts(params);
+    if(_.isEmpty(accounts)){
+        throw new AceError("No accounts are registered to this user");
+    }
+    const loans = Bank.getLoans(accounts);
+    let names = await Ace.getStocksNames(_.map(loans,'id'));
+    names  = _.keyBy(names,'id');
+    return _.map(loans, loan => _.assign(loan,names[loan.id]));
 }
 
 async function searchAceFields(params) {

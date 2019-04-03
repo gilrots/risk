@@ -45,9 +45,11 @@ class ConflictList extends React.Component {
                                     <th scope="row">{index + 1}</th>
                                     <td>{conflict.id}</td>
                                     <td>{conflict.name}</td>
-                                    <td>{conflict.long}</td>
-                                    <td>{conflict.short}</td>
-                                    <td>{conflict.accounts}</td>
+                                    <td className="longs">{conflict.long.toLocaleString('us')}</td>
+                                    <td className="shorts">{conflict.short.toLocaleString('us')}</td>
+                                    <td>{conflict.accounts.map(acnt =>
+                                        <Badge color="primary" key={acnt}>{acnt}</Badge>
+                                    )}</td>
                                 </tr>)}
                             </tbody>
                         </Table>}

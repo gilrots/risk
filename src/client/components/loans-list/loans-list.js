@@ -47,7 +47,7 @@ class LoansList extends React.Component {
                                     <td>{loan.name}</td>
                                     <td>{loan.account}</td>
                                     <td>{loan.bank}</td>
-                                    <td>{loan.amount}</td>
+                                    <td>{loan.loan.toLocaleString('us')}</td>
                                 </tr>)}
                             </tbody>
                         </Table>}

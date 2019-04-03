@@ -8,6 +8,7 @@ const accntsField = `${accntField}s`;
 const banksField = `${bankField}s`;
 const sdqField = fields[3];
 const fqField = fields[6];
+const lntField = fields[11];
 const presentationFields = [
     {id:idField,name:'מזהה נייר'},
     {id:amountField,name:'כמות'},
@@ -38,6 +39,14 @@ function calcAmount(bankData) {
 
 function getAmount(stock) {
     return stock[amountField];
+}
+
+function getLoan(stock) {
+    return stock[lntField];
+}
+
+function getAmounts(stock, filter) {
+    return getAggregatedData(stock, amountField, filter);
 }
 
 function getTotalAmount(stock, filter) {
@@ -85,7 +94,7 @@ function setAccount(stock, account) {
 }
 
 function setAccounts(stock) {
-    return stock[accntsField] = getAggregatedData(stock,getAccount);
+    return stock[accntsField] = getAggregatedData(stock,accntField);
 }
 
 function setBanks(stock) {
@@ -138,10 +147,65 @@ function getLongShortIds(){
 }
 
 function getCustomDBSnap(excludes, accounts, intras, ipos){
-    const snap = Utils.copy(DB);
-    addIntrasAndIPOs(snap, intras, ipos);
-    filter(snap, excludes, accounts);
-    return snap;
+    const bankSnap = Utils.copy(DB);
+    addIntrasAndIPOs(bankSnap, intras, ipos);
+    const divider = (id,params) => {
+        const {snap, accntMap} = params;
+        const stock = snap.all[id];
+        setAmount(stock, getTotalAmount(stock,s => accntMap[getAccount(s)]));
+        const type = getStockType(stock);
+        snap[type][id] = stock;
+        if(type !== stockTypes.none){
+            snap.ids.push(id);
+        }
+    };
+    filter(bankSnap, excludes, accounts.concat(sysAccount), divider);
+    return bankSnap;
+}
+
+function getConflicts(accounts){
+    const bankSnap = Utils.copy(DB);
+    bankSnap.conflicts = [];
+    const divider = (id,params) => {
+        const {snap, accntMap} = params;
+        const stock = snap.all[id];
+        const amounts = getAmounts(stock, s => accntMap[getAccount(s)]);
+        if(amounts > 1 && amounts.some(a=> a > 0) && amounts.some(a=> a < 0)){
+            const conf = _.partition(amounts, a => a > 0);
+            snap.conflicts.push({
+                id: id,
+                long: _.sum(conf[0]),
+                short: _.sum(conf[1]),
+                accounts: getAccounts(stock, s => accntMap[getAccount(s)])
+            }); 
+        } 
+    };
+    filter(bankSnap, [], accounts, divider);
+    return bankSnap.conflicts;
+}
+
+function getLoans(accounts){
+    const bankSnap = Utils.copy(DB);
+    bankSnap.loans = [];
+    const divider = (id,params) => {
+        const {snap, accntMap} = params;
+        const stock = snap.all[id];
+        const data = getData(stock);
+        _.forEach(data, bankData => {
+            const accnt = getAccount(bankData);
+            const loan = getLoan(bankData);
+            if(accntMap[accnt] && loan && loan > 0) {
+                snap.loans.push({
+                    id: id,
+                    bank: banks[getBank(bankData)],
+                    account: accnt,
+                    loan: loan,
+                }); 
+            } 
+        })
+    };
+    filter(bankSnap, [], accounts, divider);
+    return bankSnap.loans;
 }
 
 function getStockType(stock){
@@ -154,20 +218,12 @@ function addIntrasAndIPOs(bankSnap, intras, ipos){
     _.forEach(ipos, ipo => updateStocks(fakeStock(ipo.id,ipo.amount), origins.ipo, bankSnap));
 }
 
-function filter(bankSnap, excludes, accounts){
+function filter(bankSnap, excludes, accounts, divider){
     const excldMap = _.keyMap(excludes,() => true)
-    const accntMap = _.keyMap(accounts.concat(sysAccount),() => true);
+    const accntMap = _.keyMap(accounts,() => true);
     const predicate = id => !excldMap[id] && getAccounts(bankSnap.all[id]).some(acct => accntMap[acct]);
-    const divider = id => {
-        const stock = bankSnap.all[id];
-        setAmount(stock, getTotalAmount(stock,s => accntMap[getAccount(s)]));
-        const type = getStockType(stock);
-        bankSnap[type][id] = stock;
-        if(type !== stockTypes.none){
-            bankSnap.ids.push(id);
-        }
-    };
-    _.chain(bankSnap.all).keys().filter(predicate).forEach(divider).value();
+    const params = {accntMap:accntMap, snap:bankSnap};
+    _.chain(bankSnap.all).keys().filter(predicate).forEach(id => divider(id, params)).value();
 }
 
 function updateBankLatency(bankData){
@@ -213,5 +269,7 @@ module.exports = {
     getCustomDBSnap,
     getFields,
     getBankLatency,
-    getLongShortIds
+    getLongShortIds,
+    getConflicts,
+    getLoans
 };
