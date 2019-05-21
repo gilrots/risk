@@ -87,6 +87,16 @@ class StockViewer extends React.Component {
         const rows = originalRows.slice(0);
         return { originalRows, rows };
     }
+    
+    getFormat(col){
+        if(!_.isNil(col.style) && !_.isNil(col.format))
+            return props => <div className={col.style}> {Formatters[col.format](props)}</div>;
+        if(!_.isNil(col.style))
+            return props => <div className={col.style}>{props.value}</div>;
+        if(!_.isNil(col.format))
+            return Formatters[col.format];
+        return undefined;
+    }
 
     createColumns(props) {
         let res =  _.filter(props.stocks.cols,'visible').map(col => ({
@@ -94,7 +104,7 @@ class StockViewer extends React.Component {
             name: col.name,
             sortable: true,
             resizable: true,
-            formatter: !_.isNil(col.format) ? Formatters[col.format] : undefined
+            formatter: this.getFormat(col)
         }));
         this.cellActions = props.excludeMode && res.length > 0 ? {
             [res[0].key]: this.rowActions
@@ -119,7 +129,6 @@ class StockViewer extends React.Component {
  
     rowRenderer = ({ renderBaseRow, ...props }) => 
         <div className={`${props.row.origin}-ROW`}>
-            {console.log(props)}
             <div id={`ROW-ID-${props.row.id}`}>{renderBaseRow(props)}</div>
             <UncontrolledCollapse toggler={`ROW-ID-${props.row.id}`}>
                 <Card>
@@ -143,10 +152,11 @@ class StockViewer extends React.Component {
                     rowsCount={rows.length}
                     getCellActions={this.getCellActions}
                     rowRenderer={this.rowRenderer}
+                    minHeight={800}
                     rowHeight={20}/>
               </RiskLoader>;
     }
 }
-//minHeight={800}
+//
 
 export default StockViewer;

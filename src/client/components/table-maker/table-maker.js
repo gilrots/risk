@@ -5,10 +5,10 @@ import { Container, Row, Col, Input, InputGroup, InputGroupAddon,
     DropdownToggle, DropdownMenu, DropdownItem, UncontrolledDropdown } from "reactstrap";
 import PropTypes from "prop-types";
 import SearchDropdown from "../search-dropdown/search-dropdown";
-import {post, notify} from "../../helpers/client-utils"
+import {post, notify, addOrRemoveString} from "../../helpers/client-utils"
 import {FormattersMenu} from '../stock-viewer/formatters';
 const api = require('../../../common/config').server.api;
-
+const styleClasses = ['bold-row'];
 const defaults = {
     param: { source: "ace", item: { id: "name" } },
     agg: { key: '', exp: '' },
@@ -282,6 +282,15 @@ class TableMaker extends React.Component {
                                             (<DropdownItem onClick={e => this.setColData(index, 'format', item.id)} key={item.id}>{item.name}</DropdownItem>))}
                                         </DropdownMenu>
                                     </UncontrolledDropdown>
+                                </Col>
+                            </Row>
+                            <Row className="my-3">
+                                <Col>
+                                    Style
+                                    <Button className="ml-1" color={col.style && col.style.includes(styleClasses[0]) ?"primary":"secondary"}
+                                            onClick={() => this.setColData(index, 'style',addOrRemoveString(col.style, styleClasses[0]))} >
+                                            <i className="fa fa-bold" />
+                                    </Button>
                                 </Col>
                             </Row>
                         </Container> : "Choose column to view or edit"}

@@ -74,7 +74,8 @@ const defaultTable = {
                     ace: [defaultAce[0]]
                 },
                 aggregations: [],
-            }
+            },
+            style:"bold-row"
         },
         {
             ...defaultCols[1],
@@ -440,7 +441,8 @@ async function createTable(params) {
                         arguments: calc.arguments,
                         aggregations: calc.aggregations
                     },
-                    format: col.format
+                    format: col.format,
+                    style: col.style
                 };
             };
             data.cols = data.cols.map(parseCol);
@@ -580,7 +582,8 @@ function tableToClient(table) {
                 exp: parseExpression(col.func.exp, calc.argsMap),
                 params: calc.params,
                 aggregations: calc.aggregations.reverse(),
-                format: col.format
+                format: col.format,
+                style: col.style
             };
         };
         result.cols = table.cols.map(deparseCol);

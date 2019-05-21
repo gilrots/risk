@@ -30,6 +30,10 @@ html, body, #root {
     overflow: visible
 }
 
+.bold-row {
+    font-weight: bold;
+}
+
 .maxz {
     z-index: 10000;
     top: 100%;

@@ -49,6 +49,10 @@ export function notify(component, response, title, message = "Action completed!"
     }
 }
 
+export function addOrRemoveString(string, addon) {
+    return _.isEmpty(string) ? addon : (string.includes(addon) ? string.replace(addon, "") : `${string} ${addon}`)
+}
+
 export function exportCSV(name, tables, formatters) {
    return new Promise(resolve => {
         const totalCols = _.sumBy(tables,'table.cols.length') + tables.length;
