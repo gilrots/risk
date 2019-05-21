@@ -4,7 +4,7 @@
       "port": 80,
       "api": "/gili",
       "mock": {
-        "allow": true,
+        "allow": false,
         "interval": 200
       }
     },

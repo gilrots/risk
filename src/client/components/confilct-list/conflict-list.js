@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import * as Utils from '../../../common/utils';
-import {Container, Table} from "reactstrap";
+import {Container, Table, Badge} from "reactstrap";
 import RiskLoader from "../loader/loader";
 import {get} from "../../helpers/client-utils"
 const config = require('../../../common/config');

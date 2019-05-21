@@ -170,7 +170,8 @@ function getConflicts(accounts){
         const {snap, accntMap} = params;
         const stock = snap.all[id];
         const amounts = getAmounts(stock, s => accntMap[getAccount(s)]);
-        if(amounts > 1 && amounts.some(a=> a > 0) && amounts.some(a=> a < 0)){
+        if(amounts.length > 1 && amounts.some(a=> a > 0) && amounts.some(a=> a < 0)){
+        
             const conf = _.partition(amounts, a => a > 0);
             snap.conflicts.push({
                 id: id,

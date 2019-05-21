@@ -1,9 +1,11 @@
 import {Formatters,FormattersFuncs} from "./formatters";
 const ReactDataGrid = require('react-data-grid');
 const React = require('react');
+import {UncontrolledCollapse, Button, Card, CardBody,CardSubtitle, CardTitle, Badge} from 'reactstrap';
 import _ from 'lodash';
 import PropTypes from "prop-types";
 import RiskLoader from "../loader/loader";
+import BankViewer from "./bank-viewer";
 
 const sd = {
     none: "NONE",
@@ -114,8 +116,21 @@ class StockViewer extends React.Component {
 
     //TODO: make this efficient
     getCellActions = (col,row) => this.changeCallback(this.cellActions[col.key],{col,row});
-
-    rowRenderer = ({ renderBaseRow, ...props }) => <div className={`${props.row.origin}-ROW`}>{renderBaseRow(props)}</div>;
+ 
+    rowRenderer = ({ renderBaseRow, ...props }) => 
+        <div className={`${props.row.origin}-ROW`}>
+            {console.log(props)}
+            <div id={`ROW-ID-${props.row.id}`}>{renderBaseRow(props)}</div>
+            <UncontrolledCollapse toggler={`ROW-ID-${props.row.id}`}>
+                <Card>
+                    <CardBody>
+                        <CardTitle>{props.row.name}</CardTitle>
+                        <CardSubtitle>{`ID: ${props.row.id}`}</CardSubtitle>
+                        {props.row.banks && <BankViewer value={props.row.banks}></BankViewer>}
+                    </CardBody>
+                </Card>
+            </UncontrolledCollapse>
+        </div>;
 
     render() {
         const {cols,rows} = this.state;

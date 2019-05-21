@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import React, { Fragment } from 'react';
-import { UncontrolledButtonDropdown,DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
-const bankToColor = require('../../../common/config').bank.colors;
-const bankToName = require('../../../common/config').bank.banks;
+import React from 'react';
+import BankViewer from './bank-viewer';
 
 const err = '---';
 function formatNumber(value, func){
@@ -14,20 +12,7 @@ export const percentFormatter100 = value => formatNumber(value, num => (num * 10
 export const commasFormatter = value => formatNumber(value, num => Math.floor(num).toLocaleString('us'));
 export const fix1Formatter = value => formatNumber(value, num => num.toFixed(1));
 export const fix2Formatter = value => formatNumber(value, num => num.toFixed(2));
-export const badgesFormatter =  value => _.map(_.keys(value), val => val &&
-<UncontrolledButtonDropdown  key={val}>
-      <DropdownToggle caret  color={bankToColor[val]}>
-        {_.upperFirst(val)[0]}
-      </DropdownToggle>
-      <DropdownMenu>
-        <DropdownItem header>{bankToName[val]}</DropdownItem>
-        <DropdownItem divider/>{
-            _.map(value[val], v => <DropdownItem key={v}>{v}</DropdownItem>)
-        }
-      </DropdownMenu>
-    </UncontrolledButtonDropdown>
-);
-export const listFormatter = value => formatNumber(value, num => num.toFixed(2));
+export const badgesFormatter = value => <BankViewer readonly={true} value={value}/>;
 
 export function getFormatter(func) {
     return props => func(props.value);
@@ -52,10 +37,7 @@ export const FormattersMap = [
     },{
         name: 'Badges',
         func: badgesFormatter
-    },{
-        name: 'List',
-        func: listFormatter
-    }
+    },
 ];
 _.forEach(FormattersMap, (f,i) => f.id = i);
 export const FormattersFuncs = _.map(FormattersMap,'func');

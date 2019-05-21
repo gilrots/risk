@@ -111,7 +111,6 @@ async function getConflicts(params) {
     let names = await Ace.getStocksNames(_.map(conflicts,'id'));
     names  = _.keyBy(names,'id');
     const response = _.map(conflicts, conf => _.assign(conf,names[conf.id]));
-    console.log(response);
     return response;
 }
 
